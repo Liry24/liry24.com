@@ -1,0 +1,103 @@
+---
+import { Icon } from 'astro-icon/components';
+import { Image } from 'astro:assets';
+import Layout from '../layouts/default.astro';
+import Button from '../components/button.astro';
+
+import LiriaGraphicsLogo from '../../public/logo_liria_graphics.png';
+import AvatioLogo from '../../public/logo_avatio.svg';
+---
+
+<Layout>
+    <div class="h-screen flex flex-col items-center justify-center gap-8">
+        <h1
+            class="pb-8 pl-[1rem] text-xl font-extralight tracking-[1rem] text-zinc-400"
+        >
+            Liry24
+        </h1>
+
+        <div class="w-full flex flex-col gap-2">
+            <Button
+                to="https://liria.work"
+                class="w-full py-10 bg-zinc-900 hover:bg-zinc-800"
+            >
+                <Icon name="liria" size="42" />
+            </Button>
+
+            <div class="w-full grid grid-cols-2 gap-2">
+                <Button
+                    to="https://eicosapenta.booth.pm"
+                    class="group relative w-full py-6 overflow-hidden"
+                >
+                    <div class="max-w-48 flex items-center gap-4">
+                        <Image
+                            src={LiriaGraphicsLogo}
+                            alt="Liria Graphics Logo"
+                            class="shrink pt-2 select-none"
+                        />
+                    </div>
+                </Button>
+                <Button to="https://avatio.me" class="w-full py-6 gap-4">
+                    <div class="max-w-48 max-h-12 flex items-center gap-4">
+                        <Image
+                            src={AvatioLogo}
+                            alt="Avatio Logo"
+                            width={124}
+                            class="shrink select-none"
+                        />
+                    </div>
+                </Button>
+            </div>
+        </div>
+
+        <div class="flex flex-col items-center justify-center gap-2">
+            <h2 class="pl-[0.75rem] tracking-[0.75rem] font-bold text-zinc-400">
+                create
+            </h2>
+            <div class="flex flex-wrap items-center justify-center gap-2">
+                <Button to="https://www.artstation.com/liry24">
+                    <Icon name="simple-icons:artstation" size="24" />
+                </Button>
+                <Button to="https://github.com/Liry24">
+                    <Icon name="simple-icons:github" size="24" />
+                </Button>
+            </div>
+        </div>
+
+        <div class="flex flex-col items-center justify-center gap-2">
+            <h2 class="pl-[0.75rem] tracking-[0.75rem] font-bold text-zinc-400">
+                persona
+            </h2>
+            <div class="flex flex-wrap items-center justify-center gap-2">
+                <Button
+                    to="https://avatio.me/@aed3763b-0e15-46e1-b44d-b9a0d5390332"
+                >
+                    <Icon name="avatio" size="24" />
+                </Button>
+                <Button to="https://x.com/Liry24g">
+                    <Icon name="simple-icons:x" size="24" />
+                </Button>
+                <Button to="https://discord.com/users/365789612024659969">
+                    <Icon name="simple-icons:discord" size="24" />
+                </Button>
+                <Button to="https://spti.fi/liry24">
+                    <Icon name="simple-icons:spotify" size="24" />
+                </Button>
+                <Button to="https://steamcommunity.com/id/Liry24">
+                    <Icon name="simple-icons:steam" size="24" />
+                </Button>
+                <Button
+                    to="https://tracker.gg/valorant/profile/riot/Liry%23yoshi/overview"
+                >
+                    <Icon name="simple-icons:valorant" size="24" />
+                </Button>
+                <Button to="https://plsdb.com/profile/liry24">
+                    <Icon name="lucide:gamepad-2" size="24" />
+                </Button>
+                <Button to="https://geartics.com/liry24">
+                    <Icon name="lucide:monitor-smartphone" size="24" />
+                </Button>
+            </div>
+        </div>
+    </div>
+</Layout>
