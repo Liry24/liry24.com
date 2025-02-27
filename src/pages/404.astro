@@ -1,0 +1,24 @@
+---
+import { Icon } from 'astro-icon/components';
+import { Image } from 'astro:assets';
+import Layout from '../layouts/default.astro';
+import Button from '../components/button.astro';
+
+import LiriaGraphicsLogo from '../../public/logo_liria_graphics.png';
+import AvatioLogo from '../../public/logo_avatio.svg';
+
+import { links } from '../utils/microCms';
+---
+
+<Layout>
+    <div class="h-screen flex flex-col items-center justify-center gap-8">
+        <h1
+            class="pb-8 pl-[1rem] text-6xl font-extralight tracking-[1rem] text-zinc-400"
+        >
+            404
+        </h1>
+        <Button to="/">
+            <Icon name="lucide:arrow-left" size="22" class="text-zinc-500" />
+        </Button>
+    </div>
+</Layout>

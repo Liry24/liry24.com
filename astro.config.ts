@@ -5,30 +5,10 @@ import icon from 'astro-icon';
 import vercel from '@astrojs/vercel';
 import react from '@astrojs/react';
 
-import { links } from './src/utils/microCms';
-
-const redirects: Record<string, string> = {
-    '/liria': links.liria,
-    '/booth': links.booth,
-    '/avatio-site': links.avatio,
-    ...Object.fromEntries(
-        links.create.map((link) => [
-            `/${link.slug}`,
-            { status: 302, destination: link.url },
-        ])
-    ),
-    ...Object.fromEntries(
-        links.persona.map((link) => [
-            `/${link.slug}`,
-            { status: 302, destination: link.url },
-        ])
-    ),
-};
-
 // https://astro.build/config
 export default defineConfig({
     site: 'https://liry24.com',
-    output: 'static',
+    output: 'server',
     adapter: vercel({
         webAnalytics: {
             enabled: true,
@@ -38,5 +18,4 @@ export default defineConfig({
     vite: {
         plugins: [tailwindcss()],
     },
-    redirects: redirects,
 });
