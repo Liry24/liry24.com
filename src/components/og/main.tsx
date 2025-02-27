@@ -25,6 +25,7 @@ const layout = () => {
                     fontWeight: 'light',
                     letterSpacing: '0.5em',
                     color: 'white',
+                    paddingLeft: '0.5em',
                 }}
             >
                 Liry24
