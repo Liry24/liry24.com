@@ -23,6 +23,7 @@
         "astro": "^5.3.1",
         "astro-icon": "^1.1.5",
         "astro-seo": "^0.8.4",
+        "microcms-js-sdk": "^3.1.2",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
         "tailwind-merge": "^3.0.2",
