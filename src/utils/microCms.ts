@@ -1,15 +1,8 @@
-import { loadEnv } from 'vite';
 import { createClient } from 'microcms-js-sdk';
 
-const { MICROCMS_SERVICE_DOMAIN, MICROCMS_API_KEY } = loadEnv(
-    process.env.NODE_ENV || 'development',
-    process.cwd(),
-    ''
-);
-
 const client = createClient({
-    serviceDomain: MICROCMS_SERVICE_DOMAIN,
-    apiKey: MICROCMS_API_KEY,
+    serviceDomain: import.meta.env.MICROCMS_SERVICE_DOMAIN,
+    apiKey: import.meta.env.MICROCMS_API_KEY,
 });
 
 type Link = {
