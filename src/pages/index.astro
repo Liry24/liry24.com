@@ -1,13 +1,13 @@
 ---
 import { Icon } from 'astro-icon/components';
 import { Image } from 'astro:assets';
-import Layout from '../layouts/default.astro';
-import Button from '../components/button.astro';
+import Layout from '@/layouts/default.astro';
+import Button from '@/components/button.astro';
 
-import LiriaGraphicsLogo from '../../public/logo_liria_graphics.png';
-import AvatioLogo from '../../public/logo_avatio.svg';
+import LiriaGraphicsLogo from '@public/logo_liria_graphics.png';
+import AvatioLogo from '@public/logo_avatio.svg';
 
-import { links } from '../utils/microCms';
+import { links } from '@/utils/microCms';
 ---
 
 <Layout>
@@ -19,10 +19,7 @@ import { links } from '../utils/microCms';
         </h1>
 
         <div class="w-full flex flex-col gap-2">
-            <Button
-                to={links.liria}
-                class="w-full py-10 bg-zinc-900 hover:bg-zinc-800"
-            >
+            <Button to={links.liria} class="w-full py-10 hover:bg-zinc-800">
                 <Icon name="liria" size="42" />
             </Button>
 
@@ -65,6 +62,28 @@ import { links } from '../utils/microCms';
                             <Icon name={link.icon} size={link.iconSize ?? 24} />
                         </Button>
                     ))
+                }
+            </div>
+        </div>
+
+        <div class="flex flex-col items-center justify-center gap-2">
+            <h2
+                class="pl-[0.75rem] tracking-[0.75rem] font-extralight text-zinc-400"
+            >
+                social
+            </h2>
+            <div class="flex flex-wrap items-center justify-center gap-2">
+                {
+                    links.social
+                        .filter((link) => !link.hidden)
+                        .map((link) => (
+                            <Button to={link.url}>
+                                <Icon
+                                    name={link.icon}
+                                    size={link.iconSize ?? 24}
+                                />
+                            </Button>
+                        ))
                 }
             </div>
         </div>

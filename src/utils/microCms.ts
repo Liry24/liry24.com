@@ -18,6 +18,7 @@ interface Links {
     booth: string;
     avatio: string;
     create: Link[];
+    social: Link[];
     persona: Link[];
 }
 
