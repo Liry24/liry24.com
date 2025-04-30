@@ -1,14 +1,14 @@
 ---
-import { twMerge } from 'tailwind-merge';
+import { twMerge } from 'tailwind-merge'
 
 interface Props {
-    to?: string;
-    tabindex?: number;
-    class?: string;
+    to?: string
+    tabindex?: number
+    class?: string
 }
-const { to, tabindex, class: className } = Astro.props;
+const { to, tabindex, class: className } = Astro.props
 
-const Element = to?.length ? 'a' : 'button';
+const Element = to?.length ? 'a' : 'button'
 ---
 
 <Element

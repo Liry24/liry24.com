@@ -1,8 +1,8 @@
-import { generate } from './generate';
+import { generate } from './generate'
 
 export const OG = async () => {
-    return await generate(layout());
-};
+    return await generate(layout())
+}
 
 const layout = () => {
     return (
@@ -31,5 +31,5 @@ const layout = () => {
                 Liry24
             </span>
         </div>
-    );
-};
+    )
+}

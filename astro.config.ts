@@ -1,9 +1,9 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
-import tailwindcss from '@tailwindcss/vite';
-import icon from 'astro-icon';
-import vercel from '@astrojs/vercel';
-import react from '@astrojs/react';
+import { defineConfig, fontProviders } from 'astro/config'
+import tailwindcss from '@tailwindcss/vite'
+import icon from 'astro-icon'
+import vercel from '@astrojs/vercel'
+import react from '@astrojs/react'
 
 // https://astro.build/config
 export default defineConfig({
@@ -18,4 +18,14 @@ export default defineConfig({
     vite: {
         plugins: [tailwindcss()],
     },
-});
+    experimental: {
+        fonts: [
+            {
+                provider: fontProviders.google(),
+                name: 'Geist',
+                cssVariable: '--font-geist',
+                weights: [100, 200, 300, 400, 500, 600, 700, 800, 900],
+            },
+        ],
+    },
+})

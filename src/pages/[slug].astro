@@ -1,19 +1,11 @@
 ---
-import { links } from '@/utils/microCms';
+import { redirects } from "@/utils/redirects"
 
-const slug = Astro.params.slug;
+const slug = Astro.params.slug
 
-if (!slug) return Astro.redirect('/');
-
-const redirects: Record<string, string> = {
-    liria: links.liria,
-    booth: links.booth,
-    avatio: links.avatio,
-    ...Object.fromEntries(links.create.map(({ slug, url }) => [slug, url])),
-    ...Object.fromEntries(links.persona.map(({ slug, url }) => [slug, url])),
-};
+if (!slug) return Astro.redirect('/')
 
 if (Object.keys(redirects).includes(slug))
-    return Astro.redirect(redirects[slug]);
-else return Astro.rewrite('/404');
+    return Astro.redirect(redirects[slug])
+else return Astro.rewrite('/404')
 ---

@@ -1,111 +1,212 @@
 ---
-import { Icon } from 'astro-icon/components';
-import { Image } from 'astro:assets';
-import Layout from '@/layouts/default.astro';
-import Button from '@/components/button.astro';
+import { Icon } from 'astro-icon/components'
+import { Image } from 'astro:assets'
+import Layout from '@/layouts/default.astro'
 
-import LiriaGraphicsLogo from '@public/logo_liria_graphics.png';
-import AvatioLogo from '@public/logo_avatio.svg';
+import AvatioLogo from '@public/logo_avatio.svg'
 
-import { links } from '@/utils/microCms';
+const create = [
+    {
+        url: '/github',
+        label: 'GitHub',
+        icon: 'simple-icons:github',
+        iconSize: 20,
+    },
+    {
+        url: '/artstation',
+        label: 'ArtStation',
+        icon: 'simple-icons:artstation',
+        iconSize: 20,
+    },
+]
+
+const social = [
+    {
+        url: '/x',
+        label: 'Twitter',
+        icon: 'simple-icons:twitter',
+        iconSize: 20,
+    },
+    {
+        url: '/discord',
+        label: 'Discord',
+        icon: 'simple-icons:discord',
+        iconSize: 20,
+    },
+    {
+        url: '/vrchat',
+        label: 'VRChat',
+        icon: 'mingcute:message-2-fill',
+        iconSize: 20,
+    },
+    {
+        url: '/avatio',
+        label: 'Avatio',
+        icon: 'avatio',
+        iconSize: 20,
+    },
+]
+
+const persona = [
+    {
+        url: '/spotify',
+        label: 'Spotify',
+        icon: 'simple-icons:spotify',
+        iconSize: 20,
+    },
+    {
+        url: '/steam',
+        label: 'Steam',
+        icon: 'simple-icons:steam',
+        iconSize: 20,
+    },
+    {
+        url: '/valorant',
+        label: 'Valorant',
+        icon: 'simple-icons:valorant',
+        iconSize: 20,
+    },
+    {
+        url: '/pulse',
+        label: 'Pulse',
+        icon: 'mingcute:game-2-fill',
+        iconSize: 20,
+    },
+    {
+        url: '/geartics',
+        label: 'Geartics',
+        icon: 'mingcute:device-fill',
+        iconSize: 20,
+    },
+]
 ---
 
 <Layout>
-    <div class="h-screen flex flex-col items-center justify-center gap-8">
+    <div class="mt-20 flex flex-col items-start gap-14">
         <h1
-            class="pb-8 pl-[1rem] text-xl font-extralight tracking-[1rem] text-zinc-400"
+            class="text-xl leading-none font-light tracking-[1rem] whitespace-nowrap text-zinc-300"
         >
             Liry24
         </h1>
 
-        <div class="w-full flex flex-col gap-2">
-            <Button to={links.liria} class="w-full py-10 hover:bg-zinc-800">
-                <Icon name="liria" size="42" />
-            </Button>
+        <div class="-my-4 h-px w-full bg-zinc-800"></div>
 
-            <div class="w-full grid grid-cols-2 gap-2">
-                <Button
-                    to={links.booth}
-                    class="group relative w-full py-6 overflow-hidden"
+        <div class="flex flex-col gap-6">
+            <a
+                href="https://liria.work"
+                target="_blank"
+                class="flex items-center gap-3 transition-opacity hover:opacity-60 focus-visible:opacity-60"
+            >
+                <span
+                    class="text-sm leading-none font-extralight tracking-[0.6rem] whitespace-nowrap text-zinc-400"
                 >
-                    <div class="max-w-48 flex items-center gap-4">
-                        <Image
-                            src={LiriaGraphicsLogo}
-                            alt="Liria Graphics Logo"
-                            class="shrink pt-2 select-none"
-                        />
-                    </div>
-                </Button>
-                <Button to={links.avatio} class="w-full py-6 gap-4">
-                    <div class="max-w-48 max-h-12 flex items-center gap-4">
-                        <Image
-                            src={AvatioLogo}
-                            alt="Avatio Logo"
-                            width={124}
-                            class="shrink select-none"
-                        />
-                    </div>
-                </Button>
+                    //
+                </span>
+                <Icon name="liria" size="20" class="mr-1.5 text-zinc-400" />
+                <h2
+                    class="text-sm leading-none font-extralight tracking-[0.6rem] whitespace-nowrap text-zinc-400"
+                >
+                    Liria
+                </h2>
+            </a>
+
+            <div class="flex items-start gap-7">
+                <a
+                    href="https://excosapenta.booth.pm"
+                    target="_blank"
+                    class="flex items-baseline transition-opacity hover:opacity-60 focus-visible:opacity-60"
+                >
+                    <span class="text-4xl font-bold tracking-tight">
+                        Liria
+                    </span>
+                    <span class="text-4xl font-thin tracking-tight">
+                        Graphics
+                    </span>
+                </a>
+                <a
+                    href="https://avatio.me"
+                    target="_blank"
+                    class="flex items-center transition-opacity hover:opacity-60 focus-visible:opacity-60"
+                >
+                    <Image
+                        src={AvatioLogo}
+                        alt="Avatio Logo"
+                        width={108}
+                        loading="eager"
+                        class="shrink select-none"
+                    />
+                </a>
             </div>
         </div>
 
-        <div class="flex flex-col items-center justify-center gap-2">
+        <div class="flex flex-col items-start gap-6">
             <h2
-                class="pl-[0.75rem] tracking-[0.75rem] font-extralight text-zinc-400"
+                class="text-sm leading-none font-extralight tracking-[0.6rem] whitespace-nowrap text-zinc-400"
             >
-                create
+                // create
             </h2>
-            <div class="flex flex-wrap items-center justify-center gap-2">
+            <div class="flex flex-wrap items-start gap-5">
                 {
-                    links.create.map((link) => (
-                        <Button to={link.url}>
-                            <Icon name={link.icon} size={link.iconSize ?? 24} />
-                        </Button>
+                    create.map((link) => (
+                        <a
+                            href={link.url}
+                            target="_blank"
+                            class="flex items-center gap-3 transition-opacity hover:opacity-60 focus-visible:opacity-60"
+                        >
+                            <Icon name={link.icon} size={link.iconSize} />
+                            <span class="text-sm font-light tracking-[0.4rem] text-zinc-300">
+                                {link.label}
+                            </span>
+                        </a>
                     ))
                 }
             </div>
         </div>
 
-        <div class="flex flex-col items-center justify-center gap-2">
+        <div class="flex flex-col items-start gap-6">
             <h2
-                class="pl-[0.75rem] tracking-[0.75rem] font-extralight text-zinc-400"
+                class="text-sm leading-none font-extralight tracking-[0.6rem] whitespace-nowrap text-zinc-400"
             >
-                social
+                // social
             </h2>
-            <div class="flex flex-wrap items-center justify-center gap-2">
+            <div class="flex flex-wrap items-start gap-5">
                 {
-                    links.social
-                        .filter((link) => !link.hidden)
-                        .map((link) => (
-                            <Button to={link.url}>
-                                <Icon
-                                    name={link.icon}
-                                    size={link.iconSize ?? 24}
-                                />
-                            </Button>
-                        ))
+                    social.map((link) => (
+                        <a
+                            href={link.url}
+                            target="_blank"
+                            class="flex items-center gap-3 transition-opacity hover:opacity-60 focus-visible:opacity-60"
+                        >
+                            <Icon name={link.icon} size={link.iconSize} />
+                            <span class="text-sm font-light tracking-[0.4rem] text-zinc-300">
+                                {link.label}
+                            </span>
+                        </a>
+                    ))
                 }
             </div>
         </div>
 
-        <div class="flex flex-col items-center justify-center gap-2">
+        <div class="flex flex-col items-start gap-6">
             <h2
-                class="pl-[0.75rem] tracking-[0.75rem] font-extralight text-zinc-400"
+                class="text-sm leading-none font-extralight tracking-[0.6rem] whitespace-nowrap text-zinc-400"
             >
-                persona
+                // persona
             </h2>
-            <div class="flex flex-wrap items-center justify-center gap-2">
+            <div class="flex flex-wrap items-start gap-5">
                 {
-                    links.persona
-                        .filter((link) => !link.hidden)
-                        .map((link) => (
-                            <Button to={link.url}>
-                                <Icon
-                                    name={link.icon}
-                                    size={link.iconSize ?? 24}
-                                />
-                            </Button>
-                        ))
+                    persona.map((link) => (
+                        <a
+                            href={link.url}
+                            target="_blank"
+                            class="flex items-center gap-3 transition-opacity hover:opacity-60 focus-visible:opacity-60"
+                        >
+                            <Icon name={link.icon} size={link.iconSize} />
+                            <span class="text-sm font-light tracking-[0.4rem] text-zinc-300">
+                                {link.label}
+                            </span>
+                        </a>
+                    ))
                 }
             </div>
         </div>
