@@ -2,8 +2,39 @@
 import { Icon } from 'astro-icon/components'
 import { Image } from 'astro:assets'
 import Layout from '@/layouts/default.astro'
-
+import ToolIcon from '@/components/toolIcon.astro'
 import AvatioLogo from '@public/logo_avatio.svg'
+
+const arts = [
+    {
+        src: 'https://cdna.artstation.com/p/assets/images/images/077/981/164/large/liry24-compo-2.jpg',
+        alt: 'A research',
+    },
+    {
+        src: 'https://cdnb.artstation.com/p/assets/images/images/048/392/847/large/hiroki-yoshida-c-001.jpg',
+        alt: 'Audio Mixer "Pro MIX"',
+    },
+    {
+        src: 'https://cdnb.artstation.com/p/assets/images/images/028/974/657/large/hiroki-yoshida-comp.jpg',
+        alt: 'Danboard',
+    },
+    {
+        src: 'https://cdna.artstation.com/p/assets/images/images/026/192/936/large/hiroki-yoshida-untitled26c.jpg',
+        alt: 'No Parking',
+    },
+    {
+        src: 'https://cdna.artstation.com/p/assets/images/images/025/847/470/large/hiroki-yoshida-compo-lr.jpg',
+        alt: 'Coleman',
+    },
+    {
+        src: 'https://cdna.artstation.com/p/assets/images/images/025/160/038/large/hiroki-yoshida-compo-8.jpg',
+        alt: 'Ticket gate',
+    },
+    {
+        src: 'https://cdnb.artstation.com/p/assets/images/images/024/661/105/large/hiroki-yoshida-compo-2100.jpg',
+        alt: 'Telephones',
+    },
+]
 
 const create = [
     {
@@ -94,6 +125,96 @@ const persona = [
                 <p class="text-sm font-light tracking-[0.3rem] text-zinc-400">
                     3D Artist / Developer / Gamer
                 </p>
+
+                <div class="flex w-full flex-wrap items-center gap-3">
+                    <ToolIcon
+                        label="Blender"
+                        icon="simple-icons:blender"
+                        iconSize={18}
+                    />
+                    <ToolIcon
+                        label="Autodesk Maya"
+                        icon="simple-icons:autodeskmaya"
+                        iconSize={16}
+                    />
+                    <ToolIcon
+                        label="Houdini"
+                        icon="simple-icons:houdini"
+                        iconSize={16}
+                        class="ml-0.5"
+                    />
+                    <ToolIcon
+                        label="Adobe"
+                        icon="ic:baseline-adobe"
+                        iconSize={21}
+                    />
+                    <ToolIcon
+                        label="Affinity"
+                        icon="simple-icons:affinity"
+                        iconSize={17}
+                    />
+                    <ToolIcon
+                        label="DaVinci Resolve"
+                        icon="simple-icons:davinciresolve"
+                        iconSize={17}
+                    />
+                    <ToolIcon
+                        label="Unity"
+                        icon="simple-icons:unity"
+                        iconSize={17}
+                    />
+                    <ToolIcon
+                        label="Visual Studio Code"
+                        icon="simple-icons:visualstudiocode"
+                        iconSize={16}
+                    />
+                    <ToolIcon
+                        label="Git"
+                        icon="simple-icons:git"
+                        iconSize={17}
+                        class="ml-px"
+                    />
+                    <ToolIcon
+                        label="TypeScript"
+                        icon="simple-icons:typescript"
+                        iconSize={16}
+                    />
+                    <ToolIcon
+                        label="Python"
+                        icon="simple-icons:python"
+                        iconSize={16}
+                        class="ml-px"
+                    />
+                    <ToolIcon
+                        label="Nuxt"
+                        icon="simple-icons:nuxt"
+                        iconSize={19}
+                    />
+                    <ToolIcon
+                        label="Astro"
+                        icon="simple-icons:astro"
+                        iconSize={17}
+                        class="-mt-px"
+                    />
+                    <ToolIcon
+                        label="Tauri"
+                        icon="simple-icons:tauri"
+                        iconSize={16}
+                        class="-ml-px"
+                    />
+                    <ToolIcon
+                        label="Tailwind CSS"
+                        icon="simple-icons:tailwindcss"
+                        iconSize={18}
+                        class="-ml-px"
+                    />
+                    <ToolIcon
+                        label="PostgreSQL"
+                        icon="simple-icons:postgresql"
+                        iconSize={17}
+                        class="-ml-0.5"
+                    />
+                </div>
             </div>
 
             <div class="-my-4 h-px w-full bg-zinc-800"></div>
@@ -152,6 +273,21 @@ const persona = [
                 >
                     // create
                 </h2>
+                <div class="flex flex-wrap items-start gap-3">
+                    {
+                        arts.map((art) => (
+                            <Image
+                                src={art.src}
+                                alt={art.alt}
+                                width={96}
+                                height={96}
+                                loading="eager"
+                                fit="cover"
+                                class="size-24 shrink-0 rounded-lg object-cover"
+                            />
+                        ))
+                    }
+                </div>
                 <div class="flex flex-wrap items-start gap-5">
                     {
                         create.map((link) => (

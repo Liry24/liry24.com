@@ -1,0 +1,24 @@
+---
+import { Icon } from 'astro-icon/components'
+
+interface Props {
+    icon: string
+    iconSize?: number | string
+    label: string
+    class?: string
+}
+const { icon, iconSize, label, class: className } = Astro.props
+---
+
+<div class="group relative flex items-center justify-center transition-all">
+    <Icon
+        name={icon}
+        size={iconSize || 18}
+        class={`text-zinc-400 transition-opacity ${className || ''}`}
+    />
+    <p
+        class="absolute left-0 mt-12 text-sm leading-none font-light tracking-[0.3rem] whitespace-nowrap text-zinc-400 opacity-0 transition-opacity group-hover:opacity-100"
+    >
+        {label}
+    </p>
+</div>
