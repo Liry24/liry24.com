@@ -7,39 +7,39 @@ import AvatioLogo from '@public/logo_avatio.svg'
 
 const arts = [
     {
-        url: 'https://www.artstation.com/artwork/obn6Az',
-        src: 'https://cdna.artstation.com/p/assets/images/images/077/981/164/large/liry24-compo-2.jpg',
-        alt: 'A research',
-    },
-    {
-        url: 'https://www.artstation.com/artwork/yJRe6O',
-        src: 'https://cdnb.artstation.com/p/assets/images/images/048/392/847/large/hiroki-yoshida-c-001.jpg',
-        alt: 'Audio Mixer "Pro MIX"',
-    },
-    {
-        url: 'https://www.artstation.com/artwork/R3yWxr',
-        src: 'https://cdnb.artstation.com/p/assets/images/images/028/974/657/large/hiroki-yoshida-comp.jpg',
-        alt: 'Danboard',
-    },
-    {
-        url: 'https://www.artstation.com/artwork/aRAelz',
-        src: 'https://cdna.artstation.com/p/assets/images/images/026/192/936/large/hiroki-yoshida-untitled26c.jpg',
-        alt: 'No Parking',
+        url: 'https://www.artstation.com/artwork/Ya3D0V',
+        src: '/arts/telephones.jpg',
+        alt: 'Telephones',
     },
     {
         url: 'https://www.artstation.com/artwork/Z5yElN',
-        src: 'https://cdna.artstation.com/p/assets/images/images/025/847/470/large/hiroki-yoshida-compo-lr.jpg',
+        src: '/arts/coleman.jpg',
         alt: 'Coleman',
     },
     {
+        url: 'https://www.artstation.com/artwork/obn6Az',
+        src: '/arts/research.jpg',
+        alt: 'A research',
+    },
+    {
+        url: 'https://www.artstation.com/artwork/R3yWxr',
+        src: '/arts/danboard.jpg',
+        alt: 'Danboard',
+    },
+    {
         url: 'https://www.artstation.com/artwork/Vdm48Z',
-        src: 'https://cdna.artstation.com/p/assets/images/images/025/160/038/large/hiroki-yoshida-compo-8.jpg',
+        src: '/arts/gate.jpg',
         alt: 'Ticket gate',
     },
     {
-        url: 'https://www.artstation.com/artwork/Ya3D0V',
-        src: 'https://cdnb.artstation.com/p/assets/images/images/024/661/105/large/hiroki-yoshida-compo-2100.jpg',
-        alt: 'Telephones',
+        url: 'https://www.artstation.com/artwork/yJRe6O',
+        src: '/arts/mixer.jpg',
+        alt: 'Audio Mixer "Pro MIX"',
+    },
+    {
+        url: 'https://www.artstation.com/artwork/aRAelz',
+        src: '/arts/no-parking.jpg',
+        alt: 'No Parking',
     },
 ]
 
@@ -283,7 +283,11 @@ const persona = [
                 <div class="flex flex-wrap items-start gap-3">
                     {
                         arts.map((art) => (
-                            <a href={art.url} target="_blank">
+                            <a
+                                href={art.url}
+                                target="_blank"
+                                class="group relative overflow-hidden rounded-lg"
+                            >
                                 <Image
                                     src={art.src}
                                     alt={art.alt}
@@ -291,8 +295,15 @@ const persona = [
                                     height={96}
                                     loading="eager"
                                     fit="cover"
-                                    class="size-24 shrink-0 rounded-lg object-cover"
+                                    class="size-24 shrink-0 object-cover"
                                 />
+                                <div class="absolute inset-0 flex items-center justify-center bg-zinc-900/50 opacity-0 transition-opacity group-hover:opacity-100">
+                                    <Icon
+                                        name="simple-icons:artstation"
+                                        size={24}
+                                        class="text-zinc-100"
+                                    />
+                                </div>
                             </a>
                         ))
                     }

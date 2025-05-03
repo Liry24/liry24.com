@@ -10,15 +10,84 @@ interface Props {
 const { icon, iconSize, label, class: className } = Astro.props
 ---
 
-<div class="group relative flex items-center justify-center transition-all">
-    <Icon
-        name={icon}
-        size={iconSize || 18}
-        class={`text-zinc-400 transition-opacity ${className || ''}`}
-    />
-    <p
-        class="absolute left-0 mt-12 text-sm leading-none font-light tracking-[0.3rem] whitespace-nowrap text-zinc-400 opacity-0 transition-opacity group-hover:opacity-100"
-    >
-        {label}
-    </p>
+<div
+    class="tool-icon-container relative flex items-center justify-center overflow-hidden"
+>
+    <div class="icon-label-wrapper relative flex items-center justify-center">
+        <Icon
+            name={icon}
+            size={iconSize || 18}
+            class={`tool-icon text-zinc-500 ${className || ''}`}
+        />
+        <p
+            class="tool-label absolute text-sm leading-none font-light tracking-[0.3rem] whitespace-nowrap text-zinc-400"
+        >
+            {label}
+        </p>
+    </div>
 </div>
+
+<script>
+    import { gsap } from 'gsap'
+
+    // すべてのツールアイコンコンテナに対して処理を実行
+    document.querySelectorAll('.tool-icon-container').forEach((container) => {
+        const wrapper = container.querySelector('.icon-label-wrapper')
+        const icon = container.querySelector('.tool-icon') as HTMLElement
+        const label = container.querySelector('.tool-label') as HTMLElement
+
+        // 必要な要素が見つからない場合は処理をスキップ
+        if (!wrapper || !icon || !label) return
+
+        // ラベルの幅を取得（アニメーション用）
+        const labelWidth = label.offsetWidth
+
+        // 初期状態
+        gsap.set(label, {
+            opacity: 0,
+            position: 'absolute',
+            left: '50%',
+            xPercent: -48,
+            pointerEvents: 'none',
+        })
+
+        gsap.set(wrapper, {
+            width: icon.offsetWidth,
+        })
+
+        // タイムラインを作成（初期状態では一時停止）
+        const tl = gsap.timeline({ paused: true })
+
+        // アニメーションの定義
+        tl.to(icon, {
+            opacity: 0,
+            scale: 0.8,
+            duration: 0.2,
+            ease: 'power2.out',
+        })
+
+        tl.to(
+            wrapper,
+            {
+                width: labelWidth,
+                duration: 0.3,
+                ease: 'power2.out',
+            },
+            '-=0.2'
+        )
+
+        tl.to(
+            label,
+            {
+                opacity: 1,
+                duration: 0.3,
+                ease: 'power2.out',
+            },
+            '-=0.3'
+        )
+
+        // ホバーイベントの設定
+        container.addEventListener('mouseenter', () => tl.play())
+        container.addEventListener('mouseleave', () => tl.reverse())
+    })
+</script>
