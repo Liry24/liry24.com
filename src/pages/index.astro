@@ -226,7 +226,7 @@ const persona = [
 
             <div class="-my-4 h-px w-full bg-zinc-800"></div>
 
-            <div class="flex flex-col gap-6">
+            <div class="flex flex-col gap-5">
                 <a
                     href="https://liria.work"
                     target="_blank"
@@ -245,11 +245,11 @@ const persona = [
                     </h2>
                 </a>
 
-                <div class="flex items-start gap-7">
+                <div class="-ml-1 flex items-start gap-5">
                     <a
                         href="https://eicosapenta.booth.pm"
                         target="_blank"
-                        class="flex items-baseline transition-opacity hover:opacity-60 focus-visible:opacity-60"
+                        class="flex items-baseline p-1 transition-opacity hover:opacity-60 focus-visible:opacity-60"
                     >
                         <span class="text-4xl font-bold tracking-tight">
                             Liria
@@ -261,7 +261,7 @@ const persona = [
                     <a
                         href="https://avatio.me"
                         target="_blank"
-                        class="flex items-center transition-opacity hover:opacity-60 focus-visible:opacity-60"
+                        class="flex items-center p-1 transition-opacity hover:opacity-60 focus-visible:opacity-60"
                     >
                         <Image
                             src={AvatioLogo}
@@ -274,7 +274,7 @@ const persona = [
                 </div>
             </div>
 
-            <div class="flex flex-col items-start gap-6">
+            <div class="flex flex-col items-start gap-5">
                 <h2
                     class="text-sm leading-none font-extralight tracking-[0.6rem] whitespace-nowrap text-zinc-400"
                 >
@@ -308,16 +308,16 @@ const persona = [
                         ))
                     }
                 </div>
-                <div class="flex flex-wrap items-start gap-5">
+                <div class="-ml-1 flex flex-wrap items-start gap-3">
                     {
                         create.map((link) => (
                             <a
                                 href={link.url}
                                 target="_blank"
-                                class="flex items-center gap-3 transition-opacity hover:opacity-60 focus-visible:opacity-60"
+                                class="flex items-center gap-3 p-1 transition-opacity hover:opacity-60 focus-visible:opacity-60"
                             >
                                 <Icon name={link.icon} size={link.iconSize} />
-                                <span class="text-sm font-light tracking-[0.4rem] text-zinc-300">
+                                <span class="text-sm font-light tracking-[0.4rem] text-zinc-400">
                                     {link.label}
                                 </span>
                             </a>
@@ -326,22 +326,22 @@ const persona = [
                 </div>
             </div>
 
-            <div class="flex flex-col items-start gap-6">
+            <div class="flex flex-col items-start gap-5">
                 <h2
                     class="text-sm leading-none font-extralight tracking-[0.6rem] whitespace-nowrap text-zinc-400"
                 >
                     // social
                 </h2>
-                <div class="flex flex-wrap items-start gap-5">
+                <div class="-ml-1 flex flex-wrap items-start gap-5">
                     {
                         social.map((link) => (
                             <a
                                 href={link.url}
                                 target="_blank"
-                                class="flex items-center gap-3 transition-opacity hover:opacity-60 focus-visible:opacity-60"
+                                class="flex items-center gap-3 p-1 transition-opacity hover:opacity-60 focus-visible:opacity-60"
                             >
                                 <Icon name={link.icon} size={link.iconSize} />
-                                <span class="text-sm font-light tracking-[0.4rem] text-zinc-300">
+                                <span class="text-sm font-light tracking-[0.4rem] text-zinc-400">
                                     {link.label}
                                 </span>
                             </a>
@@ -350,22 +350,22 @@ const persona = [
                 </div>
             </div>
 
-            <div class="flex flex-col items-start gap-6">
+            <div class="flex flex-col items-start gap-5">
                 <h2
                     class="text-sm leading-none font-extralight tracking-[0.6rem] whitespace-nowrap text-zinc-400"
                 >
                     // persona
                 </h2>
-                <div class="flex flex-wrap items-start gap-5">
+                <div class="-ml-1 flex flex-wrap items-start gap-3">
                     {
                         persona.map((link) => (
                             <a
                                 href={link.url}
                                 target="_blank"
-                                class="flex items-center gap-3 transition-opacity hover:opacity-60 focus-visible:opacity-60"
+                                class="flex items-center gap-3 p-1 transition-opacity hover:opacity-60 focus-visible:opacity-60"
                             >
                                 <Icon name={link.icon} size={link.iconSize} />
-                                <span class="text-sm font-light tracking-[0.4rem] text-zinc-300">
+                                <span class="text-sm font-light tracking-[0.4rem] text-zinc-400">
                                     {link.label}
                                 </span>
                             </a>
@@ -379,7 +379,7 @@ const persona = [
             <div class="h-px w-full bg-zinc-800"></div>
 
             <div
-                class="flex w-full flex-wrap items-center justify-end gap-3 pb-6"
+                class="flex w-full flex-wrap items-center justify-end gap-1 pb-6"
             >
                 <p class="text-xs font-light tracking-[0.3rem] text-zinc-400">
                     built with
@@ -387,35 +387,35 @@ const persona = [
                 <a
                     href="https://vercel.com"
                     target="_blank"
-                    class="flex items-center text-zinc-400 transition-opacity hover:opacity-60 focus-visible:opacity-60"
+                    class="flex items-center p-1 text-zinc-400 transition-opacity hover:opacity-60 focus-visible:opacity-60"
                 >
                     <Icon name="simple-icons:vercel" />
                 </a>
                 <a
                     href="https://astro.build"
                     target="_blank"
-                    class="flex items-center text-zinc-400 transition-opacity hover:opacity-60 focus-visible:opacity-60"
+                    class="flex items-center p-1 text-zinc-400 transition-opacity hover:opacity-60 focus-visible:opacity-60"
                 >
                     <Icon name="simple-icons:astro" />
                 </a>
                 <a
                     href="https://tailwindcss.com"
                     target="_blank"
-                    class="flex items-center text-zinc-400 transition-opacity hover:opacity-60 focus-visible:opacity-60"
+                    class="flex items-center p-1 text-zinc-400 transition-opacity hover:opacity-60 focus-visible:opacity-60"
                 >
                     <Icon name="simple-icons:tailwindcss" />
                 </a>
                 <a
                     href="https://bun.sh"
                     target="_blank"
-                    class="flex items-center text-zinc-400 transition-opacity hover:opacity-60 focus-visible:opacity-60"
+                    class="flex items-center p-1 text-zinc-400 transition-opacity hover:opacity-60 focus-visible:opacity-60"
                 >
                     <Icon name="simple-icons:bun" />
                 </a>
                 <a
                     href="https://github.com/features/copilot"
                     target="_blank"
-                    class="flex items-center text-zinc-400 transition-opacity hover:opacity-60 focus-visible:opacity-60"
+                    class="flex items-center p-1 text-zinc-400 transition-opacity hover:opacity-60 focus-visible:opacity-60"
                 >
                     <Icon name="simple-icons:githubcopilot" />
                 </a>
