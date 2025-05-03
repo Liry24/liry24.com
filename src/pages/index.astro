@@ -245,7 +245,7 @@ const persona = [
                     </h2>
                 </a>
 
-                <div class="-ml-1 flex items-start gap-5">
+                <div class="-ml-1 flex flex-wrap items-start gap-5">
                     <a
                         href="https://eicosapenta.booth.pm"
                         target="_blank"
@@ -261,14 +261,14 @@ const persona = [
                     <a
                         href="https://avatio.me"
                         target="_blank"
-                        class="flex items-center p-1 transition-opacity hover:opacity-60 focus-visible:opacity-60"
+                        class="flex shrink-0 items-center p-1 transition-opacity hover:opacity-60 focus-visible:opacity-60"
                     >
                         <Image
                             src={AvatioLogo}
                             alt="Avatio Logo"
                             width={108}
                             loading="eager"
-                            class="shrink select-none"
+                            class="shrink-0 select-none"
                         />
                     </a>
                 </div>
@@ -295,7 +295,7 @@ const persona = [
                                     height={96}
                                     loading="eager"
                                     fit="cover"
-                                    class="size-24 shrink-0 object-cover"
+                                    class="size-16 shrink-0 object-cover sm:size-24"
                                 />
                                 <div class="absolute inset-0 flex items-center justify-center bg-zinc-900/50 opacity-0 transition-opacity group-hover:opacity-100">
                                     <Icon
