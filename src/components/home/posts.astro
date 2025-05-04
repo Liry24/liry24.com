@@ -11,29 +11,35 @@ const avatio = await ofetch<avatio[]>('https://avatio.me/api/releases')
 const posts = [
     ...note.data.contents.map((post) => ({
         source: 'note',
+        slug: post.key,
         url: `https://note.com/liry24/n/${post.key}`,
         icon: 'note',
         title: post.name,
-        slug: post.key,
         publishedAt: post.publishAt,
+        likes: post.likeCount,
+        comments: post.commentCount,
     })),
     ...zenn.articles.map((post) => ({
         source: 'zenn',
-        url: `https://zenn.dev/articles/${post.slug}`,
+        slug: post.slug,
+        url: `https://zenn.dev/${post.path}`,
         icon: 'simple-icons:zenn',
         title: post.title,
-        slug: post.slug,
         publishedAt: post.published_at,
+        likes: post.liked_count,
+        comments: post.comments_count,
     })),
     ...avatio
         .filter((post) => post.category === 'news' || post.category === 'blog')
         .map((post) => ({
             source: 'avatio',
+            slug: post.slug,
             url: `https://avatio.me/release/${post.slug}`,
             icon: 'avatio',
             title: post.title,
-            slug: post.slug,
             publishedAt: post.created_at,
+            likes: null,
+            comments: null,
         })),
 ].sort(
     (a, b) =>
@@ -60,11 +66,45 @@ const posts = [
                         {post.title}
                     </h3>
                     <div class="flex items-end justify-between gap-2">
-                        <span class="text-xs leading-none font-extralight tracking-[0.2rem] whitespace-nowrap text-zinc-400">
-                            {new Date(post.publishedAt).toLocaleDateString(
-                                'ja-JP'
-                            )}
-                        </span>
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs leading-none font-extralight tracking-[0.2rem] whitespace-nowrap text-zinc-400">
+                                {new Date(post.publishedAt).toLocaleDateString(
+                                    'ja-JP'
+                                )}
+                            </span>
+
+                            {() => {
+                                if (post.likes)
+                                    return (
+                                        <div class="flex items-center gap-1.5">
+                                            <Icon
+                                                name="lucide:heart"
+                                                size="15"
+                                                class="text-zinc-500"
+                                            />
+                                            <span class="text-xs leading-none font-light tracking-[0.2rem] whitespace-nowrap text-zinc-500">
+                                                {post.likes}
+                                            </span>
+                                        </div>
+                                    )
+                            }}
+
+                            {() => {
+                                if (post.comments)
+                                    return (
+                                        <div class="flex items-center gap-1.5">
+                                            <Icon
+                                                name="lucide:message-circle"
+                                                size="15"
+                                                class="text-zinc-500"
+                                            />
+                                            <span class="text-xs leading-none font-light tracking-[0.2rem] whitespace-nowrap text-zinc-500">
+                                                {post.comments}
+                                            </span>
+                                        </div>
+                                    )
+                            }}
+                        </div>
                         <Icon
                             name={post.icon}
                             size="18"
