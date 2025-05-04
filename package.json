@@ -40,7 +40,7 @@
     "engines": {
         "node": "22.15.0"
     },
-    "packageManager": "bun@1.2.11",
+    "packageManager": "bun@1.2.12",
     "prettier": {
         "trailingComma": "es5",
         "tabWidth": 4,

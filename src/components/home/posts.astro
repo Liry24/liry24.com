@@ -3,6 +3,30 @@ import { ofetch } from 'ofetch'
 import { Icon } from 'astro-icon/components'
 
 const zenn = await ofetch<zenn>('https://zenn.dev/api/articles?username=liria')
+const avatio = await ofetch<avatio[]>('https://avatio.me/api/releases')
+
+const posts = [
+    ...zenn.articles.map((post) => ({
+        source: 'zenn',
+        url: `https://zenn.dev/articles/${post.slug}`,
+        icon: 'simple-icons:zenn',
+        title: post.title,
+        slug: post.slug,
+        published_at: post.published_at,
+    })),
+    ...avatio.map((post) => ({
+        source: 'avatio',
+        url: `https://avatio.me/release/${post.slug}`,
+        icon: 'avatio',
+        title: post.title,
+        slug: post.slug,
+        published_at: post.created_at,
+    })),
+].sort((a, b) => {
+    const dateA = new Date(a.published_at).getTime()
+    const dateB = new Date(b.published_at).getTime()
+    return dateB - dateA
+})
 ---
 
 <div class="flex w-full flex-col gap-5">
@@ -14,11 +38,11 @@ const zenn = await ofetch<zenn>('https://zenn.dev/api/articles?username=liria')
     </div>
     <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
         {
-            zenn.articles.map((post) => (
+            posts.map((post) => (
                 <a
-                    href={`https://zenn.dev/articles/${post.slug}`}
+                    href={post.url}
                     target="_blank"
-                    class="flex flex-col gap-3 rounded-lg p-4 ring-1 ring-zinc-800 transition hover:ring-zinc-500 focus-visible:ring-zinc-500"
+                    class="flex flex-col justify-between gap-3 rounded-lg p-4 ring-1 ring-zinc-800 transition hover:ring-zinc-500 focus-visible:ring-zinc-500"
                 >
                     <h3 class="text-sm tracking-wider text-zinc-200">
                         {post.title}
@@ -28,7 +52,7 @@ const zenn = await ofetch<zenn>('https://zenn.dev/api/articles?username=liria')
                             {new Date(post.published_at).toLocaleDateString()}
                         </span>
                         <Icon
-                            name="simple-icons:zenn"
+                            name={post.icon}
                             size="18"
                             class="text-zinc-400"
                         />

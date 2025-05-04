@@ -35,3 +35,15 @@ interface zenn {
     next_page: number | null
     total_count: number | null
 }
+
+interface avatio {
+    slug: string
+    created_at: string
+    updated_at: string
+    short_title?: string
+    title: string
+    description?: string
+    thumbnail?: string | null
+    category?: 'news' | 'update' | 'event' | 'blog'
+    content: string
+}
