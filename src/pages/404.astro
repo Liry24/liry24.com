@@ -2,10 +2,12 @@
 import { Icon } from 'astro-icon/components'
 import Layout from '@/layouts/default.astro'
 import Button from '@/components/button.astro'
+
+export const prerender = true
 ---
 
 <Layout>
-    <div class="h-screen flex flex-col items-center justify-center gap-8">
+    <div class="flex h-screen flex-col items-center justify-center gap-8">
         <h1
             class="pb-8 pl-[1rem] text-6xl font-extralight tracking-[1rem] text-zinc-400"
         >
