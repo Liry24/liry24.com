@@ -9,7 +9,8 @@
             "@public/*": ["./public/*"]
         },
         "moduleResolution": "bundler",
-        "jsx": "react-jsx",
-        "jsxImportSource": "react"
+        "jsx": "preserve",
+        "jsxImportSource": "react",
+        "types": ["unplugin-icons/types/vue"]
     }
 }

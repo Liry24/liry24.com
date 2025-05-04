@@ -2,31 +2,43 @@
 import { ofetch } from 'ofetch'
 import { Icon } from 'astro-icon/components'
 
+const note = await ofetch<note>(
+    'https://note.com/api/v2/creators/liry24/contents?kind=note'
+)
 const zenn = await ofetch<zenn>('https://zenn.dev/api/articles?username=liria')
 const avatio = await ofetch<avatio[]>('https://avatio.me/api/releases')
 
 const posts = [
+    ...note.data.contents.map((post) => ({
+        source: 'note',
+        url: `https://note.com/liry24/n/${post.key}`,
+        icon: 'note',
+        title: post.name,
+        slug: post.key,
+        publishedAt: post.publishAt,
+    })),
     ...zenn.articles.map((post) => ({
         source: 'zenn',
         url: `https://zenn.dev/articles/${post.slug}`,
         icon: 'simple-icons:zenn',
         title: post.title,
         slug: post.slug,
-        published_at: post.published_at,
+        publishedAt: post.published_at,
     })),
-    ...avatio.map((post) => ({
-        source: 'avatio',
-        url: `https://avatio.me/release/${post.slug}`,
-        icon: 'avatio',
-        title: post.title,
-        slug: post.slug,
-        published_at: post.created_at,
-    })),
-].sort((a, b) => {
-    const dateA = new Date(a.published_at).getTime()
-    const dateB = new Date(b.published_at).getTime()
-    return dateB - dateA
-})
+    ...avatio
+        .filter((post) => post.category === 'news' || post.category === 'blog')
+        .map((post) => ({
+            source: 'avatio',
+            url: `https://avatio.me/release/${post.slug}`,
+            icon: 'avatio',
+            title: post.title,
+            slug: post.slug,
+            publishedAt: post.created_at,
+        })),
+].sort(
+    (a, b) =>
+        new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+)
 ---
 
 <div class="flex w-full flex-col gap-5">
@@ -42,19 +54,21 @@ const posts = [
                 <a
                     href={post.url}
                     target="_blank"
-                    class="flex flex-col justify-between gap-3 rounded-lg p-4 ring-1 ring-zinc-800 transition hover:ring-zinc-500 focus-visible:ring-zinc-500"
+                    class="group flex flex-col justify-between gap-3 rounded-lg p-4 ring-1 ring-zinc-800 transition hover:ring-zinc-500 focus-visible:ring-zinc-500"
                 >
                     <h3 class="text-sm tracking-wider text-zinc-200">
                         {post.title}
                     </h3>
                     <div class="flex items-end justify-between gap-2">
                         <span class="text-xs leading-none font-extralight tracking-[0.2rem] whitespace-nowrap text-zinc-400">
-                            {new Date(post.published_at).toLocaleDateString()}
+                            {new Date(post.publishedAt).toLocaleDateString(
+                                'ja-JP'
+                            )}
                         </span>
                         <Icon
                             name={post.icon}
                             size="18"
-                            class="text-zinc-400"
+                            class="text-zinc-500 transition group-hover:text-zinc-300 group-focus-visible:text-zinc-300"
                         />
                     </div>
                 </a>

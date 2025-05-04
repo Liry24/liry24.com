@@ -132,15 +132,13 @@ const persona = [
     </div>
 
     <div class="flex flex-col gap-5">
-        <div class="flex flex-col items-start gap-3">
+        <div class="flex flex-col items-start gap-2 sm:gap-1">
             <h2
-                class="text-xs leading-none font-extralight tracking-[0.4rem] whitespace-nowrap text-zinc-500"
+                class="mb-1 text-xs leading-none font-extralight tracking-[0.4rem] whitespace-nowrap text-zinc-500 sm:mb-2"
             >
-                // social
+                // persona
             </h2>
-            <div
-                class="-ml-1 grid grid-cols-2 flex-wrap items-start gap-3 sm:flex"
-            >
+            <div class="-ml-1 flex flex-wrap items-start gap-3">
                 {
                     social.map((link) => (
                         <a
@@ -153,24 +151,14 @@ const persona = [
                                 size="18"
                                 class="text-zinc-400"
                             />
-                            <span class="text-xs font-light tracking-[0.3rem] text-zinc-400">
+                            <span class="hidden text-xs font-light tracking-[0.3rem] text-zinc-400 sm:block">
                                 {link.label}
                             </span>
                         </a>
                     ))
                 }
             </div>
-        </div>
-
-        <div class="flex flex-col items-start gap-3">
-            <h2
-                class="text-xs leading-none font-extralight tracking-[0.4rem] whitespace-nowrap text-zinc-500"
-            >
-                // persona
-            </h2>
-            <div
-                class="-ml-1 grid grid-cols-2 flex-wrap items-start gap-3 sm:flex"
-            >
+            <div class="-ml-1 flex flex-wrap items-start gap-3">
                 {
                     persona.map((link) => (
                         <a
@@ -183,7 +171,7 @@ const persona = [
                                 size="18"
                                 class="text-zinc-400"
                             />
-                            <span class="text-xs font-light tracking-[0.3rem] text-zinc-400">
+                            <span class="hidden text-xs font-light tracking-[0.3rem] text-zinc-400 sm:block">
                                 {link.label}
                             </span>
                         </a>

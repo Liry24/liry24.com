@@ -47,3 +47,43 @@ interface avatio {
     category?: 'news' | 'update' | 'event' | 'blog'
     content: string
 }
+
+interface note {
+    data: {
+        contents: {
+            id: number
+            type: 'TextNote'
+            status: 'published'
+            name: string
+            description: string | null
+            likeCount: number
+            key: string
+            slug: string
+            publishAt: string
+            thumbnailExternalUrl: string
+            eyecatch: string | null
+            user: {
+                id: number
+                key: string
+                name: string
+                urlname: string
+                nickname: string
+                userProfileImagePath: string
+                customDomain: string | null
+            }
+            canRead: boolean
+            externalUrl: string | null
+            customDomain: string | null
+            body: string
+            canUpdate: boolean
+            commentCount: number
+            anonymousLikeCount: number
+            disableComment: boolean
+            noteDraft: string | null
+            noteUrl: string
+            format: string
+        }[]
+        isLastPage: boolean
+        totalCount: number
+    }
+}
