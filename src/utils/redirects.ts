@@ -1,5 +1,5 @@
 const redirects = {
-    liria: 'https://liria.work',
+    liria: 'https://liria.me',
     booth: 'https://eicosapenta.booth.pm',
     artstation: 'https://www.artstation.com/liry24',
     github: 'https://github.com/Liry24',
