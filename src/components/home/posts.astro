@@ -6,7 +6,6 @@ const note = await ofetch<note>(
     'https://note.com/api/v2/creators/liry24/contents?kind=note'
 )
 const zenn = await ofetch<zenn>('https://zenn.dev/api/articles?username=liria')
-const avatio = await ofetch<avatio[]>('https://avatio.me/api/releases')
 
 const posts = [
     ...note.data.contents.map((post) => ({
@@ -29,18 +28,6 @@ const posts = [
         likes: post.liked_count,
         comments: post.comments_count,
     })),
-    ...avatio
-        .filter((post) => post.category === 'news' || post.category === 'blog')
-        .map((post) => ({
-            source: 'avatio',
-            slug: post.slug,
-            url: `https://avatio.me/release/${post.slug}`,
-            icon: 'avatio',
-            title: post.title,
-            publishedAt: post.created_at,
-            likes: null,
-            comments: null,
-        })),
 ].sort(
     (a, b) =>
         new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
