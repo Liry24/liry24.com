@@ -1,19 +1,103 @@
 ---
+import { Icon } from 'astro-icon/components'
+import { Image } from 'astro:assets'
+import imageValRank from '@/assets/images/valorant_rank_immortal_1.png'
 import Layout from '@/layouts/default.astro'
 import Head from '@/components/home/head.astro'
 import Arts from '@/components/home/arts.astro'
-import Liria from '@/components/home/liria.astro'
 import Posts from '@/components/home/posts.astro'
 
 export const prerender = true
 ---
 
 <Layout>
-    <div class="flex flex-col items-start gap-12">
+    <div class="flex flex-col items-start gap-16 pt-20">
+        <h1
+            class="-ml-2 text-9xl leading-none font-thin tracking-wider text-nowrap text-zinc-200"
+        >
+            Liry24
+        </h1>
+
         <Head />
-        <div class="-my-3 h-px w-full bg-zinc-800"></div>
-        <Liria />
-        <Arts />
-        <Posts server:defer />
+
+        <div class="h-px w-full bg-zinc-800"></div>
+
+        <div class="flex w-full flex-col gap-28">
+            <div class="flex w-full flex-col items-start gap-2">
+                <h2
+                    class="mb-4 text-xs leading-none font-light tracking-[0.4rem] whitespace-nowrap text-zinc-400 before:content-['//']"
+                >
+                    creation circle
+                </h2>
+
+                <a
+                    href="https://liria.me"
+                    target="_blank"
+                    class="flex w-full items-center gap-4 transition-opacity hover:opacity-80 focus-visible:opacity-80"
+                >
+                    <span
+                        class="-mt-2 text-8xl font-extrabold tracking-tight text-zinc-100"
+                    >
+                        Liria
+                    </span>
+
+                    <Icon
+                        name="liria"
+                        size="24"
+                        class="ml-auto text-zinc-200"
+                    />
+
+                    <span class="text-sm font-light tracking-wide">
+                        liria.me
+                    </span>
+                </a>
+
+                <p class="ml-1.5 text-sm tracking-wider text-zinc-400">
+                    VRC 3D Items / Web Development
+                </p>
+            </div>
+
+            <div class="flex w-full flex-col items-start gap-6">
+                <h2
+                    class="text-xs leading-none font-light tracking-[0.4rem] text-nowrap text-zinc-400 before:content-['//']"
+                >
+                    arts
+                </h2>
+
+                <Arts />
+            </div>
+
+            <div class="flex w-full flex-col items-start gap-6">
+                <h2
+                    class="text-xs leading-none font-light tracking-[0.4rem] text-nowrap text-zinc-400 before:content-['//']"
+                >
+                    posts
+                </h2>
+
+                <Posts server:defer />
+            </div>
+
+            <div class="flex w-full flex-col items-start gap-6">
+                <h2
+                    class="text-xs leading-none font-light tracking-[0.4rem] text-nowrap text-zinc-400 before:content-['//']"
+                >
+                    peak ranks
+                </h2>
+
+                <a
+                    href="/valorant"
+                    target="_blank"
+                    class="mx-auto flex items-center gap-2"
+                >
+                    <span class="pt-px text-xl leading-none">VALORANT</span>
+                    <img
+                        src={imageValRank.src}
+                        alt="Immortal 1"
+                        width={48}
+                        height={48}
+                    />
+                </a>
+            </div>
+        </div>
     </div>
 </Layout>

@@ -4,11 +4,10 @@ import tailwindcss from '@tailwindcss/vite'
 import icon from 'astro-icon'
 import vercel from '@astrojs/vercel'
 import react from '@astrojs/react'
-import vue from '@astrojs/vue'
 
 // https://astro.build/config
 export default defineConfig({
-    site: process.env.PUBLIC_VERCEL_URL || 'https://liry24.com',
+    site: `https://${process.env.PUBLIC_VERCEL_PROJECT_PRODUCTION_URL || 'liry24.com'}`,
 
     output: 'server',
 
@@ -18,7 +17,12 @@ export default defineConfig({
         },
     }),
 
-    integrations: [icon(), react(), vue()],
+    integrations: [
+        icon({
+            iconDir: 'src/assets/icons',
+        }),
+        react(),
+    ],
 
     vite: {
         plugins: [tailwindcss()],

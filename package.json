@@ -12,7 +12,6 @@
     "dependencies": {
         "@astrojs/react": "4.4.0",
         "@astrojs/vercel": "8.2.8",
-        "@astrojs/vue": "^5.1.1",
         "@tailwindcss/vite": "^4.1.13",
         "@vercel/analytics": "^1.5.0",
         "@vercel/og": "^0.8.5",
@@ -25,8 +24,7 @@
         "react": "^19.1.1",
         "react-dom": "^19.1.1",
         "tailwind-merge": "^3.3.1",
-        "tailwindcss": "^4.1.13",
-        "vue": "^3.5.22"
+        "tailwindcss": "^4.1.13"
     },
     "devDependencies": {
         "@iconify-json/ic": "^1.2.4",

@@ -57,54 +57,31 @@ const arts = [
     })
 </script>
 
-<div class="flex flex-col items-start gap-5">
-    <a
-        href="https://www.artstation.com/liry24"
-        target="_blank"
-        class="flex items-center gap-3 transition-opacity hover:opacity-60 focus-visible:opacity-60"
-    >
-        <span
-            class="text-sm leading-none font-extralight tracking-[0.6rem] whitespace-nowrap text-zinc-400"
-        >
-            //
-        </span>
-        <h2
-            class="text-sm leading-none font-extralight tracking-[0.6rem] whitespace-nowrap text-zinc-400"
-        >
-            arts
-        </h2>
-        <Icon
-            name="simple-icons:artstation"
-            size="14"
-            class="mt-px text-zinc-400"
-        />
-    </a>
-    <div class="flex flex-wrap items-start gap-3">
-        {
-            arts.map((art) => (
-                <a
-                    href={art.url}
-                    target="_blank"
-                    class="art-thumbnail group relative overflow-hidden rounded-lg"
-                >
-                    <Image
-                        src={art.src}
-                        alt={art.alt}
-                        width={96}
-                        height={96}
-                        loading="eager"
-                        fit="cover"
-                        class="size-16 shrink-0 object-cover sm:size-24"
+<div class="grid w-full grid-cols-2 gap-3">
+    {
+        arts.map((art) => (
+            <a
+                href={art.url}
+                target="_blank"
+                class="art-thumbnail group relative overflow-hidden rounded-lg"
+            >
+                <Image
+                    src={art.src}
+                    alt={art.alt}
+                    width={256}
+                    height={256}
+                    loading="eager"
+                    fit="cover"
+                    class="h-32 w-full shrink-0 object-cover"
+                />
+                <div class="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+                    <Icon
+                        name="simple-icons:artstation"
+                        size={24}
+                        class="text-zinc-100"
                     />
-                    <div class="absolute inset-0 flex items-center justify-center bg-zinc-900/50 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
-                        <Icon
-                            name="simple-icons:artstation"
-                            size={24}
-                            class="text-zinc-100"
-                        />
-                    </div>
-                </a>
-            ))
-        }
-    </div>
+                </div>
+            </a>
+        ))
+    }
 </div>

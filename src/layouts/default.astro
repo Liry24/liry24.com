@@ -1,5 +1,5 @@
 ---
-import '../styles/global.css'
+import '../assets/css/main.css'
 import { Font } from 'astro:assets'
 import Analytics from '@vercel/analytics/astro'
 import { SEO } from 'astro-seo'
@@ -47,11 +47,11 @@ const image = 'https://liry24.com/og.png'
         />
     </head>
     <body
-        class="mx-auto flex min-h-[100dvh] max-w-4xl flex-col bg-zinc-950 px-12 text-zinc-100"
+        class="mx-auto flex min-h-[100dvh] max-w-4xl flex-col bg-black px-12 text-zinc-300"
     >
-        <div class="grid grow">
+        <main class="isolate grid grow">
             <slot />
-        </div>
+        </main>
 
         <footer class="mt-12 flex w-full flex-col items-start gap-4">
             <div class="h-px w-full bg-zinc-800"></div>

@@ -37,11 +37,6 @@ const persona = [
         icon: 'simple-icons:steam',
     },
     {
-        url: '/valorant',
-        label: 'Valorant',
-        icon: 'simple-icons:valorant',
-    },
-    {
         url: '/pulse',
         label: 'Pulse',
         icon: 'mingcute:game-2-fill',
@@ -54,130 +49,138 @@ const persona = [
 ]
 ---
 
-<div class="flex flex-col items-start gap-8">
-    <h1
-        class="mt-20 mb-6 text-xl leading-none font-light tracking-[1rem] whitespace-nowrap text-zinc-300"
-    >
-        Liry24
-    </h1>
-
-    <div class="flex w-full flex-wrap items-center gap-3">
-        <ToolIcon label="Blender" icon="simple-icons:blender" iconSize={18} />
-        <ToolIcon
-            label="Autodesk Maya"
-            icon="simple-icons:autodeskmaya"
-            iconSize={16}
-        />
-        <ToolIcon
-            label="Houdini"
-            icon="simple-icons:houdini"
-            iconSize={16}
-            class="ml-0.5"
-        />
-        <ToolIcon label="Adobe" icon="ic:baseline-adobe" iconSize={21} />
-        <ToolIcon label="Affinity" icon="simple-icons:affinity" iconSize={17} />
-        <ToolIcon
-            label="DaVinci Resolve"
-            icon="simple-icons:davinciresolve"
-            iconSize={17}
-        />
-        <ToolIcon label="Unity" icon="simple-icons:unity" iconSize={17} />
-        <ToolIcon
-            label="Visual Studio Code"
-            icon="simple-icons:visualstudiocode"
-            iconSize={16}
-        />
-        <ToolIcon
-            label="Git"
-            icon="simple-icons:git"
-            iconSize={17}
-            class="ml-px"
-        />
-        <ToolIcon
-            label="TypeScript"
-            icon="simple-icons:typescript"
-            iconSize={16}
-        />
-        <ToolIcon
-            label="Python"
-            icon="simple-icons:python"
-            iconSize={16}
-            class="ml-px"
-        />
-        <ToolIcon label="Nuxt" icon="simple-icons:nuxt" iconSize={19} />
-        <ToolIcon
-            label="Astro"
-            icon="simple-icons:astro"
-            iconSize={17}
-            class="-mt-px"
-        />
-        <ToolIcon
-            label="Tauri"
-            icon="simple-icons:tauri"
-            iconSize={16}
-            class="-ml-px"
-        />
-        <ToolIcon
-            label="Tailwind CSS"
-            icon="simple-icons:tailwindcss"
-            iconSize={18}
-            class="-ml-px"
-        />
-        <ToolIcon
-            label="PostgreSQL"
-            icon="simple-icons:postgresql"
-            iconSize={17}
-            class="-ml-0.5"
-        />
+<div class="flex flex-col items-start gap-12">
+    <div class="flex flex-col items-start gap-2 sm:gap-1">
+        <h2
+            class="mb-1 text-xs leading-none font-extralight tracking-[0.4rem] whitespace-nowrap text-zinc-500 sm:mb-2"
+        >
+            // skills
+        </h2>
+        <div class="flex w-full flex-wrap items-center gap-3">
+            <ToolIcon
+                label="Blender"
+                icon="simple-icons:blender"
+                iconSize={18}
+            />
+            <ToolIcon
+                label="Autodesk Maya"
+                icon="simple-icons:autodeskmaya"
+                iconSize={16}
+            />
+            <ToolIcon
+                label="Houdini"
+                icon="simple-icons:houdini"
+                iconSize={16}
+                class="ml-0.5"
+            />
+            <ToolIcon label="Adobe" icon="ic:baseline-adobe" iconSize={21} />
+            <ToolIcon
+                label="Affinity"
+                icon="simple-icons:affinity"
+                iconSize={17}
+            />
+            <ToolIcon
+                label="DaVinci Resolve"
+                icon="simple-icons:davinciresolve"
+                iconSize={17}
+            />
+            <ToolIcon label="Unity" icon="simple-icons:unity" iconSize={17} />
+            <ToolIcon
+                label="Visual Studio Code"
+                icon="simple-icons:visualstudiocode"
+                iconSize={16}
+            />
+            <ToolIcon
+                label="Git"
+                icon="simple-icons:git"
+                iconSize={17}
+                class="ml-px"
+            />
+            <ToolIcon
+                label="TypeScript"
+                icon="simple-icons:typescript"
+                iconSize={16}
+            />
+            <ToolIcon
+                label="Python"
+                icon="simple-icons:python"
+                iconSize={16}
+                class="ml-px"
+            />
+            <ToolIcon label="Nuxt" icon="simple-icons:nuxt" iconSize={19} />
+            <ToolIcon
+                label="Astro"
+                icon="simple-icons:astro"
+                iconSize={17}
+                class="-mt-px"
+            />
+            <ToolIcon
+                label="Tauri"
+                icon="simple-icons:tauri"
+                iconSize={16}
+                class="-ml-px"
+            />
+            <ToolIcon
+                label="Tailwind CSS"
+                icon="simple-icons:tailwindcss"
+                iconSize={18}
+                class="-ml-px"
+            />
+            <ToolIcon
+                label="PostgreSQL"
+                icon="simple-icons:postgresql"
+                iconSize={17}
+                class="-ml-0.5"
+            />
+        </div>
     </div>
 
-    <div class="flex flex-col gap-5">
-        <div class="flex flex-col items-start gap-2 sm:gap-1">
-            <h2
-                class="mb-1 text-xs leading-none font-extralight tracking-[0.4rem] whitespace-nowrap text-zinc-500 sm:mb-2"
-            >
-                // persona
-            </h2>
-            <div class="-ml-1 flex flex-wrap items-start gap-3">
-                {
-                    social.map((link) => (
-                        <a
-                            href={link.url}
-                            target="_blank"
-                            class="flex items-center gap-3 p-1 transition-opacity hover:opacity-60 focus-visible:opacity-60"
-                        >
-                            <Icon
-                                name={link.icon}
-                                size="18"
-                                class="text-zinc-400"
-                            />
-                            <span class="hidden text-xs font-light tracking-[0.3rem] text-zinc-400 sm:block">
-                                {link.label}
-                            </span>
-                        </a>
-                    ))
-                }
-            </div>
-            <div class="-ml-1 flex flex-wrap items-start gap-3">
-                {
-                    persona.map((link) => (
-                        <a
-                            href={link.url}
-                            target="_blank"
-                            class="flex items-center gap-3 p-1 transition-opacity hover:opacity-60 focus-visible:opacity-60"
-                        >
-                            <Icon
-                                name={link.icon}
-                                size="18"
-                                class="text-zinc-400"
-                            />
-                            <span class="hidden text-xs font-light tracking-[0.3rem] text-zinc-400 sm:block">
-                                {link.label}
-                            </span>
-                        </a>
-                    ))
-                }
-            </div>
+    <div class="flex flex-col items-start gap-2 sm:gap-1">
+        <h2
+            class="mb-2 text-xs leading-none font-light tracking-[0.4rem] text-nowrap text-zinc-400 before:content-['//']"
+        >
+            persona
+        </h2>
+
+        <div class="-ml-1 flex flex-wrap items-start gap-3">
+            {
+                social.map((link) => (
+                    <a
+                        href={link.url}
+                        target="_blank"
+                        class="flex items-center gap-3 p-1 transition-opacity hover:opacity-60 focus-visible:opacity-60"
+                    >
+                        <Icon
+                            name={link.icon}
+                            size="18"
+                            class="text-zinc-400"
+                        />
+                        <span class="hidden text-xs font-extralight tracking-[0.3rem] text-zinc-300 sm:block">
+                            {link.label}
+                        </span>
+                    </a>
+                ))
+            }
+        </div>
+        <div class="-ml-1 flex flex-wrap items-start gap-3">
+            {
+                persona.map((link) => (
+                    <a
+                        href={link.url}
+                        target="_blank"
+                        class="flex items-center gap-3 p-1 transition-opacity hover:opacity-60 focus-visible:opacity-60"
+                    >
+                        <Icon
+                            name={link.icon}
+                            size="18"
+                            class="text-zinc-400"
+                        />
+                        <span class="hidden text-xs font-extralight tracking-[0.3rem] text-zinc-300 sm:block">
+                            {link.label}
+                        </span>
+                    </a>
+                ))
+            }
         </div>
     </div>
 </div>
