@@ -1,9 +1,11 @@
 ---
-import { redirects } from "@/utils/redirects"
+import { redirects } from '@/utils/redirects'
 
 const slug = Astro.params.slug
 
 if (!slug) return Astro.redirect('/')
+
+if (slug === 'redirects') return Response.json(redirects)
 
 if (Object.keys(redirects).includes(slug))
     return Astro.redirect(redirects[slug])

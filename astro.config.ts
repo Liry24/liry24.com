@@ -4,20 +4,26 @@ import tailwindcss from '@tailwindcss/vite'
 import icon from 'astro-icon'
 import vercel from '@astrojs/vercel'
 import react from '@astrojs/react'
+import vue from '@astrojs/vue'
 
 // https://astro.build/config
 export default defineConfig({
-    site: 'https://liry24.com',
+    site: process.env.PUBLIC_VERCEL_URL || 'https://liry24.com',
+
     output: 'server',
+
     adapter: vercel({
         webAnalytics: {
             enabled: true,
         },
     }),
-    integrations: [icon(), react()],
+
+    integrations: [icon(), react(), vue()],
+
     vite: {
         plugins: [tailwindcss()],
     },
+
     experimental: {
         fonts: [
             {
@@ -27,5 +33,6 @@ export default defineConfig({
                 weights: [100, 200, 300, 400, 500, 600, 700, 800, 900],
             },
         ],
+        staticImportMetaEnv: true,
     },
 })

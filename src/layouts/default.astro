@@ -11,7 +11,7 @@ const image = 'https://liry24.com/og.png'
 ---
 
 <!doctype html>
-<html lang="en" class="grid justify-center">
+<html lang="en">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width" />
@@ -47,13 +47,13 @@ const image = 'https://liry24.com/og.png'
         />
     </head>
     <body
-        class="flex min-h-[100dvh] max-w-4xl flex-col bg-zinc-950 px-12 text-zinc-100"
+        class="mx-auto flex min-h-[100dvh] max-w-4xl flex-col bg-zinc-950 px-12 text-zinc-100"
     >
-        <div class="h-full">
+        <div class="grid grow">
             <slot />
         </div>
 
-        <div class="mt-12 flex w-full flex-col items-start gap-4">
+        <footer class="mt-12 flex w-full flex-col items-start gap-4">
             <div class="h-px w-full bg-zinc-800"></div>
 
             <div
@@ -116,15 +116,13 @@ const image = 'https://liry24.com/og.png'
                     </a>
                 </div>
             </div>
-        </div>
+        </footer>
     </body>
 </html>
 
 <style>
     html,
     body {
-        margin: 0;
-        width: 100dvw;
         font-family: var(--font-geist);
     }
 </style>

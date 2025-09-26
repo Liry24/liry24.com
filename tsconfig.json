@@ -10,7 +10,6 @@
         },
         "moduleResolution": "bundler",
         "jsx": "preserve",
-        "jsxImportSource": "react",
-        "types": ["unplugin-icons/types/vue"]
+        "jsxImportSource": "react"
     }
 }
