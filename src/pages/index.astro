@@ -1,24 +1,121 @@
 ---
-import { Icon } from 'astro-icon/components'
-import { Image } from 'astro:assets'
-import imageValRank from '@/assets/images/valorant_rank_immortal_1.png'
-import Layout from '@/layouts/default.astro'
-import Head from '@/components/home/head.astro'
 import Arts from '@/components/home/arts.astro'
 import Posts from '@/components/home/posts.astro'
+import Steam from '@/components/home/steam.astro'
+import ToolIcon from '@/components/toolIcon.astro'
+import Layout from '@/layouts/default.astro'
+import { Icon } from 'astro-icon/components'
+import { Image } from 'astro:assets'
+import { getCollection } from 'astro:content'
 
 export const prerender = true
+
+const persona = await getCollection('persona')
+const skills = await getCollection('skills')
+const ranks = await getCollection('ranks')
+const career = await getCollection('career')
+
+const avatarUrl = 'https://github.com/Liry24.png'
+const avatarSize = 28
 ---
 
 <Layout>
     <div class="flex flex-col items-start gap-16 pt-20">
         <h1
-            class="-ml-2 text-9xl leading-none font-thin tracking-wider text-nowrap text-zinc-200"
+            class="-ml-2 text-7xl leading-none font-thin tracking-wider text-nowrap text-zinc-200 sm:text-9xl"
         >
             Liry24
         </h1>
 
-        <Head />
+        <div class="flex w-full flex-col gap-10">
+            <div class="flex items-center gap-5">
+                <Image
+                    src={avatarUrl}
+                    alt="Liry24 Avatar"
+                    width={avatarSize}
+                    height={avatarSize}
+                    loading="eager"
+                    class="rounded-full"
+                />
+
+                <div class="flex flex-wrap items-center gap-x-6 gap-y-2">
+                    {
+                        persona.map((item) => (
+                            <a
+                                href={item.data.url}
+                                target="_blank"
+                                class="flex items-center gap-2 text-zinc-400 transition hover:text-zinc-200 focus-visible:text-zinc-200"
+                            >
+                                <Icon name={item.data.icon} size={16} />
+                                <span class="text-sm tracking-widest opacity-80">
+                                    {item.data.label}
+                                </span>
+                            </a>
+                        ))
+                    }
+                </div>
+            </div>
+
+            <div class="flex flex-col items-start gap-2 sm:gap-1">
+                <h2
+                    class="mb-2 text-xs leading-none font-light tracking-[0.4rem] text-nowrap text-zinc-400 before:content-['//']"
+                >
+                    skills
+                </h2>
+                <div class="flex w-full flex-wrap items-center gap-3">
+                    {
+                        skills.map((skill) => (
+                            <ToolIcon
+                                label={skill.data.label}
+                                icon={skill.data.icon}
+                                iconSize={skill.data.iconSize ?? 18}
+                                class={skill.data.class}
+                            />
+                        ))
+                    }
+                </div>
+            </div>
+
+            <div class="flex flex-col items-start gap-2 sm:gap-1">
+                <h2
+                    class="mb-2 text-xs leading-none font-light tracking-[0.4rem] text-nowrap text-zinc-400 before:content-['//']"
+                >
+                    career
+                </h2>
+                <div
+                    class="ml-0.5 flex flex-col gap-3 text-sm tracking-widest text-zinc-400"
+                >
+                    {
+                        career.map((item) => (
+                            <div class="flex items-baseline gap-4">
+                                <span class="font-medium text-zinc-500">
+                                    {item.data.period}
+                                </span>
+                                <span>
+                                    {item.data.position} at
+                                    {item.data.company}
+                                </span>
+                            </div>
+                        ))
+                    }
+                </div>
+            </div>
+
+            <Steam server:defer>
+                <a
+                    slot="fallback"
+                    href="/steam"
+                    target="_blank"
+                    class="flex h-16 animate-pulse items-center gap-3 rounded-xl bg-zinc-950 px-5 py-4 transition-colors hover:bg-zinc-900 focus-visible:bg-zinc-900"
+                >
+                    <Icon
+                        name="simple-icons:steam"
+                        size="20"
+                        class="text-zinc-400"
+                    />
+                </a>
+            </Steam>
+        </div>
 
         <div class="h-px w-full bg-zinc-800"></div>
 
@@ -179,7 +276,18 @@ export const prerender = true
                     posts
                 </h2>
 
-                <Posts server:defer />
+                <Posts server:defer>
+                    <div
+                        slot="fallback"
+                        class="grid w-full grid-cols-1 gap-3 md:grid-cols-2"
+                    >
+                        {
+                            Array.from({ length: 4 }).map(() => (
+                                <div class="h-24 w-full animate-pulse rounded-lg bg-zinc-800" />
+                            ))
+                        }
+                    </div>
+                </Posts>
             </div>
 
             <div class="flex w-full flex-col items-start gap-6">
@@ -189,20 +297,69 @@ export const prerender = true
                     peak ranks
                 </h2>
 
-                <a
-                    href="/valorant"
-                    target="_blank"
-                    class="mx-auto flex items-center gap-2"
-                >
-                    <span class="pt-px text-xl leading-none">VALORANT</span>
-                    <img
-                        src={imageValRank.src}
-                        alt="Immortal 1"
-                        width={48}
-                        height={48}
-                    />
-                </a>
+                {
+                    ranks.map((rank) => (
+                        <a
+                            href={rank.data.url}
+                            target="_blank"
+                            class="mx-auto flex items-center gap-2"
+                        >
+                            <span class="pt-px text-3xl leading-none">
+                                {rank.data.label}
+                            </span>
+                            <Image
+                                src={rank.data.image}
+                                alt={rank.data.rank}
+                                width={48}
+                                height={48}
+                            />
+                        </a>
+                    ))
+                }
             </div>
+
+            <!-- <div class="flex w-full flex-col items-start gap-6">
+                <h2
+                    class="text-xs leading-none font-light tracking-[0.4rem] text-nowrap text-zinc-400 before:content-['//']"
+                >
+                    devices
+                </h2>
+
+                <div class="flex flex-col gap-14">
+                    {
+                        devices.map((device) => (
+                            <div class="flex flex-col items-center gap-6">
+                                <h3 class="text-3xl font-bold">
+                                    {device.data.category}
+                                </h3>
+
+                                {device.data.items.length && (
+                                    <div class="grid grid-cols-2 gap-8">
+                                        {device.data.items.map((item) => (
+                                            <div class="flex flex-col items-center justify-center gap-2 rounded-lg bg-zinc-950 p-4">
+                                                <span class="text-center leading-none">
+                                                    {item.label}
+                                                </span>
+
+                                                {item.modifiers?.length && (
+                                                    <div class="flex flex-wrap items-center justify-center gap-2">
+                                                        {item.modifiers?.map(
+                                                            (modifier) => (
+                                                                <span class="rounded-full px-3 py-2 text-xs leading-none text-nowrap ring-1 ring-zinc-700">
+                                                                    {modifier}
+                                                                </span>
+                                                            )
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        ))
+                    }
+                </div> -->
         </div>
     </div>
 </Layout>

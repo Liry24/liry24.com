@@ -5,6 +5,4 @@ export const config = {
     runtime: 'edge',
 }
 
-export const GET = async () => {
-    return OG()
-}
+export const GET = async () => OG()

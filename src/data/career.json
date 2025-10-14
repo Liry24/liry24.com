@@ -1,0 +1,8 @@
+{
+    "$schema": "../../.astro/collections/career.schema.json",
+    "0": {
+        "period": "2021.4 - Now",
+        "position": "3DCG Modeler",
+        "company": "Game Dev Studio"
+    }
+}

@@ -1,0 +1,9 @@
+{
+    "$schema": "../../.astro/collections/ranks.schema.json",
+    "valorant": {
+        "url": "/valorant",
+        "label": "VALORANT",
+        "rank": "Immortal 1",
+        "image": "/ranks/valorant_immortal_1.png"
+    }
+}

@@ -1,0 +1,146 @@
+{
+    "$schema": "../../.astro/collections/devices.schema.json",
+    "pc": {
+        "category": "PC",
+        "items": [
+            {
+                "label": "Self-built PC",
+                "modifiers": [
+                    "Ryzen 7 9800X3D",
+                    "GeForce RTX 5090",
+                    "X670E Steel Legend",
+                    "64GB RAM",
+                    "1TB + 2TB + 2TB NVMe SSD"
+                ]
+            }
+        ]
+    },
+    "keyboard": {
+        "category": "Keyboard",
+        "items": [
+            {
+                "label": "Full Custom 60% Keyboard",
+                "modifiers": [
+                    "HM66 PCB",
+                    "Osume Lilac Dreams Marshmallow Keycaps",
+                    "Wooting Alumaze60",
+                    "Wooting Detachable Cable",
+                    "Wooting Wrist Rest",
+                    "Short Stroke Spacer 2.5mm"
+                ]
+            },
+            {
+                "label": "Lofree FLOW"
+            },
+            {
+                "label": "Naya Create",
+                "modifiers": ["Touch", "Float"]
+            },
+            {
+                "label": "Wooting UwU Stealth"
+            },
+            {
+                "label": "Razer Tartarus Pro"
+            }
+        ]
+    },
+    "mice": {
+        "category": "Mice",
+        "items": [
+            {
+                "label": "Wlmouse Beast X 8K"
+            },
+            {
+                "label": "Logi G Pro X Superlight 2"
+            },
+            {
+                "label": "Logi G502X"
+            },
+            {
+                "label": "Razer Naga X"
+            }
+        ]
+    },
+    "mousepads": {
+        "category": "Mousepads",
+        "items": [
+            {
+                "label": "Artisan NINJA FX 零 SOFT L BLACK"
+            },
+            {
+                "label": "Corsair MM350 PRO Black Extended XL"
+            }
+        ]
+    },
+    "gamepads": {
+        "category": "Gamepads",
+        "items": [
+            {
+                "label": "DualSense"
+            },
+            {
+                "label": "STEAM CONTROLLER"
+            }
+        ]
+    },
+    "audio": {
+        "category": "Audio",
+        "items": [
+            {
+                "label": "Sony MDR-Z7M2"
+            },
+            {
+                "label": "Sony XBA-N3"
+            },
+            {
+                "label": "Creative Pebble"
+            },
+            {
+                "label": "Shure SM7B"
+            },
+            {
+                "label": "Elgato Wave Mic Arm LP"
+            },
+            {
+                "label": "Sound Blaster X5"
+            },
+            {
+                "label": "Roland Rubix24"
+            },
+            {
+                "label": "dbx 286S"
+            }
+        ]
+    },
+    "monitor": {
+        "category": "Monitor",
+        "items": [
+            {
+                "label": "LG UltraGear 32GQ850-B"
+            },
+            {
+                "label": "LG UltraWide 29UM58-P"
+            },
+            {
+                "label": "Ergotron LX Dual"
+            }
+        ]
+    },
+    "gear": {
+        "category": "Gear",
+        "items": [
+            {
+                "label": "Elgato Stream Deck +"
+            },
+            {
+                "label": "Elgato Stream Deck Pedal"
+            },
+            {
+                "label": "Pulsar eS ARM SLEEVE Finger Glove Large Black"
+            },
+            {
+                "label": "Nitro Concepts S300 PRO"
+            }
+        ]
+    }
+}

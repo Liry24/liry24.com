@@ -1,92 +1,53 @@
 ---
-import { ofetch } from 'ofetch'
 import { Icon } from 'astro-icon/components'
+import { getLiveCollection } from 'astro:content'
 
-const note = await ofetch<note>(
-    'https://note.com/api/v2/creators/liry24/contents?kind=note'
-)
-const zenn = await ofetch<zenn>('https://zenn.dev/api/articles?username=liria')
+const { entries } = await getLiveCollection('articles')
 
-const posts = [
-    ...note.data.contents.map((post) => ({
-        source: 'note',
-        slug: post.key,
-        url: `https://note.com/liry24/n/${post.key}`,
-        icon: 'note',
-        title: post.name,
-        publishedAt: post.publishAt,
-        likes: post.likeCount,
-        comments: post.commentCount,
-    })),
-    ...zenn.articles.map((post) => ({
-        source: 'zenn',
-        slug: post.slug,
-        url: `https://zenn.dev/${post.path}`,
-        icon: 'simple-icons:zenn',
-        title: post.title,
-        publishedAt: post.published_at,
-        likes: post.liked_count,
-        comments: post.comments_count,
-    })),
-].sort(
-    (a, b) =>
-        new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
-)
+const icons = {
+    note: 'note',
+    zenn: 'simple-icons:zenn',
+}
 ---
 
-<div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+<div class="grid grid-cols-1 gap-3 md:grid-cols-2">
     {
-        posts.map((post) => (
+        entries?.map((post) => (
             <a
-                href={post.url}
+                href={post.data.url}
                 target="_blank"
-                class="group flex flex-col justify-between gap-3 rounded-lg p-4 ring-1 ring-zinc-800 transition hover:ring-zinc-500 focus-visible:ring-zinc-500"
+                class="group flex flex-col justify-between gap-3 rounded-lg bg-zinc-950 p-4 transition-colors hover:bg-zinc-900 focus-visible:bg-zinc-900"
             >
                 <h3 class="text-sm tracking-wider text-zinc-200">
-                    {post.title}
+                    {post.data.title}
                 </h3>
+
                 <div class="flex items-end justify-between gap-2">
                     <div class="flex items-center gap-3">
-                        <span class="text-xs leading-none font-extralight tracking-[0.2rem] whitespace-nowrap text-zinc-400">
-                            {new Date(post.publishedAt).toLocaleDateString(
-                                'ja-JP'
-                            )}
+                        <span class="text-xs leading-none font-light tracking-widest text-nowrap text-zinc-400">
+                            {post.data.publishedAt.toLocaleDateString('ja-JP')}
                         </span>
 
-                        {() => {
-                            if (post.likes)
-                                return (
-                                    <div class="flex items-center gap-1.5">
-                                        <Icon
-                                            name="lucide:heart"
-                                            size="15"
-                                            class="text-zinc-500"
-                                        />
-                                        <span class="text-xs leading-none font-light tracking-[0.2rem] whitespace-nowrap text-zinc-500">
-                                            {post.likes}
-                                        </span>
-                                    </div>
-                                )
-                        }}
+                        {Boolean(post.data.likes) && (
+                            <div class="flex items-center gap-1.5 text-zinc-400">
+                                <Icon name="lucide:heart" size="15" />
+                                <span class="text-xs leading-none font-light tracking-widest text-nowrap">
+                                    {post.data.likes}
+                                </span>
+                            </div>
+                        )}
 
-                        {() => {
-                            if (post.comments)
-                                return (
-                                    <div class="flex items-center gap-1.5">
-                                        <Icon
-                                            name="lucide:message-circle"
-                                            size="15"
-                                            class="text-zinc-500"
-                                        />
-                                        <span class="text-xs leading-none font-light tracking-[0.2rem] whitespace-nowrap text-zinc-500">
-                                            {post.comments}
-                                        </span>
-                                    </div>
-                                )
-                        }}
+                        {Boolean(post.data.comments) && (
+                            <div class="flex items-center gap-1.5 text-zinc-400">
+                                <Icon name="lucide:message-circle" size="15" />
+                                <span class="text-xs leading-none font-light tracking-widest text-nowrap">
+                                    {post.data.comments}
+                                </span>
+                            </div>
+                        )}
                     </div>
                     <Icon
-                        name={post.icon}
+                        name={icons[post.data.source]}
                         size="18"
                         class="text-zinc-500 transition group-hover:text-zinc-300 group-focus-visible:text-zinc-300"
                     />

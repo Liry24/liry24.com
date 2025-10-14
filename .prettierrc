@@ -1,0 +1,12 @@
+{
+    "trailingComma": "es5",
+    "tabWidth": 4,
+    "semi": false,
+    "singleQuote": true,
+    "plugins": [
+        "prettier-plugin-astro",
+        "prettier-plugin-tailwindcss",
+        "prettier-plugin-astro-organize-imports",
+        "prettier-plugin-organize-imports"
+    ]
+}
