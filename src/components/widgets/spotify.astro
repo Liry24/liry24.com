@@ -12,8 +12,8 @@ const [nowPlaying, playlist] = accessToken
     : [undefined, undefined]
 
 if (import.meta.env.PUBLIC_VERCEL_ENV === 'production') {
-    Astro.response.headers.set('Cache-Control', `max-age=${60}`) // 1 minutes
-    Astro.response.headers.set('CDN-Cache-Control', `max-age=${60 * 5}`) // 5 minutes
+    Astro.response.headers.set('Cache-Control', `max-age=${30}`) // 30 seconds
+    Astro.response.headers.set('CDN-Cache-Control', `max-age=${60}`) // 1 minutes
 }
 ---
 
