@@ -1,7 +1,7 @@
 // @ts-check
-import react from '@astrojs/react'
 import vercel from '@astrojs/vercel'
 import tailwindcss from '@tailwindcss/vite'
+import compressor from 'astro-compressor'
 import icon from 'astro-icon'
 import { defineConfig, fontProviders } from 'astro/config'
 
@@ -42,7 +42,7 @@ export default defineConfig({
         icon({
             iconDir: 'src/assets/icons',
         }),
-        react(),
+        compressor(),
     ],
 
     vite: {
@@ -50,7 +50,12 @@ export default defineConfig({
     },
 
     image: {
-        domains: ['github.com', 'avatars.steamstatic.com'],
+        domains: [
+            'github.com',
+            'avatars.steamstatic.com',
+            'i.scdn.co',
+            'mosaic.scdn.co',
+        ],
         remotePatterns: [
             {
                 protocol: 'https',
@@ -72,10 +77,11 @@ export default defineConfig({
     experimental: {
         fonts: [
             {
-                provider: fontProviders.google(),
+                provider: fontProviders.fontsource(),
                 name: 'Geist',
                 cssVariable: '--font-geist',
                 weights: [100, 200, 300, 400, 500, 600, 700, 800, 900],
+                subsets: ['latin'],
             },
         ],
         liveContentCollections: true,

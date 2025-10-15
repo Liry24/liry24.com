@@ -1,8 +1,9 @@
 ---
 import Arts from '@/components/home/arts.astro'
 import Posts from '@/components/home/posts.astro'
-import Steam from '@/components/home/steam.astro'
 import ToolIcon from '@/components/toolIcon.astro'
+import Spotify from '@/components/widgets/spotify.astro'
+import Steam from '@/components/widgets/steam.astro'
 import Layout from '@/layouts/default.astro'
 import { Icon } from 'astro-icon/components'
 import { Image } from 'astro:assets'
@@ -17,12 +18,17 @@ const career = await getCollection('career')
 
 const avatarUrl = 'https://github.com/Liry24.png'
 const avatarSize = 28
+
+if (import.meta.env.PUBLIC_VERCEL_ENV === 'production') {
+    Astro.response.headers.set('Cache-Control', `max-age=${60 * 60}`) // 1 hours
+    Astro.response.headers.set('CDN-Cache-Control', `max-age=${60 * 60 * 24}`) // 1 days
+}
 ---
 
 <Layout>
-    <div class="flex flex-col items-start gap-16 pt-20">
+    <div class="flex flex-col items-start gap-16 pt-14 sm:pt-20">
         <h1
-            class="-ml-2 text-7xl leading-none font-thin tracking-wider text-nowrap text-zinc-200 sm:text-9xl"
+            class="-ml-2 text-8xl leading-none font-thin tracking-wider text-nowrap text-zinc-200 sm:text-9xl"
         >
             Liry24
         </h1>
@@ -88,7 +94,7 @@ const avatarSize = 28
                     {
                         career.map((item) => (
                             <div class="flex items-baseline gap-4">
-                                <span class="font-medium text-zinc-500">
+                                <span class="text-right font-medium text-zinc-500">
                                     {item.data.period}
                                 </span>
                                 <span>
@@ -101,20 +107,47 @@ const avatarSize = 28
                 </div>
             </div>
 
-            <Steam server:defer>
+            <div class="grid gap-3 md:grid-cols-2">
+                <a
+                    slot="fallback"
+                    href="/spotify"
+                    target="_blank"
+                    class="group flex items-center gap-3 rounded-xl bg-zinc-950 p-3 transition-colors hover:bg-zinc-900 focus-visible:bg-zinc-900"
+                >
+                    <Spotify server:defer>
+                        <div
+                            slot="fallback"
+                            class="animate-out fade-out flex size-16 w-full items-center justify-center"
+                        >
+                            <Icon
+                                name="svg-spinners:ring-resize"
+                                size="24"
+                                class="text-zinc-500"
+                            />
+                        </div>
+                    </Spotify>
+                </a>
+
                 <a
                     slot="fallback"
                     href="/steam"
                     target="_blank"
-                    class="flex h-16 animate-pulse items-center gap-3 rounded-xl bg-zinc-950 px-5 py-4 transition-colors hover:bg-zinc-900 focus-visible:bg-zinc-900"
+                    class="group flex items-center gap-3 rounded-xl bg-zinc-950 p-3 transition-colors hover:bg-zinc-900 focus-visible:bg-zinc-900"
                 >
-                    <Icon
-                        name="simple-icons:steam"
-                        size="20"
-                        class="text-zinc-400"
-                    />
+                    <Steam server:defer>
+                        <div
+                            slot="fallback"
+                            class="animate-out fade-out flex size-16 w-full items-center justify-center"
+                        >
+                            <Icon
+                                name="svg-spinners:ring-resize"
+                                size="24"
+                                class="text-zinc-500"
+                            />
+                        </div>
+                    </Steam>
                 </a>
-            </Steam>
+            </div>
         </div>
 
         <div class="h-px w-full bg-zinc-800"></div>
@@ -134,7 +167,7 @@ const avatarSize = 28
                         class="flex items-baseline gap-5 transition-opacity hover:opacity-80 focus-visible:opacity-80"
                     >
                         <span
-                            class="-mt-2 text-8xl font-extrabold tracking-tight text-zinc-100"
+                            class="-mt-2 text-7xl font-extrabold tracking-tight text-zinc-100 sm:text-8xl"
                         >
                             Liria
                         </span>
@@ -154,7 +187,9 @@ const avatarSize = 28
                         </div>
                     </a>
 
-                    <div class="flex flex-wrap items-center gap-6 pt-2">
+                    <div
+                        class="flex flex-wrap items-center gap-x-6 gap-y-2 pt-2"
+                    >
                         <a
                             href="https://eicosapenta.booth.pm"
                             target="_blank"
@@ -223,7 +258,7 @@ const avatarSize = 28
                 >
                     <span class="text-2xl font-bold">しろくま研究所</span>
 
-                    <div class="flex flex-wrap items-center gap-6">
+                    <div class="flex flex-wrap items-center gap-x-6 gap-y-2">
                         <a
                             href="https://polarbearlab.com"
                             target="_blank"
@@ -304,14 +339,20 @@ const avatarSize = 28
                             target="_blank"
                             class="mx-auto flex items-center gap-2"
                         >
-                            <span class="pt-px text-3xl leading-none">
+                            <span class="pt-px text-xl leading-none font-bold sm:text-3xl">
                                 {rank.data.label}
                             </span>
+
+                            <span class="pt-px text-xl leading-none font-thin tracking-tight sm:text-3xl">
+                                {rank.data.season}
+                            </span>
+
                             <Image
                                 src={rank.data.image}
                                 alt={rank.data.rank}
                                 width={48}
                                 height={48}
+                                class="size-8 sm:size-12"
                             />
                         </a>
                     ))

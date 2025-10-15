@@ -58,24 +58,19 @@ export const getProfile = async (steamId: string) => {
         query: { key: STEAM_API_KEY, format: 'json', steamId: steamId },
     })
 
-    const playerSummaries = await steamFetch<PlayerSummaries>(
-        '/ISteamUser/GetPlayerSummaries/v2/',
-        {
+    const [playerSummaries, ownedGames] = await Promise.all([
+        steamFetch<PlayerSummaries>('/ISteamUser/GetPlayerSummaries/v2/', {
             query: {
                 steamids: steamId,
             },
-        }
-    )
-
-    const ownedGames = await steamFetch<OwnedGames>(
-        '/IPlayerService/GetOwnedGames/v1/',
-        {
+        }),
+        steamFetch<OwnedGames>('/IPlayerService/GetOwnedGames/v1/', {
             query: {
                 steamid: steamId,
                 format: 'json',
             },
-        }
-    )
+        }),
+    ])
 
     return {
         summaries: {

@@ -20,16 +20,6 @@
         "label": "Avatio",
         "icon": "avatio"
     },
-    "spotify": {
-        "url": "/spotify",
-        "label": "Spotify",
-        "icon": "simple-icons:spotify"
-    },
-    "steam": {
-        "url": "/steam",
-        "label": "Steam",
-        "icon": "simple-icons:steam"
-    },
     "pulse": {
         "url": "/pulse",
         "label": "Pulse",

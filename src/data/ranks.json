@@ -3,6 +3,7 @@
     "valorant": {
         "url": "/valorant",
         "label": "VALORANT",
+        "season": "V25A5",
         "rank": "Immortal 1",
         "image": "/ranks/valorant_immortal_1.png"
     }

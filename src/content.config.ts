@@ -43,6 +43,7 @@ const ranks = defineCollection({
     schema: z.object({
         url: z.string().optional(),
         label: z.string(),
+        season: z.string().optional(),
         rank: z.string(),
         image: z.string(),
     }),

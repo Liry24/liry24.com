@@ -1,7 +1,7 @@
 import type { LiveLoader } from 'astro/loaders'
 import { ofetch } from 'ofetch'
 
-interface Article {
+interface Article extends Record<string, unknown> {
     source: 'note' | 'zenn'
     url: string
     title: string
