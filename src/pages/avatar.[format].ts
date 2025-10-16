@@ -8,18 +8,17 @@ const AVATAR_URL = import.meta.glob<string>('/src/assets/images/avatar.png', {
     import: 'default',
 })['/src/assets/images/avatar.png']
 
-export const GET: APIRoute = async ({ params, url }) => {
+export const GET: APIRoute = async ({ params, request }) => {
     const format = params.format?.toLowerCase()
 
-    if (!format || !ALLOWED_FORMATS.includes(format as any)) {
+    if (!format || !ALLOWED_FORMATS.includes(format as any))
         return new Response('Invalid format', { status: 400 })
-    }
 
-    if (!AVATAR_URL) {
-        return new Response('Avatar not found', { status: 404 })
-    }
+    if (!AVATAR_URL) return new Response('Avatar not found', { status: 404 })
 
     try {
+        // requestから直接URLを取得（Vercelでより確実）
+        const url = new URL(request.url)
         const imageUrl = new URL(AVATAR_URL, url.origin).toString()
         const response = await fetch(imageUrl)
 
@@ -30,21 +29,24 @@ export const GET: APIRoute = async ({ params, url }) => {
         const size = url.searchParams.get('s')
         const sizeNum = size ? parseInt(size, 10) : null
 
+        // デバッグログ（本番環境でも確認可能）
+        console.log('Request URL:', request.url)
+        console.log('Size param:', size)
+        console.log('Size num:', sizeNum)
+
         if (
             sizeNum !== null &&
             (isNaN(sizeNum) || sizeNum < 1 || sizeNum > 4096)
-        ) {
+        )
             return new Response('Invalid size (1-4096)', { status: 400 })
-        }
 
         let image = sharp(buffer)
 
-        if (sizeNum) {
+        if (sizeNum)
             image = image.resize(sizeNum, sizeNum, {
                 fit: 'cover',
                 position: 'center',
             })
-        }
 
         image =
             format === 'png'
@@ -61,6 +63,7 @@ export const GET: APIRoute = async ({ params, url }) => {
                     format === 'jpg' ? 'image/jpeg' : `image/${format}`,
                 'Cache-Control': `max-age=${60 * 60 * 24}`, // 1 day
                 'CDN-Cache-Control': `max-age=${60 * 60 * 24 * 30}`, // 30 days
+                Vary: 'Accept-Encoding',
             },
         })
     } catch (error) {
