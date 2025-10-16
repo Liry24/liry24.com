@@ -33,9 +33,6 @@ export default defineConfig({
             enabled: true,
         },
         imageService: true,
-        isr: {
-            expiration: 60 * 60 * 24, // 1 day
-        },
     }),
 
     integrations: [
