@@ -29,11 +29,6 @@ export const GET: APIRoute = async ({ params, request }) => {
         const size = url.searchParams.get('s')
         const sizeNum = size ? parseInt(size, 10) : null
 
-        // デバッグログ（本番環境でも確認可能）
-        console.log('Request URL:', request.url)
-        console.log('Size param:', size)
-        console.log('Size num:', sizeNum)
-
         if (
             sizeNum !== null &&
             (isNaN(sizeNum) || sizeNum < 1 || sizeNum > 4096)
