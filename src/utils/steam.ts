@@ -52,7 +52,7 @@ const personaState = {
 }
 
 export const getProfile = async (steamId: string) => {
-    const STEAM_API_KEY = await getSecret('STEAM_API_KEY')
+    const STEAM_API_KEY = getSecret('STEAM_API_KEY')
     const steamFetch = ofetch.create({
         baseURL: 'https://api.steampowered.com',
         query: { key: STEAM_API_KEY, format: 'json', steamId: steamId },
