@@ -80,11 +80,5 @@
         "icon": "simple-icons:tailwindcss",
         "iconSize": 18,
         "class": "-ml-px"
-    },
-    "postgresql": {
-        "label": "PostgreSQL",
-        "icon": "simple-icons:postgresql",
-        "iconSize": 17,
-        "class": "-ml-0.5"
     }
 }

@@ -7,8 +7,14 @@ import { Image } from 'astro:assets'
 const steamProfile = await getProfile('76561198257979644')
 
 if (import.meta.env.PUBLIC_VERCEL_ENV === 'production') {
-    Astro.response.headers.set('Cache-Control', `max-age=${30}`) // 30 seconds
-    Astro.response.headers.set('CDN-Cache-Control', `max-age=${60}`) // 1 minutes
+    Astro.response.headers.set(
+        'Cache-Control',
+        `max-age=${30} stale-while-revalidate` // 30 seconds
+    )
+    Astro.response.headers.set(
+        'CDN-Cache-Control',
+        `max-age=${60} stale-while-revalidate` // 1 minutes
+    )
 }
 ---
 
@@ -18,6 +24,7 @@ if (import.meta.env.PUBLIC_VERCEL_ENV === 'production') {
         alt="Steam Avatar"
         width={64}
         height={64}
+        loading="eager"
         class="animate-in fade-in rounded-lg"
     />
 
