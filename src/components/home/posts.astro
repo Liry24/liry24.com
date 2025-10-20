@@ -9,14 +9,8 @@ const icons = {
     zenn: 'simple-icons:zenn',
 }
 
-Astro.response.headers.set(
-    'Cache-Control',
-    `max-age=${60 * 60} stale-while-revalidate` // 1 hours
-)
-Astro.response.headers.set(
-    'CDN-Cache-Control',
-    `max-age=${60 * 60 * 24} stale-while-revalidate` // 1 days
-)
+Astro.response.headers.set('Cache-Control', `max-age=${60 * 60}`) // 1 hours
+Astro.response.headers.set('CDN-Cache-Control', `max-age=${60 * 60 * 24}`) // 1 days
 ---
 
 <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
