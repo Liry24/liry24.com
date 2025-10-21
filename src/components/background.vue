@@ -9,6 +9,7 @@ import { useDeviceOrientation } from '@vueuse/core'
 const CAMERA_SENSITIVITY = 0.3
 const CAMERA_OFFSET = { x: 1, y: 1 }
 const DEVICE_ORIENTATION_SENSITIVITY = 0.02
+const BASE_ORIENTATION = { beta: 60, gamma: 0 }
 
 const mousePos = reactive({ x: 0, y: 0 })
 const targetLookAt = reactive({ x: CAMERA_OFFSET.x, y: CAMERA_OFFSET.y })
@@ -43,10 +44,14 @@ watch([beta, gamma], ([betaValue, gammaValue]) => {
     if (betaValue !== null && gammaValue !== null) {
         // beta: -180 to 180 (front-back tilt)
         // gamma: -90 to 90 (left-right tilt)
+        // Calculate relative angle from base orientation
+        const relativeBeta = betaValue - BASE_ORIENTATION.beta
+        const relativeGamma = gammaValue - BASE_ORIENTATION.gamma
+
         targetLookAt.x =
-            CAMERA_OFFSET.x + gammaValue * DEVICE_ORIENTATION_SENSITIVITY
+            CAMERA_OFFSET.x + relativeGamma * DEVICE_ORIENTATION_SENSITIVITY
         targetLookAt.y =
-            CAMERA_OFFSET.y + betaValue * DEVICE_ORIENTATION_SENSITIVITY
+            CAMERA_OFFSET.y + relativeBeta * DEVICE_ORIENTATION_SENSITIVITY
     }
 })
 
