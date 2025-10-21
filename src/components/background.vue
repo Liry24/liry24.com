@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, reactive, watch } from 'vue'
+import { onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { TresCanvas } from '@tresjs/core'
 import { EffectComposerPmndrs, ASCIIPmndrs } from '@tresjs/post-processing'
 import { BlendFunction } from 'postprocessing'
@@ -16,6 +16,9 @@ const lookAt = reactive({ x: CAMERA_OFFSET.x, y: -CAMERA_OFFSET.y })
 
 // Easing factor (0-1, lower = smoother)
 const EASE_FACTOR = 0.1
+
+// Pixel ratio (limit to max 2 for performance on high DPI devices)
+const pixelRatio = ref(1)
 
 let animationFrameId: number | null = null
 
@@ -56,6 +59,8 @@ const animate = () => {
 }
 
 onMounted(() => {
+    pixelRatio.value = Math.min(window.devicePixelRatio, 2)
+
     window.addEventListener('mousemove', handleMouseMove)
     animate()
 })
@@ -70,6 +75,7 @@ onUnmounted(() => {
     <TresCanvas
         render-mode="always"
         :clearAlpha="0"
+        :dpr="pixelRatio"
         shadows
         cast-shadow
         window-size
