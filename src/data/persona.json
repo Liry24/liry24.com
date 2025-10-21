@@ -24,5 +24,10 @@
         "url": "/pulse",
         "label": "Pulse",
         "icon": "mingcute:game-2-fill"
+    },
+    "github": {
+        "url": "/github",
+        "label": "GitHub",
+        "icon": "simple-icons:github"
     }
 }

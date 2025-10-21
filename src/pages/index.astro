@@ -164,31 +164,53 @@ if (import.meta.env.PUBLIC_VERCEL_ENV === 'production') {
                 </h2>
 
                 <div class="flex flex-col gap-1">
-                    <a
-                        href="https://liria.me"
-                        target="_blank"
-                        class="flex items-baseline gap-5 transition-opacity hover:opacity-80 focus-visible:opacity-80"
-                    >
+                    <div class="flex items-end gap-5 sm:items-baseline">
                         <span
                             class="-mt-2 text-7xl font-extrabold tracking-tight text-zinc-100 sm:text-8xl"
                         >
                             Liria
                         </span>
 
-                        <div class="flex items-center gap-2 pb-px">
-                            <span
-                                class="font-medium tracking-wide text-zinc-400"
+                        <div
+                            class="flex flex-col items-baseline gap-x-5 gap-y-0 sm:flex-row"
+                        >
+                            <a
+                                href="https://liria.me"
+                                target="_blank"
+                                class="ml-2 flex items-center gap-2 pb-px transition-opacity hover:opacity-80 focus-visible:opacity-80"
                             >
-                                Website
-                            </span>
+                                <span
+                                    class="font-medium tracking-wide text-zinc-400"
+                                >
+                                    liria.me
+                                </span>
 
-                            <Icon
-                                name="lucide:arrow-up-right"
-                                size="16"
-                                class="text-zinc-400"
-                            />
+                                <Icon
+                                    name="lucide:arrow-up-right"
+                                    size="16"
+                                    class="shrink-0 text-zinc-400"
+                                />
+                            </a>
+
+                            <a
+                                href="https://github.com/liria24"
+                                target="_blank"
+                                class="flex items-center gap-2 pb-px transition-opacity hover:opacity-80 focus-visible:opacity-80"
+                            >
+                                <span
+                                    class="font-medium tracking-wide text-zinc-400"
+                                >
+                                    GitHub
+                                </span>
+
+                                <Icon
+                                    name="lucide:arrow-up-right"
+                                    size="16"
+                                    class="shrink-0 text-zinc-400"
+                                />
+                            </a>
                         </div>
-                    </a>
+                    </div>
 
                     <div
                         class="flex flex-wrap items-center gap-x-6 gap-y-2 pt-2"
@@ -201,7 +223,7 @@ if (import.meta.env.PUBLIC_VERCEL_ENV === 'production') {
                             <Icon
                                 name="booth"
                                 size="18"
-                                class="text-zinc-300"
+                                class="shrink-0 text-zinc-300"
                             />
                             <span class="text-sm tracking-wide text-zinc-400">
                                 Liria Graphics
@@ -210,7 +232,7 @@ if (import.meta.env.PUBLIC_VERCEL_ENV === 'production') {
                             <Icon
                                 name="lucide:arrow-up-right"
                                 size="16"
-                                class="text-zinc-400"
+                                class="shrink-0 text-zinc-400"
                             />
                         </a>
 
@@ -222,7 +244,7 @@ if (import.meta.env.PUBLIC_VERCEL_ENV === 'production') {
                             <Icon
                                 name="avatio"
                                 size="18"
-                                class="text-zinc-300"
+                                class="shrink-0 text-zinc-300"
                             />
                             <span class="text-sm tracking-wide text-zinc-400">
                                 Avatio
@@ -231,7 +253,28 @@ if (import.meta.env.PUBLIC_VERCEL_ENV === 'production') {
                             <Icon
                                 name="lucide:arrow-up-right"
                                 size="16"
-                                class="text-zinc-400"
+                                class="shrink-0 text-zinc-400"
+                            />
+                        </a>
+
+                        <a
+                            href="https://presocial.vercel.app"
+                            target="_blank"
+                            class="ml-1 flex items-center gap-2 transition-opacity hover:opacity-80 focus-visible:opacity-80"
+                        >
+                            <Icon
+                                name="presocial"
+                                size="18"
+                                class="shrink-0 text-zinc-300"
+                            />
+                            <span class="text-sm tracking-wide text-zinc-400">
+                                Presocial
+                            </span>
+
+                            <Icon
+                                name="lucide:arrow-up-right"
+                                size="16"
+                                class="shrink-0 text-zinc-400"
                             />
                         </a>
 
@@ -239,7 +282,7 @@ if (import.meta.env.PUBLIC_VERCEL_ENV === 'production') {
                             <Icon
                                 name="simple-icons:discord"
                                 size="18"
-                                class="text-zinc-300"
+                                class="shrink-0 text-zinc-300"
                             />
                             <span class="text-sm tracking-wide text-zinc-400">
                                 Some Discord Bot
