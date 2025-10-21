@@ -1,35 +1,56 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, reactive } from 'vue'
+import { onMounted, onUnmounted, reactive, watch } from 'vue'
 import { TresCanvas } from '@tresjs/core'
 import { EffectComposerPmndrs, ASCIIPmndrs } from '@tresjs/post-processing'
 import { BlendFunction } from 'postprocessing'
+import { useDeviceOrientation } from '@vueuse/core'
 
 // Camera angle sensitivity
-const CAMERA_SENSITIVITY = 0.2
+const CAMERA_SENSITIVITY = 0.3
+const CAMERA_OFFSET = { x: 1, y: 1 }
+const DEVICE_ORIENTATION_SENSITIVITY = 0.02
 
 const mousePos = reactive({ x: 0, y: 0 })
-const targetCameraPos = reactive({ x: 1, y: 1 })
-const cameraPos = reactive({ x: 0, y: 0 })
+const targetLookAt = reactive({ x: CAMERA_OFFSET.x, y: CAMERA_OFFSET.y })
+const lookAt = reactive({ x: CAMERA_OFFSET.x, y: -CAMERA_OFFSET.y })
 
 // Easing factor (0-1, lower = smoother)
 const EASE_FACTOR = 0.1
 
 let animationFrameId: number | null = null
 
+// Device orientation
+const { isSupported, beta, gamma } = useDeviceOrientation()
+
 const handleMouseMove = (event: MouseEvent) => {
+    // Skip mouse control if device orientation is available
+    if (isSupported.value && beta.value !== null && gamma.value !== null) return
+
     // Normalize mouse position to -1 to 1 range
     mousePos.x = (event.clientX / window.innerWidth) * 2 - 1
     mousePos.y = -(event.clientY / window.innerHeight) * 2 + 1
 
-    // Calculate target camera position based on mouse
-    targetCameraPos.x = 1 + mousePos.x * CAMERA_SENSITIVITY
-    targetCameraPos.y = 1 + mousePos.y * CAMERA_SENSITIVITY
+    // Calculate target look-at position based on mouse
+    targetLookAt.x = CAMERA_OFFSET.x + mousePos.x * CAMERA_SENSITIVITY
+    targetLookAt.y = CAMERA_OFFSET.y + mousePos.y * CAMERA_SENSITIVITY
 }
 
+// Watch device orientation and update target look-at position
+watch([beta, gamma], ([betaValue, gammaValue]) => {
+    if (betaValue !== null && gammaValue !== null) {
+        // beta: -180 to 180 (front-back tilt)
+        // gamma: -90 to 90 (left-right tilt)
+        targetLookAt.x =
+            CAMERA_OFFSET.x + gammaValue * DEVICE_ORIENTATION_SENSITIVITY
+        targetLookAt.y =
+            CAMERA_OFFSET.y + betaValue * DEVICE_ORIENTATION_SENSITIVITY
+    }
+})
+
 const animate = () => {
-    // Apply easing to camera position
-    cameraPos.x += (targetCameraPos.x - cameraPos.x) * EASE_FACTOR
-    cameraPos.y += (targetCameraPos.y - cameraPos.y) * EASE_FACTOR
+    // Apply easing to look-at position
+    lookAt.x += (targetLookAt.x - lookAt.x) * EASE_FACTOR
+    lookAt.y += (targetLookAt.y * -1 - lookAt.y) * EASE_FACTOR
 
     animationFrameId = requestAnimationFrame(animate)
 }
@@ -54,15 +75,15 @@ onUnmounted(() => {
         window-size
     >
         <TresPerspectiveCamera
-            :position="[cameraPos.x, cameraPos.y, 1]"
-            :look-at="[-1, -2, 1]"
+            :position="[2, 0, 0]"
+            :look-at="[0, lookAt.y, lookAt.x]"
         />
 
         <TresAmbientLight :intensity="1" />
 
         <TresDirectionalLight
             :intensity="8"
-            :position="[40, 100, -10]"
+            :position="[40, 40, -40]"
             :look-at="[0, 0, 0]"
             cast-shadow
         />
@@ -77,7 +98,7 @@ onUnmounted(() => {
                 <ASCIIPmndrs
                     :blend-function="BlendFunction.SRC"
                     :ascii-texture="{
-                        characters: ' .:-+*=#%@',
+                        characters: ' .:-*+=#%@',
                     }"
                     color="#444444"
                 />
