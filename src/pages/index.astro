@@ -1,4 +1,5 @@
 ---
+import Background from '@/components/background.vue'
 import Arts from '@/components/home/arts.astro'
 import Posts from '@/components/home/posts.astro'
 import ToolIcon from '@/components/toolIcon.astro'
@@ -26,6 +27,8 @@ if (import.meta.env.PUBLIC_VERCEL_ENV === 'production') {
 ---
 
 <Layout>
+    <Background client:load class="-z-50" />
+
     <div class="flex flex-col items-start gap-16 pt-14 sm:pt-20">
         <h1
             class="-ml-2 text-8xl leading-none font-thin tracking-wider text-nowrap text-zinc-200 sm:text-9xl"
@@ -112,7 +115,7 @@ if (import.meta.env.PUBLIC_VERCEL_ENV === 'production') {
                     slot="fallback"
                     href="/spotify"
                     target="_blank"
-                    class="group flex items-center gap-3 rounded-xl bg-zinc-950 p-3 transition-colors hover:bg-zinc-900 focus-visible:bg-zinc-900"
+                    class="group flex items-center gap-3 rounded-xl bg-zinc-900/60 p-3 transition-colors hover:bg-zinc-900 focus-visible:bg-zinc-900"
                 >
                     <Spotify server:defer>
                         <div
@@ -132,7 +135,7 @@ if (import.meta.env.PUBLIC_VERCEL_ENV === 'production') {
                     slot="fallback"
                     href="/steam"
                     target="_blank"
-                    class="group flex items-center gap-3 rounded-xl bg-zinc-950 p-3 transition-colors hover:bg-zinc-900 focus-visible:bg-zinc-900"
+                    class="group flex items-center gap-3 rounded-xl bg-zinc-900/60 p-3 transition-colors hover:bg-zinc-900 focus-visible:bg-zinc-900"
                 >
                     <Steam server:defer>
                         <div
@@ -318,7 +321,7 @@ if (import.meta.env.PUBLIC_VERCEL_ENV === 'production') {
                     >
                         {
                             Array.from({ length: 4 }).map(() => (
-                                <div class="h-24 w-full animate-pulse rounded-lg bg-zinc-800" />
+                                <div class="h-24 w-full animate-pulse rounded-lg bg-zinc-700/60" />
                             ))
                         }
                     </div>

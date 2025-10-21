@@ -1,6 +1,8 @@
 // @ts-check
 import vercel from '@astrojs/vercel'
+import vue from '@astrojs/vue'
 import tailwindcss from '@tailwindcss/vite'
+import { templateCompilerOptions } from '@tresjs/core'
 import compressor from 'astro-compressor'
 import icon from 'astro-icon'
 import { defineConfig, fontProviders } from 'astro/config'
@@ -40,6 +42,9 @@ export default defineConfig({
             iconDir: 'src/assets/icons',
         }),
         compressor(),
+        vue({
+            ...templateCompilerOptions,
+        }),
     ],
 
     vite: {
