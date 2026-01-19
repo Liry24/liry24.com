@@ -1,16 +1,14 @@
 {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "[astro]": {
-        "editor.defaultFormatter": "astro-build.astro-vscode"
-    },
     "files.associations": {
         "*.css": "tailwindcss"
     },
     "editor.quickSuggestions": {
         "strings": "on"
     },
+    // "tailwindCSS.lint.cssConflict": "ignore",
     "tailwindCSS.classAttributes": ["class", "ui"],
     "tailwindCSS.experimental.classRegex": [
-        ["ui:\\s*{([^)]*)\\s*}", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
-    ]
+        ["ui:\\s*{([^)]*)\\s*}", "(?:'|\"|`)([^']*)(?:'|\"|`)", "class:\\s*?[\"'`]([^\"'`]*).*?,"]
+    ],
+    "typescript.tsdk": "node_modules\\typescript\\lib"
 }
