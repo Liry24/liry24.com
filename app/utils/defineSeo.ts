@@ -1,18 +1,23 @@
-export default ({
-    title,
-    titleTemplate,
-    description,
-    image,
-    type,
-    twitterCard,
-}: {
-    title?: string
-    titleTemplate?: string
-    description?: string
-    image?: string
-    type?: 'website' | 'article'
-    twitterCard?: 'summary' | 'summary_large_image'
-}) => {
+export default (
+    {
+        title,
+        titleTemplate,
+        description,
+        image,
+        type,
+        twitterCard,
+    }: {
+        title?: string
+        titleTemplate?: string
+        description?: string
+        image?: string
+        type?: 'website' | 'article'
+        twitterCard?: 'summary' | 'summary_large_image'
+    } = {
+        type: 'article',
+        twitterCard: 'summary',
+    }
+) => {
     useSeoMeta({
         title,
         titleTemplate,
@@ -22,10 +27,10 @@ export default ({
         twitterTitle: title,
         twitterDescription: description,
         twitterImage: image,
-        twitterCard: twitterCard || 'summary',
+        twitterCard: twitterCard,
     })
     useHead({
-        meta: [{ property: 'og:type', content: type || 'article' }],
+        meta: [{ property: 'og:type', content: type }],
         link: [{ rel: 'icon', href: '/favicon.ico' }],
     })
 }

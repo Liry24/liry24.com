@@ -82,6 +82,7 @@ const onSubmit = async () => {
                         v-model="state.name"
                         placeholder="Skill Name"
                         variant="soft"
+                        autofocus
                         class="w-full"
                     />
                 </UFormField>
@@ -117,7 +118,11 @@ const onSubmit = async () => {
                     </UPopover>
                 </UFormField>
 
-                <UFormField label="Category" name="category">
+                <UFormField
+                    label="Category"
+                    name="category"
+                    :ui="{ container: 'flex flex-col gap-2' }"
+                >
                     <UInput
                         v-model="state.category"
                         placeholder="Graphics"
@@ -130,8 +135,8 @@ const onSubmit = async () => {
                             :key="`category-${index}`"
                             :label="category"
                             variant="outline"
-                            color="neutral"
                             size="sm"
+                            @click="state.category = category"
                         />
                     </div>
                 </UFormField>

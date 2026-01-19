@@ -21,7 +21,32 @@ const tabs = [
     },
 ]
 
-const title = computed(() => tabs.find((tab) => route.path.startsWith(tab.to))?.label || 'Liry24')
+const title = ref('Liry24')
+const originalTitle = ref('Liry24')
+const titleHovered = ref(false)
+
+watch(
+    () => route.path,
+    () => {
+        const text = tabs.find((tab) => route.path.startsWith(tab.to))?.label || 'Liry24'
+        title.value = text
+        originalTitle.value = text
+        titleHovered.value = false
+    },
+    { immediate: true }
+)
+
+const handleMouseEnter = () => {
+    if (route.path !== '/') {
+        title.value = 'back to home'
+        titleHovered.value = true
+    }
+}
+
+const handleMouseLeave = () => {
+    title.value = originalTitle.value
+    titleHovered.value = false
+}
 </script>
 
 <template>
@@ -33,13 +58,19 @@ const title = computed(() => tabs.find((tab) => route.path.startsWith(tab.to))?.
                     :animate="{ opacity: 1 }"
                     class="flex w-full flex-col items-center gap-3"
                 >
-                    <MotionNuxtLink to="/" class="flex items-center gap-3">
+                    <MotionNuxtLink
+                        to="/"
+                        class="flex items-center gap-3"
+                        @mouseenter="handleMouseEnter"
+                        @mouseleave="handleMouseLeave"
+                    >
                         <NuxtImg
                             v-if="route.path === '/'"
                             src="/avatar.png"
                             alt=""
                             class="size-14 rounded-full"
                         />
+                        <Icon v-if="titleHovered" name="mingcute:arrow-left-fill" size="58" />
                         <HyperText
                             :text="title"
                             :duration="500"
@@ -47,7 +78,8 @@ const title = computed(() => tabs.find((tab) => route.path.startsWith(tab.to))?.
                             :class="
                                 cn(
                                     'font-[Special_Gothic_Expanded_One] text-6xl leading-none tracking-tight',
-                                    route.path === '/' && 'w-56'
+                                    route.path === '/' && 'w-56',
+                                    titleHovered && 'w-117'
                                 )
                             "
                         />
@@ -66,7 +98,9 @@ const title = computed(() => tabs.find((tab) => route.path.startsWith(tab.to))?.
                     </div>
                 </motion.header>
 
-                <slot />
+                <main class="contents">
+                    <slot />
+                </main>
             </div>
 
             <motion.footer

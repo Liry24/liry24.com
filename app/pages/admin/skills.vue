@@ -90,7 +90,11 @@ defineShortcuts({
                                 label="New Skill"
                                 variant="outline"
                                 color="neutral"
-                            />
+                            >
+                                <template #trailing>
+                                    <UKbd value="n" />
+                                </template>
+                            </UButton>
                         </AdminModalSkill>
                     </template>
                 </UDashboardNavbar>

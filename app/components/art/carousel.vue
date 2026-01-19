@@ -1,8 +1,14 @@
 <script setup lang="ts">
+import { ImageViewer } from '#components'
+
 interface Props {
     data: ArtImage[]
 }
 const props = defineProps<Props>()
+
+const overlay = useOverlay()
+
+const imageViewer = overlay.create(ImageViewer)
 
 const carousel = useTemplateRef('carousel')
 const activeIndex = ref(0)
@@ -25,17 +31,28 @@ const select = (index: number) => {
 </script>
 
 <template>
-    <div class="w-full flex-1">
+    <div class="flex w-full flex-col gap-4">
         <UCarousel
             ref="carousel"
             v-slot="{ item }"
             :items="props.data"
             :prev="{ onClick: onClickPrev }"
             :next="{ onClick: onClickNext }"
+            :ui="{ container: 'items-center' }"
             class="mx-auto w-full"
             @select="onSelect"
         >
-            <img :src="item.src" :alt="item.alt || ''" class="max-h-[70svh] rounded-lg" />
+            <NuxtImg
+                :src="item.src"
+                :alt="item.alt || ''"
+                class="max-h-[70svh] rounded-lg"
+                @click="
+                    imageViewer.open({
+                        src: item.src,
+                        alt: item.alt || '',
+                    })
+                "
+            />
         </UCarousel>
 
         <div class="mx-auto flex gap-2">

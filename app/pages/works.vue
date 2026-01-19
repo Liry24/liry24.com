@@ -1,5 +1,10 @@
 <script setup lang="ts">
 const { data } = useFetch('/api/works')
+
+defineSeo({
+    title: 'Works',
+    titleTemplate: '%s | Liry24',
+})
 </script>
 
 <template>
