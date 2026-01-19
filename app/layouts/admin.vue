@@ -189,9 +189,9 @@ const { data: posts } = useFetch('/api/posts', { key: 'posts' })
                 </template>
             </UDashboardSidebar>
 
-            <div class="min-h-dvh w-full overflow-auto">
+            <main class="min-h-dvh w-full overflow-auto">
                 <slot />
-            </div>
+            </main>
         </UDashboardGroup>
     </div>
 </template>

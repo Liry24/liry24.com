@@ -2,6 +2,11 @@
 const route = useRoute()
 
 const { data } = await useFetch(`/api/posts/${route.params.slug}`)
+
+defineSeo({
+    title: data.value?.title,
+    titleTemplate: '%s | Liry24',
+})
 </script>
 
 <template>
@@ -15,12 +20,7 @@ const { data } = await useFetch(`/api/posts/${route.params.slug}`)
                 {{ data.title }}
             </h1>
 
-            <div
-                :initial="{ opacity: 0 }"
-                :animate="{ opacity: 1 }"
-                :transition="{ delay: 0.1 }"
-                class="flex items-center gap-2"
-            >
+            <div class="flex items-center gap-2">
                 <NuxtTime
                     :datetime="data.createdAt"
                     date-style="short"
@@ -36,12 +36,7 @@ const { data } = await useFetch(`/api/posts/${route.params.slug}`)
                 />
             </div>
 
-            <div
-                :initial="{ opacity: 0 }"
-                :animate="{ opacity: 1 }"
-                :transition="{ delay: 0.2 }"
-                class="flex max-w-4xl flex-col gap-6"
-            >
+            <div class="flex max-w-4xl flex-col gap-6">
                 <USeparator class="my-4" />
 
                 <MDC :value="data.content" class="sentence px-1 *:first:mt-0 *:last:mb-0" />

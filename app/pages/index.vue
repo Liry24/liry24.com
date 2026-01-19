@@ -26,6 +26,7 @@ const rotateArray = <T,>(arr: T[], n: number): T[] => {
 
 defineSeo({
     title: 'Liry24',
+    type: 'website',
 })
 </script>
 
@@ -57,7 +58,8 @@ defineSeo({
                 :width="320"
                 :height="320"
                 format="webp"
-                class="aspect-square size-64 rounded-xl object-cover md:size-72 lg:size-80"
+                class="aspect-square size-64 cursor-pointer rounded-xl object-cover md:size-72 lg:size-80"
+                @click="navigateTo(`/arts?open=${art.slug}`)"
             />
         </UMarquee>
 
@@ -90,7 +92,7 @@ defineSeo({
             class="flex w-full flex-col items-center gap-2"
         >
             <div class="flex items-center gap-2">
-                <Icon name="liria:liria" size="32" />
+                <Icon name="liria:liria" size="32" aria-hidden="true" />
                 <h2 class="text-toned ml-1 pt-0.5 text-3xl leading-none font-extrabold text-nowrap">
                     Liria
                 </h2>
@@ -141,7 +143,7 @@ defineSeo({
                         Liria<span class="font-thin tracking-tighter">Graphics</span>
                     </span>
 
-                    <p class="text-muted z-1 text-center">
+                    <p class="text-toned z-1 text-center">
                         Digital Assets Store for VRChat Avatars. Available on BOOTH.
                     </p>
                 </NuxtLink>
@@ -160,7 +162,7 @@ defineSeo({
 
                     <span class="z-1 text-5xl font-extrabold tracking-tight"> Avatio </span>
 
-                    <p class="text-muted z-1 text-center">VR-SNS Avatar Setups Sharing Platform.</p>
+                    <p class="text-toned z-1 text-center">VR-SNS Avatar Setups Sharing Platform.</p>
                 </NuxtLink>
             </div>
         </motion.div>

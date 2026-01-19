@@ -3,11 +3,16 @@ import { UPageCard } from '#components'
 import { motion } from 'motion-v'
 
 const { data } = useFetch('/api/posts')
+
+defineSeo({
+    title: 'Posts',
+    titleTemplate: '%s | Liry24',
+})
 </script>
 
 <template>
     <UPage v-if="data">
-        <div class="mx-4 grid grid-cols-2 gap-6">
+        <div class="mx-4 grid grid-cols-1 gap-6 lg:grid-cols-2">
             <motion.div
                 v-for="(post, index) in data"
                 :key="post.slug"
@@ -30,7 +35,7 @@ const { data } = useFetch('/api/posts')
                         {{ post.title }}
                     </h2>
 
-                    <div class="flex items-center gap-2">
+                    <div class="flex flex-wrap items-center gap-2">
                         <NuxtTime
                             :datetime="post.createdAt"
                             date-style="short"

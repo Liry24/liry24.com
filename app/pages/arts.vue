@@ -1,5 +1,18 @@
 <script setup lang="ts">
+import { ArtViewer } from '#components'
+
+const route = useRoute()
+const overlay = useOverlay()
+
 const { data } = useFetch('/api/arts')
+
+const modalArtViewer = overlay.create(ArtViewer)
+
+onMounted(() => {
+    if (route.query.open && data.value?.map((i) => i.slug).includes(route.query.open as string)) {
+        modalArtViewer.open({ item: data.value.find((i) => i.slug === route.query.open)! })
+    }
+})
 
 defineSeo({
     title: 'Arts',
@@ -18,56 +31,31 @@ defineSeo({
             :ssr-columns="2"
         >
             <template #default="{ item }">
-                <UModal
-                    scrollable
-                    :title="item.title"
-                    :ui="{
-                        content:
-                            'max-w-full h-[calc(100dvh-4rem)] w-[calc(100dvw-4rem)] rounded-2xl',
-                    }"
+                <div
+                    class="group relative cursor-pointer overflow-clip rounded-xl"
+                    @click="modalArtViewer.open({ item })"
                 >
-                    <div class="group relative cursor-pointer overflow-clip rounded-xl">
-                        <NuxtImg
-                            :src="item.images[0]?.src"
-                            :alt="item.title"
-                            :width="520"
-                            class="size-full"
-                        />
+                    <NuxtImg
+                        :src="item.images[0]?.src"
+                        :alt="item.title"
+                        :width="520"
+                        format="webp"
+                        class="size-full"
+                    />
 
-                        <div
-                            class="absolute inset-0 flex flex-col gap-3 bg-black/50 p-4 text-zinc-100 opacity-0 transition-opacity group-hover:opacity-100"
-                        >
-                            <span class="font-[Special_Gothic_Expanded_One] text-3xl font-bold">
-                                {{ item.title }}
-                            </span>
+                    <div
+                        class="absolute inset-0 flex flex-col gap-3 bg-black/50 p-4 text-zinc-100 opacity-0 transition-opacity group-hover:opacity-100"
+                    >
+                        <span class="font-[Special_Gothic_Expanded_One] text-3xl font-bold">
+                            {{ item.title }}
+                        </span>
 
-                            <div class="mt-auto ml-auto flex items-center gap-1">
-                                <Icon name="mingcute:photo-album-fill" size="20" />
-                                <span class="font-bold">{{ item.images.length }}</span>
-                            </div>
+                        <div class="mt-auto ml-auto flex items-center gap-1">
+                            <Icon name="mingcute:photo-album-fill" size="20" />
+                            <span class="font-bold">{{ item.images.length }}</span>
                         </div>
                     </div>
-
-                    <template #content>
-                        <div class="grid grid-cols-3 gap-12 p-16">
-                            <div class="col-span-2 flex flex-col gap-4">
-                                <ArtCarousel :data="item.images" />
-
-                                <UButton
-                                    icon="mingcute:arrow-left-line"
-                                    label="Back"
-                                    variant="ghost"
-                                    class="mt-auto w-fit"
-                                />
-                            </div>
-
-                            <div class="flex flex-col gap-4">
-                                <h1 class="text-4xl font-bold">{{ item.title }}</h1>
-                                <p>{{ item.description }}</p>
-                            </div>
-                        </div>
-                    </template>
-                </UModal>
+                </div>
             </template>
         </MasonryWall>
     </div>

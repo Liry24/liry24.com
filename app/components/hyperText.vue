@@ -2,23 +2,23 @@
 import { Primitive } from 'reka-ui'
 import type { HTMLAttributes } from 'vue'
 
-const props = withDefaults(
-    defineProps<{
-        text: string
-        case?: 'upper' | 'lower'
-        duration?: number
-        animateOnLoad?: boolean
-        as?: string
-        class?: HTMLAttributes['class']
-    }>(),
-    {
-        case: 'lower',
-        duration: 800,
-        animateOnLoad: false,
-        as: 'span',
-        class: undefined,
-    }
-)
+interface Props {
+    text: string
+    case?: 'upper' | 'lower'
+    duration?: number
+    animateOnLoad?: boolean
+    as?: string
+    class?: HTMLAttributes['class']
+}
+const props = withDefaults(defineProps<Props>(), {
+    case: 'lower',
+    duration: 800,
+    animateOnLoad: false,
+    as: 'span',
+    class: undefined,
+})
+
+const emit = defineEmits(['mouseenter', 'mouseleave'])
 
 const alphabets = {
     upper: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
@@ -66,7 +66,12 @@ if (props.animateOnLoad) triggerAnimation()
 </script>
 
 <template>
-    <Primitive :as="props.as" :class="cn('flex', props.class)" @mouseenter="triggerAnimation">
+    <Primitive
+        :as="props.as"
+        :class="cn('flex', props.class)"
+        @mouseenter="emit('mouseenter')"
+        @mouseleave="emit('mouseleave')"
+    >
         <Motion
             v-for="(letter, i) in displayText"
             :key="i"
