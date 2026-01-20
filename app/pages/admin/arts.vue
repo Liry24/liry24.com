@@ -15,6 +15,8 @@ const modalArt = overlay.create(AdminModalArt)
 
 const { data, refresh } = await useFetch('/api/arts', {
     default: () => [],
+    getCachedData: (key, n, ctx) =>
+        ctx.cause !== 'refresh:manual' && n.isHydrating ? n.payload.data[key] : n.static.data[key],
 })
 
 const arts = ref([...(data.value || [])])

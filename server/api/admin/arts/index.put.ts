@@ -3,7 +3,7 @@ import { artImages as artImagesTable, arts as artsTable } from '~~/database/sche
 
 const request = {
     body: z.object({
-        arts: artsInsertSchema.array(),
+        arts: artsInsertSchema.required({ slug: true }).array(),
     }),
 }
 

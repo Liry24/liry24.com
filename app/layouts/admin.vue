@@ -132,6 +132,20 @@ const { data: posts } = useFetch('/api/posts', { key: 'posts' })
                                 label: 'Vercel',
                             },
                             {
+                                to: app.turso,
+                                target: '_blank',
+                                external: true,
+                                icon: 'mingcute:coin-2-fill',
+                                label: 'Turso',
+                            },
+                            {
+                                to: app.tigris,
+                                target: '_blank',
+                                external: true,
+                                icon: 'mingcute:storage-fill',
+                                label: 'Tigris',
+                            },
+                            {
                                 to: '/',
                                 label: 'Back to site',
                                 icon: 'lucide:arrow-left',

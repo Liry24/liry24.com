@@ -2,6 +2,8 @@ export default defineAppConfig({
     app: {
         repo: 'https://github.com/liry24/liry24.com',
         vercel: 'https://vercel.com/liria/liry24.com',
+        turso: 'https://app.turso.tech/vercel-icfg-p4qutmxrwbcgdtyntx25ew5z/databases/turso-liry24-com',
+        tigris: 'https://console.tigris.dev',
     },
     ui: {
         colors: {

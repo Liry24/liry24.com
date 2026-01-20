@@ -112,7 +112,9 @@ const save = async () => {
                                 <template v-if="social.alias">
                                     <Icon name="mingcute:arrow-right-line" />
                                     <span class="text-muted text-sm">
-                                        {{ `${location.origin}/${social.alias}` }}
+                                        {{
+                                            `${location.origin?.replace('https://', '')}/${social.alias}`
+                                        }}
                                     </span>
                                 </template>
 
