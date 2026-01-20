@@ -19,13 +19,14 @@
         "@nuxt/content": "^3.11.0",
         "@nuxt/image": "^2.0.0",
         "@nuxt/ui": "^4.3.0",
+        "@tigrisdata/storage": "^2.10.2",
         "@vercel/analytics": "^1.6.1",
-        "@vercel/blob": "^2.0.0",
         "@vercel/config": "^0.0.25",
         "@vercel/functions": "^3.3.6",
         "@vueuse/nuxt": "^14.1.0",
         "@yeger/vue-masonry-wall": "^5.1.4",
-        "ai": "^6.0.40",
+        "ai": "^6.0.41",
+        "aws4fetch": "^1.0.20",
         "better-auth": "^1.4.15",
         "clsx": "^2.1.1",
         "drizzle-orm": "1.0.0-beta.10-4a43a22",
@@ -53,7 +54,7 @@
         "vue-tsc": "^3.2.2"
     },
     "overrides": {
-        "@nuxt/ui": "https://pkg.pr.new/@nuxt/ui@a68df90",
+        "@nuxt/ui": "https://pkg.pr.new/@nuxt/ui@434b0bc",
         "vite": "8.0.0-beta.8"
     },
     "engines": {

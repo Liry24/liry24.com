@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { upload } from '@vercel/blob/client'
+import { upload } from '@tigrisdata/storage/client'
 import { nanoid } from 'nanoid'
 import type z from 'zod'
 
@@ -64,9 +64,9 @@ const onSubmit = async () => {
 
                 const imageExt = image.name.split('.').pop()
                 const imageName = `art-${artSlug}-${nanoid(6)}.${imageExt}`
-                const blob = await upload(imageName, image, {
+                const result = await upload(imageName, image, {
                     access: 'public',
-                    handleUploadUrl: '/api/admin/upload',
+                    url: '/api/admin/upload',
                     onUploadProgress: (progress) => {
                         const currentFileProgress = progress.percentage / 100
                         const totalSteps = images.value.length + 1
@@ -76,6 +76,8 @@ const onSubmit = async () => {
                         submittingProgress.value = globalProgress
                     },
                 })
+                if (result.error) throw result.error
+                const blob = result.data
 
                 imageData.push({ src: blob.url, alt: undefined })
                 addLog(`Uploaded ${image.name} successfully.`)
