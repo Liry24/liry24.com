@@ -24,8 +24,6 @@ export default defineNuxtConfig({
 
     css: ['~/assets/css/main.css'],
 
-    routeRules: {},
-
     runtimeConfig: {
         public: {
             domain: process.env.DOMAIN,
@@ -158,10 +156,7 @@ export default defineNuxtConfig({
     },
 
     image: {
-        domains: [
-            'inh2fnznqydyyofy.public.blob.vercel-storage.com',
-            'avatars.githubusercontent.com',
-        ],
+        domains: ['images.liry24.com', 'avatars.githubusercontent.com'],
     },
 
     ui: {

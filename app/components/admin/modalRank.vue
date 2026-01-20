@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { upload } from '@vercel/blob/client'
+import { upload } from '@tigrisdata/storage/client'
 
 const open = defineModel<boolean>('open', {
     default: false,
@@ -46,15 +46,17 @@ const onSubmit = async () => {
             addLog(`Uploading image: ${image.value.name}...`)
             const imageExt = image.value.name.split('.').pop()
             const imageName = `${state.game.toLowerCase().trim().replaceAll(' ', '-')}-${state.rank.toLowerCase().trim().replaceAll(' ', '-')}.${imageExt}`
-            const blob = await upload(imageName, image.value, {
+            const result = await upload(imageName, image.value, {
                 access: 'public',
-                handleUploadUrl: '/api/admin/upload',
+                url: '/api/admin/upload',
                 onUploadProgress: (progress) => {
                     const currentFileProgress = progress.percentage / 100
                     const totalSteps = 2 // 1 for image, 1 for database
                     submittingProgress.value = Math.floor((currentFileProgress / totalSteps) * 100)
                 },
             })
+            if (result.error) throw result.error
+            const blob = result.data
 
             state.imageUrl = blob.url
             addLog('Image uploaded successfully.')

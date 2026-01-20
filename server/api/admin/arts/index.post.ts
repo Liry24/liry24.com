@@ -1,3 +1,4 @@
+import { generateText } from 'ai'
 import { artImages, arts } from '~~/database/schema'
 
 const request = {
@@ -7,35 +8,57 @@ const request = {
 export default adminSessionEventHandler(async () => {
     const { slug, title, description, href, images } = await validateBody(request.body)
 
-    let artSlug: string | undefined
+    let generatedSlug: string = ''
+
+    const exists = await db.query.arts.findMany({
+        columns: {
+            slug: true,
+        },
+    })
+
+    if (!slug) {
+        const messages: { role: 'system' | 'user'; content: string }[] = []
+        if (exists.length > 0)
+            messages.push({
+                role: 'system',
+                content: `The short slug must not overlap with any of the existing slugs: ${exists.map((b) => b.slug).join(', ')}`,
+            })
+
+        const result = await generateText({
+            model: 'google/gemini-3-flash',
+            messages: [
+                ...messages,
+                {
+                    role: 'user',
+                    content: `Create a short slug for the art with the title: ${title}`,
+                },
+            ],
+            system: 'Please return only the slug as your answer.',
+        })
+
+        generatedSlug = result.text.trim()
+    }
 
     await db.transaction(async (tx) => {
-        const [art] = await tx
-            .insert(arts)
-            .values({
-                slug,
-                title,
-                description,
-                href,
-            })
-            .returning({
-                slug: arts.slug,
-            })
+        await tx.insert(arts).values({
+            slug: slug || generatedSlug,
+            title,
+            description,
+            href,
+        })
 
         await tx.insert(artImages).values(
             images.map((image) => ({
-                artSlug: art.slug,
+                artSlug: slug || generatedSlug,
                 src: image.src,
                 alt: image.alt,
             }))
         )
-
-        artSlug = art.slug
     })
 
     await purgeVercelCDNCacheByTags('arts')
 
     return {
-        slug: artSlug,
+        slug: slug || generatedSlug,
     }
 })
