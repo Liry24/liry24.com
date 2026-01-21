@@ -3,7 +3,7 @@ import { works as worksTable } from '~~/database/schema'
 
 const request = {
     body: z.object({
-        works: worksInsertSchema.array(),
+        works: worksInsertSchema.required({ slug: true }).array(),
     }),
 }
 

@@ -8,7 +8,7 @@ definePageMeta({
 })
 
 const route = useRoute()
-const toast = useToast()
+const { updatePost, deletePost } = usePost()
 
 const { data, refresh } = await useFetch(`/api/posts/${route.params.slug}`)
 
@@ -25,56 +25,20 @@ const openModalDelete = ref(false)
 
 const onSubmit = async () => {
     try {
-        await $fetch(`/api/admin/posts/${route.params.slug}`, {
-            method: 'PUT',
-            body: state,
-        })
-
-        toast.add({
-            icon: 'mingcute:check-line',
-            title: 'Saved',
-            description: 'Your changes have been saved',
-            color: 'success',
-        })
-
+        await updatePost(route.params.slug as string, state)
         await refresh()
-    } catch (e) {
-        console.log(e)
-        toast.add({
-            icon: 'mingcute:close-line',
-            title: 'Error',
-            description: 'Something went wrong',
-            color: 'error',
-        })
+    } catch {
+        // Error handled in composable
     }
 }
 
 const onDelete = async () => {
     try {
-        await $fetch(`/api/admin/posts/${route.params.slug}`, {
-            method: 'DELETE',
-        })
-
-        await refresh()
-        await refreshNuxtData('posts')
-
-        toast.add({
-            icon: 'mingcute:check-line',
-            title: 'Deleted',
-            description: 'Your post has been deleted',
-            color: 'success',
-        })
-
+        await deletePost(route.params.slug as string)
         openModalDelete.value = false
         navigateTo('/admin')
-    } catch (e) {
-        console.log(e)
-        toast.add({
-            icon: 'mingcute:close-line',
-            title: 'Error',
-            description: 'Something went wrong',
-            color: 'error',
-        })
+    } catch {
+        // Error handled in composable
     }
 }
 </script>

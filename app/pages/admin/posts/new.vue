@@ -7,7 +7,7 @@ definePageMeta({
     pageTransition: false,
 })
 
-const toast = useToast()
+const { savePost, submitting } = usePost()
 
 const state = reactive<Schema>({
     slug: '',
@@ -16,35 +16,12 @@ const state = reactive<Schema>({
     content: '',
 })
 
-const submitting = ref(false)
-
 const onSubmit = async () => {
-    submitting.value = true
     try {
-        const { slug } = await $fetch('/api/admin/posts', {
-            method: 'POST',
-            body: state,
-        })
-
-        toast.add({
-            icon: 'mingcute:check-line',
-            title: 'Saved',
-            description: 'Your changes have been saved',
-            color: 'success',
-        })
-
-        await refreshNuxtData('posts')
+        const slug = await savePost(state)
         await navigateTo(`/admin/posts/${slug}`)
-    } catch (e) {
-        console.log(e)
-        toast.add({
-            icon: 'mingcute:close-line',
-            title: 'Error',
-            description: 'Something went wrong',
-            color: 'error',
-        })
-    } finally {
-        submitting.value = false
+    } catch {
+        // Error handled in composable
     }
 }
 </script>
@@ -53,13 +30,13 @@ const onSubmit = async () => {
     <div class="px-6">
         <UDashboardPanel id="posts" resizable>
             <template #header>
-                <UDashboardNavbar title="New Blog" icon="mingcute:edit-3-fill">
+                <UDashboardNavbar title="New Post" icon="mingcute:edit-3-fill">
                     <template #right>
                         <UButton
                             icon="mingcute:upload-fill"
                             label="Submit"
                             color="neutral"
-                            :loading="submitting"
+                            :loading="submitting.state"
                             @click="onSubmit"
                         />
                     </template>

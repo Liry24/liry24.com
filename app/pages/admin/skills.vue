@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { AdminModalSkill } from '#components'
 import equal from 'fast-deep-equal'
 
 definePageMeta({
@@ -7,46 +8,28 @@ definePageMeta({
     pageTransition: false,
 })
 
-const toast = useToast()
+const { skills, originalSkills, fetchSkills, reorderSkills, deleteSkill } = useSkill()
+const overlay = useOverlay()
 
-const { data, refresh } = await useFetch('/api/skills', {
-    default: () => [],
-})
+const modalSkill = overlay.create(AdminModalSkill)
 
-const skills = ref([...(data.value || [])])
+await fetchSkills()
+
 const categories = computed<string[]>(() =>
-    skills.value.map((skill) => skill.category).filter((category): category is string => !!category)
+    [...new Set(skills.value.map((skill) => skill.category))].filter(
+        (category): category is string => !!category
+    )
 )
-const openModalSkill = ref(false)
 
-const shouldBeSaved = computed(() => !equal(data.value, skills.value))
+const shouldBeSaved = computed(() => !equal(originalSkills.value, skills.value))
 
 const handleRefresh = async () => {
-    await refresh()
-    skills.value = [...(data.value || [])]
-}
-
-const save = async () => {
-    await $fetch('/api/admin/skills', {
-        method: 'PUT',
-        body: {
-            skills: skills.value,
-        },
-    })
-
-    toast.add({
-        icon: 'mingcute:check-line',
-        title: 'Saved',
-        description: 'Your changes have been saved',
-        color: 'success',
-    })
-
-    handleRefresh()
+    await fetchSkills()
 }
 
 defineShortcuts({
     n: () => {
-        openModalSkill.value = true
+        modalSkill.open({ categories: categories.value })
     },
 })
 </script>
@@ -77,19 +60,16 @@ defineShortcuts({
                             icon="mingcute:check-line"
                             label="Save"
                             color="neutral"
-                            @click="save"
+                            @click="reorderSkills"
                         />
 
-                        <AdminModalSkill
-                            v-model:open="openModalSkill"
-                            :categories
-                            @success="handleRefresh"
-                        >
+                        <AdminModalSkill :categories @success="handleRefresh">
                             <UButton
-                                icon="lucide:plus"
+                                icon="mingcute:add-line"
                                 label="New Skill"
                                 variant="outline"
                                 color="neutral"
+                                :ui="{ leadingIcon: 'size-4.5' }"
                             >
                                 <template #trailing>
                                     <UKbd value="n" />
@@ -103,11 +83,7 @@ defineShortcuts({
             <template #body>
                 <UScrollArea class="h-[calc(100dvh-var(--ui-header-height))] p-6">
                     <ReorderGroup v-model:values="skills" axis="y" class="grid gap-2">
-                        <ReorderItem
-                            v-for="(skill, index) in skills"
-                            :key="skill.id"
-                            :value="skill"
-                        >
+                        <ReorderItem v-for="skill in skills" :key="skill.id" :value="skill">
                             <div
                                 class="bg-muted/50 ring-muted flex cursor-grab items-center gap-3 rounded-lg p-4 ring select-none"
                             >
@@ -125,13 +101,14 @@ defineShortcuts({
                                         icon="mingcute:edit-3-fill"
                                         variant="ghost"
                                         size="sm"
+                                        @click="modalSkill.open({ data: skill, categories })"
                                     />
 
                                     <UButton
                                         icon="mingcute:close-line"
                                         variant="ghost"
                                         size="sm"
-                                        @click="skills.splice(index, 1)"
+                                        @click="deleteSkill(skill)"
                                     />
                                 </div>
                             </div>

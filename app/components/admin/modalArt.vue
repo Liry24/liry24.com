@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { upload } from '@tigrisdata/storage/client'
-import { nanoid } from 'nanoid'
 import type z from 'zod'
 
 const open = defineModel<boolean>('open', {
@@ -20,7 +18,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits(['success'])
 
-const toast = useToast()
+const { saveArt, submitting } = useArt()
 
 const schema = artsInsertSchema.omit({ images: true })
 type Schema = z.infer<typeof schema>
@@ -32,119 +30,40 @@ const state = reactive<Schema>({
     href: props.data?.href || '',
 })
 const images = ref<File[]>([])
-const submitting = ref(false)
-const submittingProgress = ref(0)
-const submittingLogs = ref<ConsoleLog[]>([])
 
 const onSubmit = async () => {
-    submitting.value = true
-    submittingProgress.value = 0
-    submittingLogs.value = []
-
-    const addLog = (message: string, type: ConsoleLog['type'] = 'log') => {
-        submittingLogs.value.push({
-            createdAt: new Date(),
-            message,
-            type,
-        })
-    }
-
     try {
-        const imageData: { src: string; alt?: string }[] = []
-
-        if (images.value.length) {
-            addLog(`Starting upload of ${images.value.length} images...`)
-
-            const artSlug = state.slug?.toLowerCase().trim().replaceAll(' ', '-') || nanoid(4)
-            for (let i = 0; i < images.value.length; i++) {
-                const image = images.value[i]
-                if (!image) continue
-
-                addLog(`Uploading [${i + 1}/${images.value.length}] ${image.name}...`)
-
-                const imageExt = image.name.split('.').pop()
-                const imageName = `art-${artSlug}-${nanoid(6)}.${imageExt}`
-                const result = await upload(imageName, image, {
-                    access: 'public',
-                    url: '/api/admin/upload',
-                    onUploadProgress: (progress) => {
-                        const currentFileProgress = progress.percentage / 100
-                        const totalSteps = images.value.length + 1
-                        const globalProgress = Math.floor(
-                            ((i + currentFileProgress) / totalSteps) * 100
-                        )
-                        submittingProgress.value = globalProgress
-                    },
-                })
-                if (result.error) throw result.error
-                const blob = result.data
-
-                imageData.push({ src: blob.url, alt: undefined })
-                addLog(`Uploaded ${image.name} successfully.`)
-            }
-        }
-
-        submittingProgress.value = 90
-        addLog('Saving metadata to database...')
-
-        await $fetch('/api/admin/arts', {
-            method: props.data?.slug ? 'PATCH' : 'POST',
-            body: props.data?.slug
-                ? {
-                      slug: props.data.slug,
-                      images: imageData,
-                      title: state.title,
-                      description: state.description,
-                      href: state.href,
-                  }
-                : {
-                      ...state,
-                      images: imageData,
-                  },
-        })
-
-        submittingProgress.value = 100
-        addLog('Art saved successfully.')
-
-        toast.add({
-            icon: 'mingcute:check-line',
-            title: 'Success',
-            description: 'Art saved successfully',
-            color: 'success',
-        })
+        await saveArt(state, images.value)
 
         images.value = []
         state.href = ''
-        state.slug = ''
+        state.slug = undefined
         state.title = ''
         state.description = ''
 
         open.value = false
         emit('success')
-    } catch (e) {
-        console.error(e)
-        addLog(`Error: ${e instanceof Error ? e.message : String(e)}`, 'error')
-        toast.add({
-            icon: 'mingcute:close-line',
-            title: 'Error',
-            description: 'Art saved failed',
-            color: 'error',
-        })
-    } finally {
-        submitting.value = false
+    } catch {
+        // Error handling is done in useArt (logging/toast), but we keep modal open
     }
 }
 </script>
 
 <template>
-    <UModal v-model:open="open" :dismissible="false" title="New Art" description="Add a new art">
+    <UModal
+        v-model:open="open"
+        :title="props.data?.slug ? 'Edit Art' : 'New Art'"
+        :description="props.data?.slug ? `Editing #${props.data.slug}` : 'Add a new art'"
+    >
         <slot />
 
-        <template v-if="submitting" #content>
+        <template v-if="submitting.state" #content>
             <div class="grid gap-4 p-8">
-                <span class="text-3xl leading-none font-extralight">{{ submittingProgress }}%</span>
-                <UProgress v-model="submittingProgress" color="neutral" />
-                <ConsoleLog :logs="submittingLogs" class="h-48" />
+                <span class="text-3xl leading-none font-extralight"
+                    >{{ submitting.progress }}%</span
+                >
+                <UProgress v-model="submitting.progress" color="neutral" />
+                <ConsoleLog :logs="submitting.logs" class="h-48" />
             </div>
         </template>
 

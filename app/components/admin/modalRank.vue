@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { upload } from '@tigrisdata/storage/client'
-
 const open = defineModel<boolean>('open', {
     default: false,
 })
@@ -12,7 +10,7 @@ const props = defineProps<Props>()
 
 const emit = defineEmits(['success'])
 
-const toast = useToast()
+const { saveRank, submitting } = useRank()
 
 const image = ref<File | null>(null)
 
@@ -24,66 +22,15 @@ const state = reactive({
     imageUrl: props.data?.imageUrl || '',
 })
 
-const submitting = ref(false)
-const submittingProgress = ref(0)
-const submittingLogs = ref<ConsoleLog[]>([])
-
 const onSubmit = async () => {
-    submitting.value = true
-    submittingProgress.value = 0
-    submittingLogs.value = []
-
-    const addLog = (message: string, type: ConsoleLog['type'] = 'log') => {
-        submittingLogs.value.push({
-            createdAt: new Date(),
-            message,
-            type,
-        })
-    }
-
     try {
-        if (image.value) {
-            addLog(`Uploading image: ${image.value.name}...`)
-            const imageExt = image.value.name.split('.').pop()
-            const imageName = `${state.game.toLowerCase().trim().replaceAll(' ', '-')}-${state.rank.toLowerCase().trim().replaceAll(' ', '-')}.${imageExt}`
-            const result = await upload(imageName, image.value, {
-                access: 'public',
-                url: '/api/admin/upload',
-                onUploadProgress: (progress) => {
-                    const currentFileProgress = progress.percentage / 100
-                    const totalSteps = 2 // 1 for image, 1 for database
-                    submittingProgress.value = Math.floor((currentFileProgress / totalSteps) * 100)
-                },
-            })
-            if (result.error) throw result.error
-            const blob = result.data
-
-            state.imageUrl = blob.url
-            addLog('Image uploaded successfully.')
-        }
-
-        submittingProgress.value = 50
-        addLog(props.data?.id ? 'Updating rank metadata...' : 'Adding new rank metadata...')
-
-        await $fetch('/api/admin/ranks', {
-            method: props.data?.id ? 'PATCH' : 'POST',
-            body: props.data?.id
-                ? {
-                      id: props.data.id,
-                      ...state,
-                  }
-                : state,
-        })
-
-        submittingProgress.value = 100
-        addLog('Rank saved successfully.')
-
-        toast.add({
-            icon: 'mingcute:check-line',
-            title: 'Success',
-            description: 'Rank saved successfully',
-            color: 'success',
-        })
+        await saveRank(
+            {
+                ...(props.data?.id ? { id: props.data.id } : {}),
+                ...state,
+            },
+            image.value
+        )
 
         image.value = null
         state.href = ''
@@ -94,40 +41,32 @@ const onSubmit = async () => {
 
         open.value = false
         emit('success')
-    } catch (e) {
-        console.error(e)
-        addLog(`Error: ${e instanceof Error ? e.message : String(e)}`, 'error')
-        toast.add({
-            icon: 'mingcute:close-line',
-            title: 'Error',
-            description: 'An error occurred while saving the rank',
-            color: 'error',
-        })
-    } finally {
-        submitting.value = false
+    } catch {
+        // Error handling in composable
     }
 }
 </script>
 
 <template>
-    <UModal v-model:open="open" :dismissible="false" title="New Rank" description="Add a new rank">
+    <UModal
+        v-model:open="open"
+        :title="props.data?.id ? 'Edit Rank' : 'New Rank'"
+        :description="props.data?.id ? `Editing #${props.data.id}` : 'Add a new rank'"
+    >
         <slot />
 
-        <template v-if="submitting" #content>
+        <template v-if="submitting.state" #content>
             <div class="grid gap-4 p-8">
-                <span class="text-3xl leading-none font-extralight">{{ submittingProgress }}%</span>
-                <UProgress v-model="submittingProgress" color="neutral" />
-                <ConsoleLog :logs="submittingLogs" class="h-48" />
+                <span class="text-3xl leading-none font-extralight"
+                    >{{ submitting.progress }}%</span
+                >
+                <UProgress v-model="submitting.progress" color="neutral" />
+                <ConsoleLog :logs="submitting.logs" class="h-48" />
             </div>
         </template>
 
         <template #body>
             <UForm :state="state" loading-auto class="grid gap-4" @submit="onSubmit">
-                <div v-if="props.data?.id" class="flex items-center gap-2">
-                    <span class="text-muted text-sm">Editing Rank ID:</span>
-                    <UBadge color="neutral">{{ props.data.id }}</UBadge>
-                </div>
-
                 <UFormField label="Game" name="game" required>
                     <UInput
                         v-model="state.game"

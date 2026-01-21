@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { AdminModalCareer } from '#components'
 import equal from 'fast-deep-equal'
 
 definePageMeta({
@@ -7,38 +8,24 @@ definePageMeta({
     pageTransition: false,
 })
 
-const toast = useToast()
+const { careers, originalCareers, fetchCareers, reorderCareers, deleteCareer } = useCareer()
+const overlay = useOverlay()
 
-const { data, refresh } = await useFetch('/api/careers', {
-    default: () => [],
-})
+const modalCareer = overlay.create(AdminModalCareer)
 
-const careers = ref([...(data.value || [])])
+await fetchCareers()
 
-const shouldBeSaved = computed(() => !equal(data.value, careers.value))
+const shouldBeSaved = computed(() => !equal(originalCareers.value, careers.value))
 
 const handleRefresh = async () => {
-    await refresh()
-    careers.value = [...(data.value || [])]
+    await fetchCareers()
 }
 
-const save = async () => {
-    await $fetch('/api/admin/careers', {
-        method: 'PUT',
-        body: {
-            careers: careers.value,
-        },
-    })
-
-    toast.add({
-        icon: 'mingcute:check-line',
-        title: 'Saved',
-        description: 'Your changes have been saved',
-        color: 'success',
-    })
-
-    handleRefresh()
-}
+defineShortcuts({
+    n: () => {
+        modalCareer.open()
+    },
+})
 </script>
 
 <template>
@@ -67,16 +54,21 @@ const save = async () => {
                             icon="mingcute:check-line"
                             label="Save"
                             color="neutral"
-                            @click="save"
+                            @click="reorderCareers"
                         />
 
                         <AdminModalCareer @success="handleRefresh">
                             <UButton
-                                icon="lucide:plus"
+                                icon="mingcute:add-line"
                                 label="New Career"
                                 variant="outline"
                                 color="neutral"
-                            />
+                                :ui="{ leadingIcon: 'size-4.5' }"
+                            >
+                                <template #trailing>
+                                    <UKbd value="n" />
+                                </template>
+                            </UButton>
                         </AdminModalCareer>
                     </template>
                 </UDashboardNavbar>
@@ -85,11 +77,7 @@ const save = async () => {
             <template #body>
                 <UScrollArea class="h-[calc(100dvh-var(--ui-header-height))] p-6">
                     <ReorderGroup v-model:values="careers" axis="y" class="grid gap-2">
-                        <ReorderItem
-                            v-for="(career, index) in careers"
-                            :key="career.id"
-                            :value="career"
-                        >
+                        <ReorderItem v-for="career in careers" :key="career.id" :value="career">
                             <div
                                 class="bg-muted/50 ring-muted flex cursor-grab items-center gap-3 rounded-lg p-4 ring select-none"
                             >
@@ -106,13 +94,14 @@ const save = async () => {
                                         icon="mingcute:edit-3-fill"
                                         variant="ghost"
                                         size="sm"
+                                        @click="modalCareer.open({ data: career })"
                                     />
 
                                     <UButton
                                         icon="mingcute:close-line"
                                         variant="ghost"
                                         size="sm"
-                                        @click="careers.splice(index, 1)"
+                                        @click="deleteCareer(career)"
                                     />
                                 </div>
                             </div>

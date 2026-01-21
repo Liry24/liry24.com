@@ -11,7 +11,7 @@ const props = defineProps<Props>()
 
 const emit = defineEmits(['success'])
 
-const toast = useToast()
+const { saveSkill, submitting } = useSkill()
 
 const state = reactive({
     name: props.data?.name || '',
@@ -19,31 +19,11 @@ const state = reactive({
     category: props.data?.category || '',
 })
 
-const submitting = ref(false)
-
 const onSubmit = async () => {
-    submitting.value = true
-
     try {
-        if (props.data?.id)
-            await $fetch('/api/admin/skills', {
-                method: 'PATCH',
-                body: {
-                    id: props.data.id,
-                    ...state,
-                },
-            })
-        else
-            await $fetch('/api/admin/skills', {
-                method: 'POST',
-                body: state,
-            })
-
-        toast.add({
-            icon: 'mingcute:check-line',
-            title: 'Success',
-            description: 'Skill saved successfully',
-            color: 'success',
+        await saveSkill({
+            ...(props.data?.id ? { id: props.data.id } : {}),
+            ...state,
         })
 
         state.name = ''
@@ -52,31 +32,22 @@ const onSubmit = async () => {
 
         open.value = false
         emit('success')
-    } catch (e) {
-        console.log(e)
-        toast.add({
-            icon: 'mingcute:close-line',
-            title: 'Error',
-            description: 'An error occurred while saving the skill',
-            color: 'error',
-        })
-    } finally {
-        submitting.value = false
+    } catch {
+        // Error handling in composable
     }
 }
 </script>
 
 <template>
-    <UModal v-model:open="open" title="New Skill" description="Add a new skill">
+    <UModal
+        v-model:open="open"
+        :title="props.data?.id ? 'Edit Skill' : 'New Skill'"
+        :description="props.data?.id ? `Editing #${props.data.id}` : 'Add a new skill'"
+    >
         <slot />
 
         <template #body>
             <UForm :state loading-auto class="grid gap-4" @submit="onSubmit">
-                <div v-if="props.data?.id" class="flex items-center gap-2">
-                    <span class="text-muted text-sm">Editing Skill ID:</span>
-                    <UBadge color="neutral">{{ props.data.id }}</UBadge>
-                </div>
-
                 <UFormField label="Name" name="name" required>
                     <UInput
                         v-model="state.name"
@@ -149,7 +120,7 @@ const onSubmit = async () => {
                     color="neutral"
                     size="lg"
                     block
-                    :loading="submitting"
+                    :loading="submitting.state"
                 />
             </UForm>
         </template>
