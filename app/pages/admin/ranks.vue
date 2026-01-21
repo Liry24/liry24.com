@@ -8,41 +8,24 @@ definePageMeta({
     pageTransition: false,
 })
 
-const toast = useToast()
+const { ranks, originalRanks, fetchRanks, reorderRanks, deleteRank } = useRank()
 const overlay = useOverlay()
 
 const modalRank = overlay.create(AdminModalRank)
 
-const { data, refresh } = await useFetch('/api/ranks', {
-    default: () => [],
-})
+await fetchRanks()
 
-const ranks = ref([...(data.value || [])])
-
-const shouldBeSaved = computed(() => !equal(data.value, ranks.value))
+const shouldBeSaved = computed(() => !equal(originalRanks.value, ranks.value))
 
 const handleRefresh = async () => {
-    await refresh()
-    ranks.value = [...(data.value || [])]
+    await fetchRanks()
 }
 
-const save = async () => {
-    await $fetch('/api/admin/ranks', {
-        method: 'PUT',
-        body: {
-            ranks: ranks.value,
-        },
-    })
-
-    toast.add({
-        icon: 'mingcute:check-line',
-        title: 'Saved',
-        description: 'Your changes have been saved',
-        color: 'success',
-    })
-
-    handleRefresh()
-}
+defineShortcuts({
+    n: () => {
+        modalRank.open()
+    },
+})
 </script>
 
 <template>
@@ -71,16 +54,21 @@ const save = async () => {
                             icon="mingcute:check-line"
                             label="Save"
                             color="neutral"
-                            @click="save"
+                            @click="reorderRanks"
                         />
 
                         <AdminModalRank @success="handleRefresh">
                             <UButton
-                                icon="lucide:plus"
+                                icon="mingcute:add-line"
                                 label="New Rank"
                                 variant="outline"
                                 color="neutral"
-                            />
+                                :ui="{ leadingIcon: 'size-4.5' }"
+                            >
+                                <template #trailing>
+                                    <UKbd value="n" />
+                                </template>
+                            </UButton>
                         </AdminModalRank>
                     </template>
                 </UDashboardNavbar>
@@ -89,7 +77,7 @@ const save = async () => {
             <template #body>
                 <UScrollArea class="h-[calc(100dvh-var(--ui-header-height))] p-6">
                     <ReorderGroup v-model:values="ranks" axis="y" class="grid gap-2">
-                        <ReorderItem v-for="(rank, index) in ranks" :key="rank.id" :value="rank">
+                        <ReorderItem v-for="rank in ranks" :key="rank.id" :value="rank">
                             <div
                                 class="bg-muted/50 ring-muted flex cursor-grab items-center gap-3 rounded-lg p-4 ring select-none"
                             >
@@ -114,7 +102,7 @@ const save = async () => {
                                         icon="mingcute:close-line"
                                         variant="ghost"
                                         size="sm"
-                                        @click="ranks.splice(index, 1)"
+                                        @click="deleteRank(rank)"
                                     />
                                 </div>
                             </div>

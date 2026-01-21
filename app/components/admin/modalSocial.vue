@@ -10,7 +10,7 @@ const props = defineProps<Props>()
 
 const emit = defineEmits(['success'])
 
-const toast = useToast()
+const { saveSocial, submitting } = useSocial()
 
 const state = reactive({
     href: props.data?.href || '',
@@ -19,31 +19,11 @@ const state = reactive({
     icon: props.data?.icon || '',
 })
 
-const submitting = ref(false)
-
 const onSubmit = async () => {
-    submitting.value = true
-
     try {
-        if (props.data?.id)
-            await $fetch('/api/admin/socials', {
-                method: 'PATCH',
-                body: {
-                    id: props.data.id,
-                    ...state,
-                },
-            })
-        else
-            await $fetch('/api/admin/socials', {
-                method: 'POST',
-                body: state,
-            })
-
-        toast.add({
-            icon: 'mingcute:check-line',
-            title: 'Success',
-            description: 'Link saved successfully',
-            color: 'success',
+        await saveSocial({
+            ...(props.data?.id ? { id: props.data.id } : {}),
+            ...state,
         })
 
         state.href = ''
@@ -53,31 +33,22 @@ const onSubmit = async () => {
 
         open.value = false
         emit('success')
-    } catch (e) {
-        console.log(e)
-        toast.add({
-            icon: 'mingcute:close-line',
-            title: 'Error',
-            description: 'An error occurred while saving the link',
-            color: 'error',
-        })
-    } finally {
-        submitting.value = false
+    } catch {
+        // Error handling in composable
     }
 }
 </script>
 
 <template>
-    <UModal v-model:open="open" :dismissible="false" title="New Link" description="Add a new link">
+    <UModal
+        v-model:open="open"
+        :title="props.data?.id ? 'Edit Link' : 'New Link'"
+        :description="props.data?.id ? `Editing #${props.data.id}` : 'Add a new link'"
+    >
         <slot />
 
         <template #body>
             <UForm :state loading-auto class="grid gap-4" @submit="onSubmit">
-                <div v-if="props.data?.id" class="flex items-center gap-2">
-                    <span class="text-muted text-sm">Editing Link ID:</span>
-                    <UBadge color="neutral">{{ props.data.id }}</UBadge>
-                </div>
-
                 <UFormField label="URL" name="href" required>
                     <UInput
                         v-model="state.href"
@@ -144,7 +115,7 @@ const onSubmit = async () => {
                     color="neutral"
                     size="lg"
                     block
-                    :loading="submitting"
+                    :loading="submitting.state"
                 />
             </UForm>
         </template>

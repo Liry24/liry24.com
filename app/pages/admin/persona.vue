@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { AdminModalLink } from '#components'
+import { AdminModalSocial } from '#components'
 import equal from 'fast-deep-equal'
 
 definePageMeta({
@@ -8,42 +8,25 @@ definePageMeta({
     pageTransition: false,
 })
 
-const toast = useToast()
+const { socials, originalSocials, fetchSocials, reorderSocials, deleteSocial } = useSocial()
 const overlay = useOverlay()
 const location = useBrowserLocation()
 
-const modalLink = overlay.create(AdminModalLink)
+const modalSocial = overlay.create(AdminModalSocial)
 
-const { data, refresh } = await useFetch('/api/socials', {
-    default: () => [],
-})
+await fetchSocials()
 
-const socials = ref([...(data.value || [])])
-
-const shouldBeSaved = computed(() => !equal(data.value, socials.value))
+const shouldBeSaved = computed(() => !equal(originalSocials.value, socials.value))
 
 const handleRefresh = async () => {
-    await refresh()
-    socials.value = [...(data.value || [])]
+    await fetchSocials()
 }
 
-const save = async () => {
-    await $fetch('/api/admin/socials', {
-        method: 'PUT',
-        body: {
-            links: socials.value,
-        },
-    })
-
-    toast.add({
-        icon: 'mingcute:check-line',
-        title: 'Saved',
-        description: 'Your changes have been saved',
-        color: 'success',
-    })
-
-    handleRefresh()
-}
+defineShortcuts({
+    n: () => {
+        modalSocial.open()
+    },
+})
 </script>
 
 <template>
@@ -72,20 +55,22 @@ const save = async () => {
                             icon="mingcute:check-line"
                             label="Save"
                             color="neutral"
-                            @click="save"
+                            @click="reorderSocials"
                         />
 
-                        <AdminModalLink @success="handleRefresh">
+                        <AdminModalSocial @success="handleRefresh">
                             <UButton
-                                icon="mingcute:add-fill"
+                                icon="mingcute:add-line"
                                 label="New Link"
                                 variant="outline"
                                 color="neutral"
-                                :ui="{
-                                    leadingIcon: 'size-4.5',
-                                }"
-                            />
-                        </AdminModalLink>
+                                :ui="{ leadingIcon: 'size-4.5' }"
+                            >
+                                <template #trailing>
+                                    <UKbd value="n" />
+                                </template>
+                            </UButton>
+                        </AdminModalSocial>
                     </template>
                 </UDashboardNavbar>
             </template>
@@ -93,11 +78,7 @@ const save = async () => {
             <template #body>
                 <UScrollArea class="h-[calc(100dvh-var(--ui-header-height))] p-6">
                     <ReorderGroup v-model:values="socials" axis="y" class="grid gap-2">
-                        <ReorderItem
-                            v-for="(social, index) in socials"
-                            :key="social.id"
-                            :value="social"
-                        >
+                        <ReorderItem v-for="social in socials" :key="social.id" :value="social">
                             <div
                                 class="bg-muted/50 ring-muted flex cursor-grab items-center gap-3 rounded-lg p-4 ring select-none"
                             >
@@ -112,7 +93,9 @@ const save = async () => {
                                 <template v-if="social.alias">
                                     <Icon name="mingcute:arrow-right-line" />
                                     <span class="text-muted text-sm">
-                                        {{ `${location.origin}/${social.alias}` }}
+                                        {{
+                                            `${location.origin?.replace('https://', '')}/${social.alias}`
+                                        }}
                                     </span>
                                 </template>
 
@@ -121,14 +104,14 @@ const save = async () => {
                                         icon="mingcute:edit-3-fill"
                                         variant="ghost"
                                         size="sm"
-                                        @click="modalLink.open({ data: social })"
+                                        @click="modalSocial.open({ data: social })"
                                     />
 
                                     <UButton
                                         icon="mingcute:close-line"
                                         variant="ghost"
                                         size="sm"
-                                        @click="socials.splice(index, 1)"
+                                        @click="deleteSocial(social)"
                                     />
                                 </div>
                             </div>

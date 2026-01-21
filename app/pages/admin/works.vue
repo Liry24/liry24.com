@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { AdminModalWork } from '#components'
 import equal from 'fast-deep-equal'
 
 definePageMeta({
@@ -8,12 +9,19 @@ definePageMeta({
 })
 
 const toast = useToast()
+const overlay = useOverlay()
+
+const modalWork = overlay.create(AdminModalWork)
 
 const { data, refresh } = await useFetch('/api/works', {
     default: () => [],
 })
-
 const works = ref([...(data.value || [])])
+const categories = computed<string[]>(() =>
+    [...new Set(works.value.map((work) => work.category))].filter(
+        (category): category is string => !!category
+    )
+)
 
 const shouldBeSaved = computed(() => !equal(data.value, works.value))
 
@@ -39,6 +47,12 @@ const save = async () => {
 
     handleRefresh()
 }
+
+defineShortcuts({
+    n: () => {
+        modalWork.open({ categories: categories.value })
+    },
+})
 </script>
 
 <template>
@@ -70,13 +84,18 @@ const save = async () => {
                             @click="save"
                         />
 
-                        <AdminModalWork>
+                        <AdminModalWork :categories @success="handleRefresh">
                             <UButton
-                                icon="lucide:plus"
+                                icon="mingcute:add-line"
                                 label="New Work"
                                 variant="outline"
                                 color="neutral"
-                            />
+                                :ui="{ leadingIcon: 'size-4.5' }"
+                            >
+                                <template #trailing>
+                                    <UKbd value="n" />
+                                </template>
+                            </UButton>
                         </AdminModalWork>
                     </template>
                 </UDashboardNavbar>
@@ -104,6 +123,7 @@ const save = async () => {
                                         icon="mingcute:edit-3-fill"
                                         variant="ghost"
                                         size="sm"
+                                        @click="modalWork.open({ data: work, categories })"
                                     />
 
                                     <UButton

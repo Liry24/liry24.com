@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { upload } from '@tigrisdata/storage/client'
-import { nanoid } from 'nanoid'
 import type z from 'zod'
 
 const open = defineModel<boolean>('open', {
@@ -8,19 +6,21 @@ const open = defineModel<boolean>('open', {
 })
 
 interface Props {
-    data?: Work
+    data?: Serialized<Work>
+    categories?: string[]
     fields?: {
         slug?: boolean
     }
 }
 const props = withDefaults(defineProps<Props>(), {
     data: undefined,
+    categories: () => [],
     fields: () => ({ slug: false }),
 })
 
 const emit = defineEmits(['success'])
 
-const toast = useToast()
+const { saveWork, submitting } = useWork()
 
 const schema = worksInsertSchema
 type Schema = z.infer<typeof schema>
@@ -36,62 +36,10 @@ const state = reactive<Schema>({
 })
 
 const imageFile = ref<File | null>(null)
-const submitting = ref(false)
-const submittingProgress = ref(0)
-const submittingLogs = ref<ConsoleLog[]>([])
 
 const onSubmit = async () => {
-    submitting.value = true
-    submittingProgress.value = 0
-    submittingLogs.value = []
-
-    const addLog = (message: string, type: ConsoleLog['type'] = 'log') => {
-        submittingLogs.value.push({
-            createdAt: new Date(),
-            message,
-            type,
-        })
-    }
-
     try {
-        if (imageFile.value) {
-            addLog(`Uploading image: ${imageFile.value.name}...`)
-
-            const imageExt = imageFile.value.name.split('.').pop()
-            const imageName = `work-${state.slug?.toLowerCase().trim().replaceAll(' ', '-') || nanoid(6)}.${imageExt}`
-            const result = await upload(imageName, imageFile.value, {
-                access: 'public',
-                url: '/api/admin/upload',
-                onUploadProgress: (progress) => {
-                    const currentFileProgress = progress.percentage / 100
-                    const totalSteps = 2 // 1 for image, 1 for database
-                    submittingProgress.value = Math.floor((currentFileProgress / totalSteps) * 100)
-                },
-            })
-            if (result.error) throw result.error
-            const blob = result.data
-
-            state.image = blob.url
-            addLog('Image uploaded successfully.')
-        }
-
-        submittingProgress.value = 50
-        addLog(props.data?.slug ? 'Updating work metadata...' : 'Adding new work metadata...')
-
-        await $fetch('/api/admin/works', {
-            method: props.data?.slug ? 'PATCH' : 'POST',
-            body: state,
-        })
-
-        submittingProgress.value = 100
-        addLog('Work saved successfully.')
-
-        toast.add({
-            icon: 'mingcute:check-line',
-            title: 'Success',
-            description: 'Work saved successfully',
-            color: 'success',
-        })
+        await saveWork(state, imageFile.value)
 
         state.title = ''
         state.category = ''
@@ -104,30 +52,27 @@ const onSubmit = async () => {
         imageFile.value = null
         open.value = false
         emit('success')
-    } catch (e) {
-        console.error(e)
-        addLog(`Error: ${e instanceof Error ? e.message : String(e)}`, 'error')
-        toast.add({
-            icon: 'mingcute:close-line',
-            title: 'Error',
-            description: 'An error occurred while saving the work',
-            color: 'error',
-        })
-    } finally {
-        submitting.value = false
+    } catch {
+        // Error handling in composable
     }
 }
 </script>
 
 <template>
-    <UModal v-model:open="open" :dismissible="false" title="New Work" description="Add a new work">
+    <UModal
+        v-model:open="open"
+        :title="props.data?.slug ? 'Edit Work' : 'New Work'"
+        :description="props.data?.slug ? `Editing #${props.data.slug}` : 'Add a new work'"
+    >
         <slot />
 
-        <template v-if="submitting" #content>
+        <template v-if="submitting.state" #content>
             <div class="grid gap-4 p-8">
-                <span class="text-3xl leading-none font-extralight">{{ submittingProgress }}%</span>
-                <UProgress v-model="submittingProgress" color="neutral" />
-                <ConsoleLog :logs="submittingLogs" class="h-48" />
+                <span class="text-3xl leading-none font-extralight"
+                    >{{ submitting.progress }}%</span
+                >
+                <UProgress v-model="submitting.progress" color="neutral" />
+                <ConsoleLog :logs="submitting.logs" class="h-48" />
             </div>
         </template>
 
@@ -143,15 +88,6 @@ const onSubmit = async () => {
                     />
                 </UFormField>
 
-                <UFormField label="Category" name="category">
-                    <UInput
-                        v-model="state.category"
-                        placeholder="Web Application"
-                        variant="soft"
-                        class="w-full"
-                    />
-                </UFormField>
-
                 <UFormField label="Description" name="description">
                     <UTextarea
                         v-model="state.description"
@@ -161,6 +97,29 @@ const onSubmit = async () => {
                         :rows="3"
                         class="w-full"
                     />
+                </UFormField>
+
+                <UFormField
+                    label="Category"
+                    name="category"
+                    :ui="{ container: 'flex flex-col gap-2' }"
+                >
+                    <UInput
+                        v-model="state.category"
+                        placeholder="Web Application"
+                        variant="soft"
+                        class="w-full"
+                    />
+                    <div class="flex flex-wrap gap-2">
+                        <UButton
+                            v-for="(category, index) in props.categories"
+                            :key="`category-${index}`"
+                            :label="category"
+                            variant="outline"
+                            size="sm"
+                            @click="state.category = category"
+                        />
+                    </div>
                 </UFormField>
 
                 <UFormField v-if="props.fields.slug" label="Slug" name="slug">

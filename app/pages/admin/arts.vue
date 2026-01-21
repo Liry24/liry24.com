@@ -8,41 +8,24 @@ definePageMeta({
     pageTransition: false,
 })
 
-const toast = useToast()
+const { arts, originalArts, fetchArts, reorderArts, deleteArt } = useArt()
 const overlay = useOverlay()
 
 const modalArt = overlay.create(AdminModalArt)
 
-const { data, refresh } = await useFetch('/api/arts', {
-    default: () => [],
-})
+await fetchArts()
 
-const arts = ref([...(data.value || [])])
-
-const shouldBeSaved = computed(() => !equal(data.value, arts.value))
+const shouldBeSaved = computed(() => !equal(originalArts.value, arts.value))
 
 const handleRefresh = async () => {
-    await refresh()
-    arts.value = [...(data.value || [])]
+    await fetchArts()
 }
 
-const save = async () => {
-    await $fetch('/api/admin/arts', {
-        method: 'PUT',
-        body: {
-            arts: arts.value,
-        },
-    })
-
-    await handleRefresh()
-
-    toast.add({
-        icon: 'mingcute:check-line',
-        title: 'Saved',
-        description: 'Your changes have been saved',
-        color: 'success',
-    })
-}
+defineShortcuts({
+    n: () => {
+        modalArt.open()
+    },
+})
 </script>
 
 <template>
@@ -69,16 +52,21 @@ const save = async () => {
                             icon="mingcute:check-line"
                             label="Save"
                             color="neutral"
-                            @click="save"
+                            @click="reorderArts"
                         />
 
                         <AdminModalArt @success="handleRefresh">
                             <UButton
-                                icon="lucide:plus"
+                                icon="mingcute:add-line"
                                 label="New Art"
                                 variant="outline"
                                 color="neutral"
-                            />
+                                :ui="{ leadingIcon: 'size-4.5' }"
+                            >
+                                <template #trailing>
+                                    <UKbd value="n" />
+                                </template>
+                            </UButton>
                         </AdminModalArt>
                     </template>
                 </UDashboardNavbar>
@@ -87,7 +75,7 @@ const save = async () => {
             <template #body>
                 <UScrollArea class="h-[calc(100dvh-var(--ui-header-height))] p-6">
                     <ReorderGroup v-model:values="arts" axis="y" class="grid gap-2">
-                        <ReorderItem v-for="(art, index) in arts" :key="art.slug" :value="art">
+                        <ReorderItem v-for="art in arts" :key="art.slug" :value="art">
                             <div
                                 class="bg-muted/50 ring-muted flex cursor-grab items-center gap-3 rounded-lg p-4 ring select-none"
                             >
@@ -117,7 +105,7 @@ const save = async () => {
                                         icon="mingcute:close-line"
                                         variant="ghost"
                                         size="sm"
-                                        @click="arts.splice(index, 1)"
+                                        @click="deleteArt(art)"
                                     />
                                 </div>
                             </div>
