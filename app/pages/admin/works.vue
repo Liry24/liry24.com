@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { AdminModalWork } from '#components'
-import equal from 'fast-deep-equal'
 
 definePageMeta({
     middleware: 'admin',
@@ -8,49 +7,15 @@ definePageMeta({
     pageTransition: false,
 })
 
-const toast = useToast()
 const overlay = useOverlay()
 
 const modalWork = overlay.create(AdminModalWork)
 
-const { data, refresh } = await useFetch('/api/works', {
-    default: () => [],
-})
-const works = ref([...(data.value || [])])
-const categories = computed<string[]>(() =>
-    [...new Set(works.value.map((work) => work.category))].filter(
-        (category): category is string => !!category
-    )
-)
-
-const shouldBeSaved = computed(() => !equal(data.value, works.value))
-
-const handleRefresh = async () => {
-    await refresh()
-    works.value = [...(data.value || [])]
-}
-
-const save = async () => {
-    await $fetch('/api/admin/works', {
-        method: 'PUT',
-        body: {
-            works: works.value,
-        },
-    })
-
-    toast.add({
-        icon: 'mingcute:check-line',
-        title: 'Saved',
-        description: 'Your changes have been saved',
-        color: 'success',
-    })
-
-    handleRefresh()
-}
+const { works, changed, fetchWorks, reorderWorks, deleteWork } = useWork()
 
 defineShortcuts({
     n: () => {
-        modalWork.open({ categories: categories.value })
+        modalWork.open()
     },
 })
 </script>
@@ -67,24 +32,25 @@ defineShortcuts({
 
                         <UButton
                             loading-auto
+                            aria-label="Refresh"
                             icon="mingcute:refresh-2-line"
                             variant="ghost"
                             size="sm"
-                            @click="handleRefresh"
+                            @click="fetchWorks()"
                         />
                     </template>
 
                     <template #right>
                         <UButton
-                            v-if="shouldBeSaved"
+                            v-if="changed"
                             loading-auto
                             icon="mingcute:check-line"
                             label="Save"
                             color="neutral"
-                            @click="save"
+                            @click="reorderWorks()"
                         />
 
-                        <AdminModalWork :categories @success="handleRefresh">
+                        <AdminModalWork @success="fetchWorks()">
                             <UButton
                                 icon="mingcute:add-line"
                                 label="New Work"
@@ -104,14 +70,16 @@ defineShortcuts({
             <template #body>
                 <UScrollArea class="h-[calc(100dvh-var(--ui-header-height))] p-6">
                     <ReorderGroup v-model:values="works" axis="y" class="grid gap-2">
-                        <ReorderItem v-for="(work, index) in works" :key="work.slug" :value="work">
+                        <ReorderItem v-for="work in works" :key="work.slug" :value="work">
                             <div
                                 class="bg-muted/50 ring-muted flex cursor-grab items-center gap-3 rounded-lg p-4 ring select-none"
                             >
                                 <Icon name="mingcute:dot-grid-fill" size="20" />
 
                                 <NuxtImg
-                                    :src="work.image || undefined"
+                                    v-if="work.image"
+                                    :src="work.image"
+                                    alt=""
                                     class="size-12 rounded-lg object-cover"
                                 />
 
@@ -120,17 +88,19 @@ defineShortcuts({
 
                                 <div class="ml-auto flex items-center">
                                     <UButton
+                                        aria-label="Edit Work"
                                         icon="mingcute:edit-3-fill"
                                         variant="ghost"
                                         size="sm"
-                                        @click="modalWork.open({ data: work, categories })"
+                                        @click="modalWork.open({ data: work })"
                                     />
 
                                     <UButton
+                                        aria-label="Delete Work"
                                         icon="mingcute:close-line"
                                         variant="ghost"
                                         size="sm"
-                                        @click="works.splice(index, 1)"
+                                        @click="deleteWork(work.slug)"
                                     />
                                 </div>
                             </div>

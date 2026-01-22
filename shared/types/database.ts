@@ -55,14 +55,20 @@ export const artsUpdateSchema = createUpdateSchema(arts, {
 })
 export type Art = z.infer<typeof artsSelectSchema>
 
-export const worksSelectSchema = createSelectSchema(works)
+export const worksSelectSchema = createSelectSchema(works, {
+    createdAt: z.iso.datetime(),
+})
 export const worksInsertSchema = createInsertSchema(works, {
     slug: (s) => s.optional(),
+    createdAt: () => z.iso.datetime().optional(),
     title: (s) => s.min(1),
+    sortIndex: (s) => s.optional(),
 })
 export const worksUpdateSchema = createUpdateSchema(works, {
     slug: (s) => s.optional(),
+    createdAt: () => z.iso.datetime().optional(),
     title: (s) => s.min(1),
+    sortIndex: (s) => s.optional(),
 })
 export type Work = z.infer<typeof worksSelectSchema>
 

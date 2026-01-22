@@ -1,4 +1,5 @@
 import { generateText } from 'ai'
+import { sql } from 'drizzle-orm'
 import { works } from '~~/database/schema'
 
 const request = {
@@ -6,7 +7,7 @@ const request = {
 }
 
 export default adminSessionEventHandler(async () => {
-    const { slug, title, description, category, image, icon, href } = await validateBody(
+    const { slug, title, description, category, image, icon, href, sortIndex } = await validateBody(
         request.body
     )
 
@@ -16,6 +17,7 @@ export default adminSessionEventHandler(async () => {
         columns: {
             slug: true,
         },
+        limit: 32,
     })
 
     if (!slug) {
@@ -49,6 +51,7 @@ export default adminSessionEventHandler(async () => {
         image,
         icon,
         href,
+        sortIndex: sortIndex || sql`coalesce(max(sortIndex), 0) + 1`,
     })
 
     await purgeVercelCDNCacheByTags('works')

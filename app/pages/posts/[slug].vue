@@ -3,6 +3,15 @@ const route = useRoute()
 
 const { data } = await useFetch(`/api/posts/${route.params.slug}`)
 
+const location = useBrowserLocation()
+
+const { isSupported: isShareSupported, share } = useShare({
+    title: data.value?.title,
+    url: location.value.href,
+})
+
+const { isSupported: isCopySupported, copy, copied } = useClipboard()
+
 defineSeo({
     title: data.value?.title,
     titleTemplate: '%s | Liry24',
@@ -20,7 +29,7 @@ defineSeo({
                 {{ data.title }}
             </h1>
 
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-1">
                 <NuxtTime
                     :datetime="data.createdAt"
                     date-style="short"
@@ -33,6 +42,24 @@ defineSeo({
                     :label="tag.tag"
                     icon="mingcute:hashtag-line"
                     variant="soft"
+                    class="ml-1"
+                />
+                <UButton
+                    v-if="isShareSupported"
+                    icon="mingcute:share-2-fill"
+                    variant="ghost"
+                    size="sm"
+                    class="ml-1"
+                    @click="share()"
+                />
+                <UButton
+                    v-if="isCopySupported && location.href"
+                    :icon="copied ? 'mingcute:check-fill' : 'mingcute:link-3-fill'"
+                    :label="copied ? 'URL Copied' : undefined"
+                    variant="ghost"
+                    size="sm"
+                    class="transition-all"
+                    @click="copy(location.href)"
                 />
             </div>
 

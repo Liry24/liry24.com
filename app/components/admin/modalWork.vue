@@ -7,7 +7,6 @@ const open = defineModel<boolean>('open', {
 
 interface Props {
     data?: Serialized<Work>
-    categories?: string[]
     fields?: {
         slug?: boolean
     }
@@ -20,7 +19,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits(['success'])
 
-const { saveWork, submitting } = useWork()
+const { categories, createWork, updateWork } = useWork()
 
 const schema = worksInsertSchema
 type Schema = z.infer<typeof schema>
@@ -35,21 +34,19 @@ const state = reactive<Schema>({
     href: props.data?.href || '',
 })
 
-const imageFile = ref<File | null>(null)
-
 const onSubmit = async () => {
     try {
-        await saveWork(state, imageFile.value)
+        if (props.data?.slug) await updateWork(props.data.slug, state)
+        else await createWork(state)
 
+        state.slug = undefined
         state.title = ''
         state.category = ''
         state.description = ''
-        state.slug = ''
         state.image = ''
         state.icon = ''
         state.href = ''
 
-        imageFile.value = null
         open.value = false
         emit('success')
     } catch {
@@ -65,16 +62,6 @@ const onSubmit = async () => {
         :description="props.data?.slug ? `Editing #${props.data.slug}` : 'Add a new work'"
     >
         <slot />
-
-        <template v-if="submitting.state" #content>
-            <div class="grid gap-4 p-8">
-                <span class="text-3xl leading-none font-extralight"
-                    >{{ submitting.progress }}%</span
-                >
-                <UProgress v-model="submitting.progress" color="neutral" />
-                <ConsoleLog :logs="submitting.logs" class="h-48" />
-            </div>
-        </template>
 
         <template #body>
             <UForm :state :schema class="grid gap-4" @submit="onSubmit">
@@ -112,7 +99,7 @@ const onSubmit = async () => {
                     />
                     <div class="flex flex-wrap gap-2">
                         <UButton
-                            v-for="(category, index) in props.categories"
+                            v-for="(category, index) in categories"
                             :key="`category-${index}`"
                             :label="category"
                             variant="outline"
@@ -131,49 +118,48 @@ const onSubmit = async () => {
                     />
                 </UFormField>
 
-                <UFormField label="Image">
-                    <UFileUpload
-                        v-model="imageFile"
-                        accept="image/*"
-                        layout="list"
-                        position="inside"
+                <UFormField label="URL" name="href">
+                    <UInput
+                        v-model="state.href"
+                        placeholder="https://example.com"
+                        variant="soft"
+                        class="w-full"
                     />
                 </UFormField>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <UFormField label="Icon" name="icon">
-                        <UInput
-                            v-model="state.icon"
-                            placeholder="lucide:globe"
-                            variant="soft"
-                            class="w-full"
-                        >
-                            <template #trailing>
-                                <Icon v-if="state.icon" :name="state.icon" class="size-5" />
-                            </template>
-                        </UInput>
-                    </UFormField>
+                <UFormField label="Icon" name="icon">
+                    <UInput
+                        v-model="state.icon"
+                        placeholder="lucide:globe"
+                        variant="soft"
+                        class="w-full"
+                    >
+                        <template #trailing>
+                            <Icon v-if="state.icon" :name="state.icon" class="size-5" />
+                        </template>
+                    </UInput>
+                </UFormField>
 
-                    <UFormField label="URL" name="href">
-                        <UInput
-                            v-model="state.href"
-                            placeholder="https://example.com"
-                            variant="soft"
-                            class="w-full"
-                        />
-                    </UFormField>
-                </div>
-
-                <USeparator />
-
-                <UButton
-                    type="submit"
-                    :label="props.data?.slug ? 'Update' : 'Add'"
-                    color="neutral"
-                    size="lg"
-                    block
-                />
+                <UFormField label="Image">
+                    <FileUpload
+                        v-model="state.image"
+                        prefix="work"
+                        accept="image/*"
+                        label="Upload Image"
+                    />
+                </UFormField>
             </UForm>
+        </template>
+
+        <template #footer>
+            <UButton
+                :label="props.data?.slug ? 'Update' : 'Add'"
+                color="neutral"
+                size="lg"
+                block
+                loading-auto
+                @click="onSubmit"
+            />
         </template>
     </UModal>
 </template>

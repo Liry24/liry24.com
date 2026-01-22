@@ -132,6 +132,7 @@ export const socials = table('socials', {
     alias: text(),
     icon: text().notNull(),
     label: text().notNull(),
+    sortIndex: integer({ mode: 'number' }).notNull().default(0),
 })
 
 export const careers = table('careers', {
@@ -139,6 +140,7 @@ export const careers = table('careers', {
     period: text().notNull(),
     position: text().notNull(),
     company: text().notNull(),
+    sortIndex: integer({ mode: 'number' }).notNull().default(0),
 })
 
 export const works = table('works', {
@@ -152,6 +154,7 @@ export const works = table('works', {
     image: text(),
     icon: text(),
     href: text(),
+    sortIndex: integer({ mode: 'number' }).notNull().default(0),
 })
 
 export const arts = table('arts', {
@@ -162,6 +165,7 @@ export const arts = table('arts', {
     title: text().notNull(),
     description: text(),
     href: text(),
+    sortIndex: integer({ mode: 'number' }).notNull().default(0),
 })
 
 export const artImages = table(
@@ -187,6 +191,7 @@ export const skills = table('skills', {
     name: text().notNull(),
     icon: text().notNull(),
     category: text(),
+    sortIndex: integer({ mode: 'number' }).notNull().default(0),
 })
 
 export const ranks = table('ranks', {
@@ -196,6 +201,7 @@ export const ranks = table('ranks', {
     rank: text().notNull(),
     imageUrl: text().notNull(),
     href: text(),
+    sortIndex: integer({ mode: 'number' }).notNull().default(0),
 })
 
 export const posts = table('posts', {
