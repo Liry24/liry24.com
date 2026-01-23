@@ -1,5 +1,6 @@
-import equal from 'fast-deep-equal'
 import type z from 'zod'
+
+import equal from 'fast-deep-equal'
 
 export const useWork = () => {
     const toast = useToast()

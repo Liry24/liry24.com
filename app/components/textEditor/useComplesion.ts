@@ -1,8 +1,9 @@
+import type { Editor } from '@tiptap/vue-3'
+
 import { useCompletion } from '@ai-sdk/vue'
 import { Extension } from '@tiptap/core'
 import { Plugin } from '@tiptap/pm/state'
 import { Decoration, DecorationSet } from '@tiptap/pm/view'
-import type { Editor } from '@tiptap/vue-3'
 import { useDebounceFn } from '@vueuse/core'
 
 type CompletionMode =

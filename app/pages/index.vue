@@ -1,19 +1,15 @@
 <script setup lang="ts">
-import { NuxtImg, USeparator } from '#components'
+import { LazyStacksModal, NuxtImg, USeparator } from '#components'
 import { motion } from 'motion-v'
 
+const { app } = useAppConfig()
+const overlay = useOverlay()
+
+const modalStacks = overlay.create(LazyStacksModal)
 const MotionNuxtImg = motion.create(NuxtImg)
 const MotionUSeparator = motion.create(USeparator)
 
 const { data } = useFetch('/api/home')
-
-const liria = {
-    website: 'https://liria.me',
-    x: 'https://x.com/liria_24',
-    github: 'https://github.com/liria24',
-    liriaGraphics: 'https://eicosapenta.booth.pm',
-    avatio: 'https://avatio.me',
-}
 
 const rotateArray = <T,>(arr: T[], n: number): T[] => {
     const len = arr.length
@@ -23,6 +19,8 @@ const rotateArray = <T,>(arr: T[], n: number): T[] => {
 
     return [...arr.slice(-shift), ...arr.slice(0, -shift)]
 }
+
+useKeyCommand(modalStacks.open)
 
 defineSeo({
     title: 'Liry24',
@@ -105,21 +103,21 @@ defineSeo({
 
             <div class="mt-4 flex items-center gap-2">
                 <UButton
-                    :to="liria.website"
+                    :to="app.liria.website"
                     target="_blank"
                     aria-label="Website"
                     icon="mingcute:world-2-fill"
                     variant="link"
                 />
                 <UButton
-                    :to="liria.x"
+                    :to="app.liria.x"
                     target="_blank"
                     aria-label="X"
                     icon="mingcute:social-x-fill"
                     variant="link"
                 />
                 <UButton
-                    :to="liria.github"
+                    :to="app.liria.github"
                     target="_blank"
                     aria-label="Github"
                     icon="mingcute:github-fill"
@@ -129,7 +127,7 @@ defineSeo({
 
             <div class="grid w-full max-w-6xl grid-cols-1 gap-6 md:grid-cols-2">
                 <NuxtLink
-                    :to="liria.liriaGraphics"
+                    :to="app.liria.liriaGraphics"
                     target="_blank"
                     class="group hover:bg-muted relative flex size-full flex-col items-center justify-center gap-4 rounded-xl p-10 transition-colors"
                 >
@@ -149,7 +147,7 @@ defineSeo({
                 </NuxtLink>
 
                 <NuxtLink
-                    :to="liria.avatio"
+                    :to="app.liria.avatio"
                     target="_blank"
                     class="group hover:bg-muted relative flex size-full flex-col items-center justify-center gap-4 rounded-xl p-10 transition-colors"
                 >

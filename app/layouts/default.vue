@@ -51,7 +51,7 @@ const handleMouseLeave = () => {
 
 <template>
     <MotionConfig :transition="{ duration: 0.6 }" reduced-motion="user">
-        <div class="flex min-h-dvh flex-col">
+        <div class="flex min-h-dvh flex-col gap-16">
             <div class="mx-8 my-12 flex grow flex-col gap-12 md:mx-12 lg:mx-24 lg:mt-24">
                 <motion.header
                     :initial="{ opacity: 0 }"
@@ -106,9 +106,16 @@ const handleMouseLeave = () => {
             <motion.footer
                 :initial="{ opacity: 0 }"
                 :animate="{ opacity: 1 }"
-                class="mx-8 mb-10 flex items-center gap-3 md:mx-12 lg:mx-24"
+                class="@container mx-8 mb-10 flex flex-col items-center gap-3 md:mx-12 lg:mx-24"
             >
-                <p class="text-dimmed text-sm leading-none text-nowrap">2025 © Liry24</p>
+                <span
+                    class="text-dimmed/30 font-[Special_Gothic_Expanded_One] text-[28cqw] select-none"
+                >
+                    Liry24
+                </span>
+                <p class="text-dimmed text-sm leading-none text-nowrap">
+                    {{ new Date().getFullYear() }} © Liry24
+                </p>
             </motion.footer>
         </div>
     </MotionConfig>

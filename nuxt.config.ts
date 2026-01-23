@@ -17,7 +17,6 @@ export default defineNuxtConfig({
         '@nuxt/content',
         '@vueuse/nuxt',
         'motion-v/nuxt',
-        '@nuxt/eslint',
         '@nuxt/hints',
         '@nuxt/a11y',
     ],
@@ -135,12 +134,6 @@ export default defineNuxtConfig({
             },
         },
         experimental: { sqliteConnector: 'native' },
-    },
-
-    eslint: {
-        config: {
-            stylistic: false,
-        },
     },
 
     fonts: {

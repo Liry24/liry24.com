@@ -2,6 +2,7 @@ import { passkey } from '@better-auth/passkey'
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { admin, lastLoginMethod } from 'better-auth/plugins'
+
 import { db, schema } from './database'
 
 const config = useRuntimeConfig()
