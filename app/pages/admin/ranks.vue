@@ -2,12 +2,6 @@
 import { AdminModalRank } from '#components'
 import equal from 'fast-deep-equal'
 
-definePageMeta({
-    middleware: 'admin',
-    layout: 'admin',
-    pageTransition: false,
-})
-
 const { ranks, originalRanks, fetchRanks, reorderRanks, deleteRank } = useRank()
 const overlay = useOverlay()
 

@@ -1,12 +1,6 @@
 <script setup lang="ts">
 import type { Schema } from '~/components/admin/postForm.vue'
 
-definePageMeta({
-    middleware: 'admin',
-    layout: 'admin',
-    pageTransition: false,
-})
-
 const route = useRoute()
 const { updatePost, deletePost } = usePost()
 

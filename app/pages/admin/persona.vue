@@ -2,12 +2,6 @@
 import { AdminModalSocial } from '#components'
 import equal from 'fast-deep-equal'
 
-definePageMeta({
-    middleware: 'admin',
-    layout: 'admin',
-    pageTransition: false,
-})
-
 const { socials, originalSocials, fetchSocials, reorderSocials, deleteSocial } = useSocial()
 const overlay = useOverlay()
 const location = useBrowserLocation()

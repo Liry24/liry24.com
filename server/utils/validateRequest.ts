@@ -14,8 +14,8 @@ export const validateBody = async <T extends z.ZodTypeAny>(
     if (!result.success) {
         if (import.meta.dev) console.error(result.error)
         throw createError({
-            statusCode: 400,
-            statusMessage: 'Validation Error',
+            status: 400,
+            statusText: 'Validation Error',
         })
     }
 
@@ -35,8 +35,8 @@ export const validateFormData = async <T extends z.ZodTypeAny>(schema: T): Promi
     if (!result.success) {
         if (import.meta.dev) console.error(result.error)
         throw createError({
-            statusCode: 400,
-            statusMessage: 'Validation Error',
+            status: 400,
+            statusText: 'Validation Error',
         })
     }
 
@@ -49,8 +49,8 @@ export const validateParams = async <T extends z.ZodTypeAny>(schema: T): Promise
     if (!result.success) {
         if (import.meta.dev) console.error(result.error)
         throw createError({
-            statusCode: 400,
-            statusMessage: 'Validation Error',
+            status: 400,
+            statusText: 'Validation Error',
         })
     }
 
@@ -63,8 +63,8 @@ export const validateQuery = async <T extends z.ZodTypeAny>(schema: T): Promise<
     if (!result.success) {
         if (import.meta.dev) console.error(result.error)
         throw createError({
-            statusCode: 400,
-            statusMessage: 'Validation Error',
+            status: 400,
+            statusText: 'Validation Error',
         })
     }
 

@@ -24,8 +24,8 @@ export default eventHandler(async () => {
 
     if (!data)
         throw createError({
-            statusCode: 404,
-            statusMessage: 'Post not found',
+            status: 404,
+            statusText: 'Post not found',
         })
 
     await defineCDNCache(60 * 60 * 24, `post-${slug}`)

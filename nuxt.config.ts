@@ -52,6 +52,10 @@ export default defineNuxtConfig({
         },
     },
 
+    routeRules: {
+        '/admin/**': { appLayout: 'admin', appMiddleware: 'admin' },
+    },
+
     app: {
         pageTransition: { name: 'page', mode: 'out-in' },
         head: {
@@ -102,6 +106,13 @@ export default defineNuxtConfig({
                 },
             },
         },
+        typescript: {
+            tsConfig: {
+                compilerOptions: {
+                    noUncheckedIndexedAccess: true,
+                },
+            },
+        },
         experimental: {
             asyncContext: true,
         },
@@ -111,7 +122,6 @@ export default defineNuxtConfig({
         crossOriginPrefetch: true,
         extractAsyncDataHandlers: true,
         inlineRouteRules: true,
-        payloadExtraction: true,
         sharedPrerenderData: true,
         typescriptPlugin: true,
     },

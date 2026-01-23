@@ -1,12 +1,6 @@
 <script setup lang="ts">
 import { AdminModalWork } from '#components'
 
-definePageMeta({
-    middleware: 'admin',
-    layout: 'admin',
-    pageTransition: false,
-})
-
 const overlay = useOverlay()
 
 const modalWork = overlay.create(AdminModalWork)

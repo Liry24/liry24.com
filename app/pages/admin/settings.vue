@@ -1,10 +1,4 @@
 <script setup lang="ts">
-definePageMeta({
-    middleware: 'admin',
-    layout: 'admin',
-    pageTransition: false,
-})
-
 const { getSession } = useAuth()
 const session = await getSession()
 </script>

@@ -2,12 +2,6 @@
 import { AdminModalArt } from '#components'
 import equal from 'fast-deep-equal'
 
-definePageMeta({
-    middleware: 'admin',
-    layout: 'admin',
-    pageTransition: false,
-})
-
 const { arts, originalArts, fetchArts, reorderArts, deleteArt } = useArt()
 const overlay = useOverlay()
 

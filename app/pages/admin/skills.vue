@@ -2,12 +2,6 @@
 import { AdminModalSkill } from '#components'
 import equal from 'fast-deep-equal'
 
-definePageMeta({
-    middleware: 'admin',
-    layout: 'admin',
-    pageTransition: false,
-})
-
 const { skills, originalSkills, fetchSkills, reorderSkills, deleteSkill } = useSkill()
 const overlay = useOverlay()
 

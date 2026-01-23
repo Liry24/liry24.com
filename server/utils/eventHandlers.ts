@@ -22,8 +22,8 @@ export const authedSessionEventHandler = <T = unknown>(
     sessionEventHandler(async ({ event, session }) => {
         if (!session)
             throw createError({
-                statusCode: StatusCodes.UNAUTHORIZED,
-                statusMessage: getReasonPhrase(StatusCodes.UNAUTHORIZED),
+                status: StatusCodes.UNAUTHORIZED,
+                statusText: getReasonPhrase(StatusCodes.UNAUTHORIZED),
             })
 
         return handler({ event, session })
@@ -41,8 +41,8 @@ export const adminSessionEventHandler = <T = unknown>(
     sessionEventHandler(async ({ event, session }) => {
         if (session?.user?.role !== 'admin')
             throw createError({
-                statusCode: StatusCodes.FORBIDDEN,
-                statusMessage: getReasonPhrase(StatusCodes.FORBIDDEN),
+                status: StatusCodes.FORBIDDEN,
+                statusText: getReasonPhrase(StatusCodes.FORBIDDEN),
             })
 
         return handler({ event, session })
