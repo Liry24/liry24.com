@@ -3,28 +3,16 @@ import type { Schema } from '~/components/admin/postForm.vue'
 export const usePost = () => {
     const toast = useToast()
 
-    const submitting = ref<{
-        state: boolean
-        progress: number
-        logs: ConsoleLog[]
-    }>({
-        state: false,
-        progress: 0,
-        logs: [],
-    })
+    const submitting = ref(false)
 
     const savePost = async (state: Schema) => {
-        submitting.value.state = true
-        submitting.value.progress = 0
-        submitting.value.logs = []
+        submitting.value = true
 
         try {
             const { slug } = await $fetch('/api/admin/posts', {
                 method: 'POST',
                 body: state,
             })
-
-            submitting.value.progress = 100
 
             toast.add({
                 icon: 'mingcute:check-line',
@@ -45,22 +33,18 @@ export const usePost = () => {
             })
             throw e
         } finally {
-            submitting.value.state = false
+            submitting.value = false
         }
     }
 
     const updatePost = async (slug: string, state: Schema) => {
-        submitting.value.state = true
-        submitting.value.progress = 0
-        submitting.value.logs = []
+        submitting.value = true
 
         try {
             await $fetch(`/api/admin/posts/${slug}`, {
                 method: 'PUT',
                 body: state,
             })
-
-            submitting.value.progress = 100
 
             toast.add({
                 icon: 'mingcute:check-line',
@@ -80,21 +64,17 @@ export const usePost = () => {
             })
             throw e
         } finally {
-            submitting.value.state = false
+            submitting.value = false
         }
     }
 
     const deletePost = async (slug: string) => {
-        submitting.value.state = true
-        submitting.value.progress = 0
-        submitting.value.logs = []
+        submitting.value = true
 
         try {
             await $fetch(`/api/admin/posts/${slug}`, {
                 method: 'DELETE',
             })
-
-            submitting.value.progress = 100
 
             await refreshNuxtData('posts')
 
@@ -114,7 +94,7 @@ export const usePost = () => {
             })
             throw e
         } finally {
-            submitting.value.state = false
+            submitting.value = false
         }
     }
 

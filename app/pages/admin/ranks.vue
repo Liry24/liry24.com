@@ -1,19 +1,5 @@
 <script setup lang="ts">
-import { AdminModalRank } from '#components'
-import equal from 'fast-deep-equal'
-
-const { ranks, originalRanks, fetchRanks, reorderRanks, deleteRank } = useRank()
-const overlay = useOverlay()
-
-const modalRank = overlay.create(AdminModalRank)
-
-await fetchRanks()
-
-const shouldBeSaved = computed(() => !equal(originalRanks.value, ranks.value))
-
-const handleRefresh = async () => {
-    await fetchRanks()
-}
+const { ranks, changed, fetchRanks, reorderRanks, deleteRank, modalRank } = useRank()
 
 defineShortcuts({
     n: () => {
@@ -37,13 +23,13 @@ defineShortcuts({
                             icon="mingcute:refresh-2-line"
                             variant="ghost"
                             size="sm"
-                            @click="handleRefresh"
+                            @click="fetchRanks()"
                         />
                     </template>
 
                     <template #right>
                         <UButton
-                            v-if="shouldBeSaved"
+                            v-if="changed"
                             loading-auto
                             icon="mingcute:check-line"
                             label="Save"
@@ -51,7 +37,7 @@ defineShortcuts({
                             @click="reorderRanks"
                         />
 
-                        <AdminModalRank @success="handleRefresh">
+                        <AdminModalRank @success="fetchRanks">
                             <UButton
                                 icon="mingcute:add-line"
                                 label="New Rank"
@@ -96,7 +82,7 @@ defineShortcuts({
                                         icon="mingcute:close-line"
                                         variant="ghost"
                                         size="sm"
-                                        @click="deleteRank(rank)"
+                                        @click="deleteRank(rank.id)"
                                     />
                                 </div>
                             </div>

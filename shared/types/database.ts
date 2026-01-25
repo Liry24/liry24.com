@@ -35,7 +35,15 @@ export const artImagesUpdateSchema = createUpdateSchema(artImages, {
 export type ArtImage = z.infer<typeof artImagesSelectSchema>
 
 export const artsSelectSchema = createSelectSchema(arts).extend({
-    images: artImagesSelectSchema.omit({ artSlug: true }).partial({ id: true }).array(),
+    images: artImagesSelectSchema
+        .omit({
+            artSlug: true,
+        })
+        .partial({
+            id: true,
+            alt: true,
+        })
+        .array(),
 })
 export const artsInsertSchema = createInsertSchema(arts, {
     slug: (s) => s.optional(),

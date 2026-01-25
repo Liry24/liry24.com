@@ -10,7 +10,7 @@ const props = defineProps<Props>()
 
 const emit = defineEmits(['success'])
 
-const { saveRank, submitting } = useRank()
+const { createRank, updateRank } = useRank()
 
 const image = ref<File | null>(null)
 
@@ -24,15 +24,9 @@ const state = reactive({
 
 const onSubmit = async () => {
     try {
-        await saveRank(
-            {
-                ...(props.data?.id ? { id: props.data.id } : {}),
-                ...state,
-            },
-            image.value
-        )
+        if (props.data?.id) await updateRank(props.data.id, state)
+        else await createRank(state)
 
-        image.value = null
         state.href = ''
         state.game = ''
         state.season = ''
@@ -54,16 +48,6 @@ const onSubmit = async () => {
         :description="props.data?.id ? `Editing #${props.data.id}` : 'Add a new rank'"
     >
         <slot />
-
-        <template v-if="submitting.state" #content>
-            <div class="grid gap-4 p-8">
-                <span class="text-3xl leading-none font-extralight"
-                    >{{ submitting.progress }}%</span
-                >
-                <UProgress v-model="submitting.progress" color="neutral" />
-                <ConsoleLog :logs="submitting.logs" class="h-48" />
-            </div>
-        </template>
 
         <template #body>
             <UForm :state="state" loading-auto class="grid gap-4" @submit="onSubmit">
@@ -95,7 +79,12 @@ const onSubmit = async () => {
                 </UFormField>
 
                 <UFormField label="Image" required>
-                    <UFileUpload v-model="image" accept="image/*" layout="list" position="inside" />
+                    <FileUpload
+                        v-model="state.imageUrl"
+                        prefix="rank"
+                        accept="image/*"
+                        label="Upload Image"
+                    />
                 </UFormField>
 
                 <UFormField label="URL" name="href">
@@ -106,17 +95,18 @@ const onSubmit = async () => {
                         class="w-full"
                     />
                 </UFormField>
-
-                <USeparator />
-
-                <UButton
-                    type="submit"
-                    :label="props.data?.id ? 'Update' : 'Add'"
-                    color="neutral"
-                    size="lg"
-                    block
-                />
             </UForm>
+        </template>
+
+        <template #footer>
+            <UButton
+                :label="props.data?.id ? 'Update' : 'Add'"
+                color="neutral"
+                size="lg"
+                block
+                loading-auto
+                @click="onSubmit"
+            />
         </template>
     </UModal>
 </template>

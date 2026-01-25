@@ -2,19 +2,22 @@ import { eq } from 'drizzle-orm'
 import { socials } from '~~/database/schema'
 
 const request = {
+    params: socialsSelectSchema.required({ id: true }),
     body: socialsUpdateSchema.required({ id: true }),
 }
 
 export default adminSessionEventHandler(async () => {
-    const { id, href, alias, label, icon } = await validateBody(request.body)
+    const { id } = await validateParams(request.params)
+    const { href, alias, icon, label, sortIndex } = await validateBody(request.body)
 
     await db
         .update(socials)
         .set({
             href,
             alias,
-            label,
             icon,
+            label,
+            sortIndex,
         })
         .where(eq(socials.id, id))
 

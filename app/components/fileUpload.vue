@@ -12,8 +12,13 @@ const props = withDefaults(defineProps<Props>(), {
     prefix: undefined,
 })
 
+interface Image {
+    src: string
+    alt?: string | null
+}
+
 // Simplified model type
-const model = defineModel<M extends true ? string[] : string | null>()
+const model = defineModel<M extends true ? Image[] : Image | null>()
 
 const files = shallowRef<(M extends true ? File[] : File) | null | undefined>()
 
@@ -62,7 +67,7 @@ watch(files, async (value) => {
         if (Array.isArray(value)) {
             // Initialize model.value as array if not already
             if (!Array.isArray(model.value))
-                model.value = [] as unknown as M extends true ? string[] : string | null
+                model.value = [] as unknown as M extends true ? Image[] : Image | null
 
             for (const uploadItem of value) {
                 addLog(`Uploading ${uploadItem.name}...`)
@@ -76,12 +81,13 @@ watch(files, async (value) => {
                     addLog(result.error?.message || 'Failed to upload', 'error')
                     throw result.error
                 }
-                ;(model.value as string[]).push(
-                    createCleanURL(result.data.url).replace(
+                ;(model.value as Image[]).push({
+                    src: createCleanURL(result.data.url).replace(
                         'liry24com.t3.storage.dev',
                         'images.liry24.com'
-                    )
-                )
+                    ),
+                    alt: undefined,
+                })
                 addLog('Uploaded successfully.')
             }
         } else {
@@ -98,7 +104,10 @@ watch(files, async (value) => {
                 'images.liry24.com'
             )
             await nextTick()
-            model.value = newUrl as M extends true ? string[] : string | null
+            model.value = {
+                src: newUrl,
+                alt: undefined,
+            } as M extends true ? Image[] : Image | null
             addLog('Uploaded successfully.')
         }
 
@@ -183,8 +192,8 @@ const uploadedFiles = computed(() => {
                     size="sm"
                     @click="
                         props.multiple
-                            ? (model as string[]).splice(index, 1)
-                            : (model = null as unknown as M extends true ? string[] : string | null)
+                            ? (model as Image[]).splice(index, 1)
+                            : (model = null as unknown as M extends true ? Image[] : Image | null)
                     "
                 />
             </div>

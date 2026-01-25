@@ -1,20 +1,7 @@
 <script setup lang="ts">
-import { AdminModalSocial } from '#components'
-import equal from 'fast-deep-equal'
+const { socials, changed, fetchSocials, reorderSocials, deleteSocial, modalSocial } = useSocial()
 
-const { socials, originalSocials, fetchSocials, reorderSocials, deleteSocial } = useSocial()
-const overlay = useOverlay()
 const location = useBrowserLocation()
-
-const modalSocial = overlay.create(AdminModalSocial)
-
-await fetchSocials()
-
-const shouldBeSaved = computed(() => !equal(originalSocials.value, socials.value))
-
-const handleRefresh = async () => {
-    await fetchSocials()
-}
 
 defineShortcuts({
     n: () => {
@@ -38,13 +25,13 @@ defineShortcuts({
                             icon="mingcute:refresh-2-line"
                             variant="ghost"
                             size="sm"
-                            @click="handleRefresh"
+                            @click="fetchSocials()"
                         />
                     </template>
 
                     <template #right>
                         <UButton
-                            v-if="shouldBeSaved"
+                            v-if="changed"
                             loading-auto
                             icon="mingcute:check-line"
                             label="Save"
@@ -52,7 +39,7 @@ defineShortcuts({
                             @click="reorderSocials"
                         />
 
-                        <AdminModalSocial @success="handleRefresh">
+                        <AdminModalSocial @success="fetchSocials">
                             <UButton
                                 icon="mingcute:add-line"
                                 label="New Link"
@@ -105,7 +92,7 @@ defineShortcuts({
                                         icon="mingcute:close-line"
                                         variant="ghost"
                                         size="sm"
-                                        @click="deleteSocial(social)"
+                                        @click="deleteSocial(social.id)"
                                     />
                                 </div>
                             </div>

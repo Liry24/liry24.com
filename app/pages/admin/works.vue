@@ -1,11 +1,5 @@
 <script setup lang="ts">
-import { AdminModalWork } from '#components'
-
-const overlay = useOverlay()
-
-const modalWork = overlay.create(AdminModalWork)
-
-const { works, changed, fetchWorks, reorderWorks, deleteWork } = useWork()
+const { works, changed, fetchWorks, reorderWorks, deleteWork, modalWork } = useWork()
 
 defineShortcuts({
     n: () => {

@@ -1,90 +1,39 @@
-import { upload } from '@tigrisdata/storage/client'
+import type z from 'zod'
+
+import { AdminModalRank } from '#components'
+import equal from 'fast-deep-equal'
 
 export const useRank = () => {
     const toast = useToast()
+    const overlay = useOverlay()
 
-    const ranks = useState<Serialized<Rank>[]>('ranks', () => [])
-    const originalRanks = useState<Serialized<Rank>[]>('ranks-original', () => [])
+    const modalRank = overlay.create(AdminModalRank)
 
-    const submitting = ref<{
-        state: boolean
-        progress: number
-        logs: ConsoleLog[]
-    }>({
-        state: false,
-        progress: 0,
-        logs: [],
+    const { data: ranks, refresh: fetchRanks } = useFetch('/api/ranks', {
+        dedupe: 'defer',
+        default: () => [],
+        getCachedData: (key, n, ctx) =>
+            ctx.cause !== 'refresh:manual' && n.isHydrating
+                ? n.payload.data[key]
+                : n.static.data[key],
+        onResponse: (value) => {
+            original.value = value.response._data || []
+        },
     })
+    const original = shallowRef(ranks.value)
 
-    const fetchRanks = async () => {
-        const { data } = await useFetch('/api/ranks', {
-            key: 'ranks-list',
-            default: () => [],
-        })
+    const changed = computed(() => !equal(ranks.value, original.value))
 
-        if (data.value) {
-            ranks.value = [...data.value]
-            originalRanks.value = [...data.value]
-        }
-    }
+    const submitting = ref(false)
 
-    const addLog = (message: string, type: ConsoleLog['type'] = 'log') => {
-        submitting.value.logs.push({
-            createdAt: new Date(),
-            message,
-            type,
-        })
-    }
-
-    const saveRank = async (state: Partial<Rank>, image: File | null) => {
-        submitting.value.state = true
-        submitting.value.progress = 0
-        submitting.value.logs = []
+    const createRank = async (state: Partial<Rank>) => {
+        submitting.value = true
 
         try {
-            if (image) {
-                addLog(`Uploading image: ${image.name}...`)
-                const imageExt = image.name.split('.').pop()
-                // Ensure game and rank string values exist for filename generation, fallback to defaults or existing data if state is partial?
-                // The modal passed reactive state which should be complete enough.
-                const gameName = state.game?.toLowerCase().trim().replaceAll(' ', '-') || 'game'
-                const rankName = state.rank?.toLowerCase().trim().replaceAll(' ', '-') || 'rank'
-
-                const imageName = `${gameName}-${rankName}.${imageExt}`
-
-                const result = await upload(imageName, image, {
-                    access: 'public',
-                    url: '/api/admin/upload',
-                    onUploadProgress: (progress) => {
-                        const currentFileProgress = progress.percentage / 100
-                        const totalSteps = 2
-                        submitting.value.progress = Math.floor(
-                            (currentFileProgress / totalSteps) * 100
-                        )
-                    },
-                })
-                if (result.error) throw result.error
-                const blob = result.data
-
-                state.imageUrl = blob.url
-                addLog('Image uploaded successfully.')
-            }
-
-            submitting.value.progress = 50
-            addLog(state.id ? 'Updating rank metadata...' : 'Adding new rank metadata...')
-
             await $fetch('/api/admin/ranks', {
-                method: state.id ? 'PATCH' : 'POST',
-                body: state.id
-                    ? {
-                          id: state.id,
-                          ...state,
-                      }
-                    : state,
+                method: 'POST',
+                body: state,
             })
-
-            submitting.value.progress = 100
-            addLog('Rank saved successfully.')
 
             toast.add({
                 icon: 'mingcute:check-line',
@@ -96,23 +45,42 @@ export const useRank = () => {
             await fetchRanks()
         } catch (e) {
             console.error(e)
-            addLog(`Error: ${e instanceof Error ? e.message : String(e)}`, 'error')
             toast.add({
                 icon: 'mingcute:close-line',
                 title: 'Error',
-                description: 'An error occurred while saving the rank',
+                description: 'An error occurred while saving the work',
                 color: 'error',
             })
             throw e
         } finally {
-            submitting.value.state = false
+            submitting.value = false
         }
     }
 
-    const deleteRank = async (item: Serialized<Rank>) => {
-        const index = ranks.value.findIndex((r) => r.id === item.id)
-        if (index > -1) {
-            ranks.value.splice(index, 1)
+    const updateRank = async (id: Rank['id'], item: z.infer<typeof ranksUpdateSchema>) => {
+        try {
+            await $fetch(`/api/admin/ranks/${id}`, {
+                method: 'PATCH',
+                body: item,
+            })
+
+            await fetchRanks()
+
+            toast.add({
+                icon: 'mingcute:check-line',
+                title: 'Success',
+                description: 'Rank saved successfully',
+                color: 'success',
+            })
+        } catch (e) {
+            console.error(e)
+            toast.add({
+                icon: 'mingcute:close-line',
+                title: 'Error',
+                description: 'An error occurred while saving the work',
+                color: 'error',
+            })
+            throw e
         }
     }
 
@@ -143,13 +111,43 @@ export const useRank = () => {
         }
     }
 
+    const deleteRank = async (id: Rank['id']) => {
+        try {
+            if (!(await confirm('Are you sure you want to delete this rank?'))) return
+
+            await $fetch(`/api/admin/ranks/${id}`, {
+                method: 'DELETE',
+            })
+
+            await fetchRanks()
+
+            toast.add({
+                icon: 'mingcute:check-line',
+                title: 'Success',
+                description: 'Rank deleted successfully',
+                color: 'success',
+            })
+        } catch (e) {
+            console.error(e)
+            toast.add({
+                icon: 'mingcute:close-line',
+                title: 'Error',
+                description: 'An error occurred while deleting the rank',
+                color: 'error',
+            })
+            throw e
+        }
+    }
+
     return {
         ranks,
-        originalRanks,
+        changed,
         fetchRanks,
-        saveRank,
+        createRank,
+        updateRank,
         deleteRank,
         reorderRanks,
         submitting,
+        modalRank,
     }
 }

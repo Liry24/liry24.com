@@ -1,19 +1,5 @@
 <script setup lang="ts">
-import { AdminModalArt } from '#components'
-import equal from 'fast-deep-equal'
-
-const { arts, originalArts, fetchArts, reorderArts, deleteArt } = useArt()
-const overlay = useOverlay()
-
-const modalArt = overlay.create(AdminModalArt)
-
-await fetchArts()
-
-const shouldBeSaved = computed(() => !equal(originalArts.value, arts.value))
-
-const handleRefresh = async () => {
-    await fetchArts()
-}
+const { arts, changed, fetchArts, reorderArts, deleteArt, modalArt } = useArt()
 
 defineShortcuts({
     n: () => {
@@ -35,13 +21,13 @@ defineShortcuts({
                             icon="mingcute:refresh-2-line"
                             variant="ghost"
                             size="sm"
-                            @click="handleRefresh"
+                            @click="fetchArts()"
                         />
                     </template>
 
                     <template #right>
                         <UButton
-                            v-if="shouldBeSaved"
+                            v-if="changed"
                             loading-auto
                             icon="mingcute:check-line"
                             label="Save"
@@ -49,7 +35,7 @@ defineShortcuts({
                             @click="reorderArts"
                         />
 
-                        <AdminModalArt @success="handleRefresh">
+                        <AdminModalArt @success="fetchArts()">
                             <UButton
                                 icon="mingcute:add-line"
                                 label="New Art"
@@ -99,7 +85,7 @@ defineShortcuts({
                                         icon="mingcute:close-line"
                                         variant="ghost"
                                         size="sm"
-                                        @click="deleteArt(art)"
+                                        @click="deleteArt(art.slug)"
                                     />
                                 </div>
                             </div>

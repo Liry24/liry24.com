@@ -1,12 +1,17 @@
 <script setup lang="ts">
-import type z from 'zod'
+import z from 'zod'
 
 const open = defineModel<boolean>('open', {
     default: false,
 })
 
 interface Props {
-    data?: Serialized<Art>
+    data?: Serialized<Art> & {
+        images: {
+            src: string
+            alt: string | null | undefined
+        }[]
+    }
     fields?: {
         slug?: boolean
     }
@@ -18,9 +23,16 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits(['success'])
 
-const { saveArt, submitting } = useArt()
+const { createArt, updateArt } = useArt()
 
-const schema = artsInsertSchema.omit({ images: true })
+const schema = artsInsertSchema.extend({
+    images: z
+        .object({
+            src: z.string(),
+            alt: z.string().nullable().optional(),
+        })
+        .array(),
+})
 type Schema = z.infer<typeof schema>
 
 const state = reactive<Schema>({
@@ -28,23 +40,24 @@ const state = reactive<Schema>({
     title: props.data?.title || '',
     description: props.data?.description || '',
     href: props.data?.href || '',
+    images: props.data?.images || [],
 })
-const images = ref<File[]>([])
 
 const onSubmit = async () => {
     try {
-        await saveArt(state, images.value)
+        if (props.data?.slug) await updateArt(props.data.slug, state)
+        else await createArt(state)
 
-        images.value = []
-        state.href = ''
         state.slug = undefined
         state.title = ''
         state.description = ''
+        state.href = ''
+        state.images = []
 
         open.value = false
         emit('success')
     } catch {
-        // Error handling is done in useArt (logging/toast), but we keep modal open
+        // Error handling in composable
     }
 }
 </script>
@@ -57,20 +70,10 @@ const onSubmit = async () => {
     >
         <slot />
 
-        <template v-if="submitting.state" #content>
-            <div class="grid gap-4 p-8">
-                <span class="text-3xl leading-none font-extralight"
-                    >{{ submitting.progress }}%</span
-                >
-                <UProgress v-model="submitting.progress" color="neutral" />
-                <ConsoleLog :logs="submitting.logs" class="h-48" />
-            </div>
-        </template>
-
         <template #body>
             <UForm :state :schema class="grid gap-4" @submit="onSubmit">
                 <UFormField label="Images" name="images" required>
-                    <UFileUpload v-model="images" multiple accept="image/*" class="min-h-32" />
+                    <FileUpload v-model="state.images" multiple accept="image/*" class="min-h-32" />
                 </UFormField>
 
                 <UFormField label="Title" name="title" required>
@@ -111,17 +114,18 @@ const onSubmit = async () => {
                         class="w-full"
                     />
                 </UFormField>
-
-                <USeparator />
-
-                <UButton
-                    type="submit"
-                    :label="props.data?.slug ? 'Update' : 'Add'"
-                    color="neutral"
-                    size="lg"
-                    block
-                />
             </UForm>
+        </template>
+
+        <template #footer>
+            <UButton
+                :label="props.data?.slug ? 'Update' : 'Add'"
+                color="neutral"
+                size="lg"
+                block
+                loading-auto
+                @click="onSubmit"
+            />
         </template>
     </UModal>
 </template>

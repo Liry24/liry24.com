@@ -1,12 +1,15 @@
 import type z from 'zod'
 
+import { AdminModalWork } from '#components'
 import equal from 'fast-deep-equal'
 
 export const useWork = () => {
     const toast = useToast()
+    const overlay = useOverlay()
+
+    const modalWork = overlay.create(AdminModalWork)
 
     const { data: works, refresh: fetchWorks } = useFetch('/api/works', {
-        key: 'works-list',
         dedupe: 'defer',
         default: () => [],
         getCachedData: (key, n, ctx) =>
@@ -152,5 +155,6 @@ export const useWork = () => {
         deleteWork,
         reorderWorks,
         submitting,
+        modalWork,
     }
 }

@@ -1,54 +1,54 @@
+import type { z } from 'zod'
+
+import { AdminModalSkill } from '#components'
+import equal from 'fast-deep-equal'
+
 export const useSkill = () => {
     const toast = useToast()
+    const overlay = useOverlay()
 
-    const skills = useState<Serialized<Skill>[]>('skills', () => [])
-    const originalSkills = useState<Serialized<Skill>[]>('skills-original', () => [])
+    const { data: skills, refresh: fetchSkills } = useFetch('/api/skills', {
+        dedupe: 'defer',
+        default: () => [],
+        getCachedData: (key, n, ctx) =>
+            ctx.cause !== 'refresh:manual' && n.isHydrating
+                ? n.payload.data[key]
+                : n.static.data[key],
+        onResponse: (value) => {
+            original.value = value.response._data || []
+        },
+    })
+    const original = shallowRef(skills.value)
 
-    const submitting = ref<{
-        state: boolean
-        progress: number
-        logs: ConsoleLog[]
-    }>({
-        state: false,
-        progress: 0,
-        logs: [],
+    const changed = computed(() => !equal(skills.value, original.value))
+
+    const categories = computed<string[]>(() =>
+        [...new Set(skills.value.map((skill) => skill.category))].filter(
+            (category): category is string => !!category
+        )
+    )
+
+    const submitting = ref(false)
+
+    const modalSkill = overlay.create(AdminModalSkill, {
+        props: {
+            categories: categories.value,
+        },
     })
 
-    const fetchSkills = async () => {
-        const { data } = await useFetch('/api/skills', {
-            key: 'skills-list',
-            default: () => [],
-        })
-
-        if (data.value) {
-            skills.value = [...data.value]
-            originalSkills.value = [...data.value]
-        }
-    }
-
-    const saveSkill = async (state: Partial<Skill>) => {
-        submitting.value.state = true
-        submitting.value.progress = 0
-        submitting.value.logs = []
+    const createSkill = async (state: Partial<Skill>) => {
+        submitting.value = true
 
         try {
-            if (state.id)
-                await $fetch('/api/admin/skills', {
-                    method: 'PATCH',
-                    body: state,
-                })
-            else
-                await $fetch('/api/admin/skills', {
-                    method: 'POST',
-                    body: state,
-                })
-
-            submitting.value.progress = 100
+            await $fetch('/api/admin/skills', {
+                method: 'POST',
+                body: state,
+            })
 
             toast.add({
                 icon: 'mingcute:check-line',
                 title: 'Success',
-                description: 'Skill saved successfully',
+                description: 'Work saved successfully',
                 color: 'success',
             })
 
@@ -58,19 +58,39 @@ export const useSkill = () => {
             toast.add({
                 icon: 'mingcute:close-line',
                 title: 'Error',
-                description: 'An error occurred while saving the skill',
+                description: 'An error occurred while saving the work',
                 color: 'error',
             })
             throw e
         } finally {
-            submitting.value.state = false
+            submitting.value = false
         }
     }
 
-    const deleteSkill = async (item: Serialized<Skill>) => {
-        const index = skills.value.findIndex((s) => s.id === item.id)
-        if (index > -1) {
-            skills.value.splice(index, 1)
+    const updateSkill = async (id: Skill['id'], item: z.infer<typeof skillsUpdateSchema>) => {
+        try {
+            await $fetch(`/api/admin/skills/${id}`, {
+                method: 'PATCH',
+                body: item,
+            })
+
+            await fetchSkills()
+
+            toast.add({
+                icon: 'mingcute:check-line',
+                title: 'Success',
+                description: 'Work saved successfully',
+                color: 'success',
+            })
+        } catch (e) {
+            console.error(e)
+            toast.add({
+                icon: 'mingcute:close-line',
+                title: 'Error',
+                description: 'An error occurred while saving the work',
+                color: 'error',
+            })
+            throw e
         }
     }
 
@@ -101,13 +121,44 @@ export const useSkill = () => {
         }
     }
 
+    const deleteSkill = async (id: Skill['id']) => {
+        try {
+            if (!(await confirm('Are you sure you want to delete this skill?'))) return
+
+            await $fetch(`/api/admin/skills/${id}`, {
+                method: 'DELETE',
+            })
+
+            await fetchSkills()
+
+            toast.add({
+                icon: 'mingcute:check-line',
+                title: 'Success',
+                description: 'Skill deleted successfully',
+                color: 'success',
+            })
+        } catch (e) {
+            console.error(e)
+            toast.add({
+                icon: 'mingcute:close-line',
+                title: 'Error',
+                description: 'An error occurred while deleting the work',
+                color: 'error',
+            })
+            throw e
+        }
+    }
+
     return {
         skills,
-        originalSkills,
+        changed,
+        categories,
         fetchSkills,
-        saveSkill,
+        createSkill,
+        updateSkill,
         deleteSkill,
         reorderSkills,
         submitting,
+        modalSkill,
     }
 }

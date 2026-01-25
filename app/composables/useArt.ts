@@ -1,143 +1,86 @@
-import { upload } from '@tigrisdata/storage/client'
-import { nanoid } from 'nanoid'
+import type { z } from 'zod'
+
+import { AdminModalArt } from '#components'
+import equal from 'fast-deep-equal'
 
 export const useArt = () => {
     const toast = useToast()
+    const overlay = useOverlay()
 
-    const arts = useState<Serialized<Art>[]>('arts', () => [])
-    const originalArts = useState<Serialized<Art>[]>('arts-original', () => [])
+    const modalArt = overlay.create(AdminModalArt)
 
-    const submitting = ref<{
-        state: boolean
-        progress: number
-        logs: ConsoleLog[]
-    }>({
-        state: false,
-        progress: 0,
-        logs: [],
-    })
-
-    const fetchArts = async () => {
-        const { data } = await useFetch('/api/arts', {
-            key: 'arts-list',
-            default: () => [],
-            getCachedData: (key, n, ctx) =>
-                ctx.cause !== 'refresh:manual' && n.isHydrating
-                    ? n.payload.data[key]
-                    : n.static.data[key],
-        })
-
-        if (data.value) {
-            arts.value = [...data.value]
-            originalArts.value = [...data.value]
-        }
-    }
-
-    const addLog = (message: string, type: ConsoleLog['type'] = 'log') => {
-        submitting.value.logs.push({
-            createdAt: new Date(),
-            message,
-            type,
-        })
-    }
-
-    const saveArt = async (
-        state: {
-            slug?: string | null
-            title: string
-            description?: string | null
-            href?: string | null
+    const { data: arts, refresh: fetchArts } = useFetch('/api/arts', {
+        dedupe: 'defer',
+        default: () => [],
+        getCachedData: (key, n, ctx) =>
+            ctx.cause !== 'refresh:manual' && n.isHydrating
+                ? n.payload.data[key]
+                : n.static.data[key],
+        onResponse: (value) => {
+            original.value = value.response._data || []
         },
-        images: File[]
-    ) => {
-        submitting.value.state = true
-        submitting.value.progress = 0
-        submitting.value.logs = []
+    })
+    const original = shallowRef(arts.value)
+
+    const changed = computed(() => !equal(arts.value, original.value))
+
+    const submitting = ref(false)
+
+    const createArt = async (state: Partial<Art>) => {
+        submitting.value = true
 
         try {
-            const imageData: { src: string; alt?: string }[] = []
-
-            if (images.length) {
-                addLog(`Starting upload of ${images.length} images...`)
-
-                const artSlug = state.slug?.toLowerCase().trim().replaceAll(' ', '-') || nanoid(4)
-                for (let i = 0; i < images.length; i++) {
-                    const image = images[i]
-                    if (!image) continue
-
-                    addLog(`Uploading [${i + 1}/${images.length}] ${image.name}...`)
-
-                    const imageExt = image.name.split('.').pop()
-                    const imageName = `art-${artSlug}-${nanoid(6)}.${imageExt}`
-                    const result = await upload(imageName, image, {
-                        access: 'public',
-                        url: '/api/admin/upload',
-                        onUploadProgress: (progress) => {
-                            const currentFileProgress = progress.percentage / 100
-                            const totalSteps = images.length + 1
-                            const globalProgress = Math.floor(
-                                ((i + currentFileProgress) / totalSteps) * 100
-                            )
-                            submitting.value.progress = globalProgress
-                        },
-                    })
-                    if (result.error) throw result.error
-                    const blob = result.data
-
-                    imageData.push({ src: blob.url, alt: undefined })
-                    addLog(`Uploaded ${image.name} successfully.`)
-                }
-            }
-
-            submitting.value.progress = 90
-            addLog('Saving metadata to database...')
-
             await $fetch('/api/admin/arts', {
-                method: state.slug ? 'PATCH' : 'POST',
-                body: state.slug
-                    ? {
-                          slug: state.slug,
-                          images: imageData,
-                          title: state.title,
-                          description: state.description || '',
-                          href: state.href || '',
-                      }
-                    : {
-                          ...state,
-                          images: imageData,
-                      },
+                method: 'POST',
+                body: state,
             })
-
-            submitting.value.progress = 100
-            addLog('Art saved successfully.')
 
             toast.add({
                 icon: 'mingcute:check-line',
                 title: 'Success',
-                description: 'Art saved successfully',
+                description: 'Work saved successfully',
                 color: 'success',
             })
 
             await fetchArts()
         } catch (e) {
             console.error(e)
-            addLog(`Error: ${e instanceof Error ? e.message : String(e)}`, 'error')
             toast.add({
                 icon: 'mingcute:close-line',
                 title: 'Error',
-                description: 'Art saved failed',
+                description: 'An error occurred while saving the work',
                 color: 'error',
             })
             throw e
         } finally {
-            submitting.value.state = false
+            submitting.value = false
         }
     }
 
-    const deleteArt = async (item: Serialized<Art>) => {
-        const index = arts.value.findIndex((a) => a.slug === item.slug)
-        if (index > -1) {
-            arts.value.splice(index, 1)
+    const updateArt = async (id: Art['slug'], item: z.infer<typeof artsUpdateSchema>) => {
+        try {
+            await $fetch(`/api/admin/arts/${id}`, {
+                method: 'PATCH',
+                body: item,
+            })
+
+            await fetchArts()
+
+            toast.add({
+                icon: 'mingcute:check-line',
+                title: 'Success',
+                description: 'Work saved successfully',
+                color: 'success',
+            })
+        } catch (e) {
+            console.error(e)
+            toast.add({
+                icon: 'mingcute:close-line',
+                title: 'Error',
+                description: 'An error occurred while saving the work',
+                color: 'error',
+            })
+            throw e
         }
     }
 
@@ -168,13 +111,43 @@ export const useArt = () => {
         }
     }
 
+    const deleteArt = async (id: Art['slug']) => {
+        try {
+            if (!(await confirm('Are you sure you want to delete this art?'))) return
+
+            await $fetch(`/api/admin/arts/${id}`, {
+                method: 'DELETE',
+            })
+
+            await fetchArts()
+
+            toast.add({
+                icon: 'mingcute:check-line',
+                title: 'Success',
+                description: 'Art deleted successfully',
+                color: 'success',
+            })
+        } catch (e) {
+            console.error(e)
+            toast.add({
+                icon: 'mingcute:close-line',
+                title: 'Error',
+                description: 'An error occurred while deleting the work',
+                color: 'error',
+            })
+            throw e
+        }
+    }
+
     return {
         arts,
-        originalArts,
+        changed,
         fetchArts,
-        saveArt,
+        createArt,
+        updateArt,
         deleteArt,
         reorderArts,
         submitting,
+        modalArt,
     }
 }

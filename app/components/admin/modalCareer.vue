@@ -10,7 +10,7 @@ const props = defineProps<Props>()
 
 const emit = defineEmits(['success'])
 
-const { saveCareer, submitting } = useCareer()
+const { createCareer, updateCareer } = useCareer()
 
 const state = reactive({
     period: props.data?.period || '',
@@ -20,10 +20,8 @@ const state = reactive({
 
 const onSubmit = async () => {
     try {
-        await saveCareer({
-            ...(props.data?.id ? { id: props.data.id } : {}),
-            ...state,
-        })
+        if (props.data?.id) await updateCareer(props.data.id, state)
+        else await createCareer(state)
 
         state.period = ''
         state.position = ''
@@ -73,18 +71,18 @@ const onSubmit = async () => {
                         class="w-full"
                     />
                 </UFormField>
-
-                <USeparator />
-
-                <UButton
-                    type="submit"
-                    :label="props.data?.id ? 'Update' : 'Add'"
-                    color="neutral"
-                    size="lg"
-                    block
-                    :loading="submitting.state"
-                />
             </UForm>
+        </template>
+
+        <template #footer>
+            <UButton
+                :label="props.data?.id ? 'Update' : 'Add'"
+                color="neutral"
+                size="lg"
+                block
+                loading-auto
+                @click="onSubmit"
+            />
         </template>
     </UModal>
 </template>

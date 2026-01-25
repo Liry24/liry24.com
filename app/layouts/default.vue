@@ -51,8 +51,8 @@ const handleMouseLeave = () => {
 
 <template>
     <MotionConfig :transition="{ duration: 0.6 }" reduced-motion="user">
-        <div class="flex min-h-dvh flex-col gap-16">
-            <div class="mx-8 my-12 flex grow flex-col gap-12 md:mx-12 lg:mx-24 lg:mt-24">
+        <div class="flex flex-col gap-16">
+            <div class="mx-8 my-12 flex min-h-dvh flex-col gap-12 md:mx-12 lg:mx-24 lg:mt-24">
                 <motion.header
                     :initial="{ opacity: 0 }"
                     :animate="{ opacity: 1 }"

@@ -4,6 +4,8 @@ const { session, signOut } = useAuth()
 
 const { data: users } = useFetch('/api/admin/users')
 const { data: posts } = useFetch('/api/posts', { key: 'posts' })
+
+const sidebarCollapsed = ref(false)
 </script>
 
 <template>
@@ -13,21 +15,41 @@ const { data: posts } = useFetch('/api/posts', { key: 'posts' })
                 id="default"
                 collapsible
                 resizable
+                :collapsed="sidebarCollapsed"
                 :ui="{
                     root: 'min-h-[calc(100svh-0.5rem)]',
+                    header: cn(sidebarCollapsed && ''),
                     footer: 'lg:border-t lg:border-default p-1',
                 }"
             >
                 <template #header="{ collapsed }">
-                    <div :data-collapsed="collapsed" class="flex items-center gap-2 pl-2">
+                    <div
+                        :class="
+                            cn(
+                                'flex w-full items-center gap-2 pl-2',
+                                collapsed && 'mt-8 mb-8 flex-col pl-0'
+                            )
+                        "
+                    >
                         <UButton
                             to="/admin"
                             icon="liria:liria"
-                            label="Admin"
+                            :label="collapsed ? undefined : 'Admin'"
                             variant="link"
                             color="neutral"
                             size="sm"
                             class="text-highlighted gap-1.5 p-0 text-base font-extralight"
+                        />
+                        <UButton
+                            :icon="
+                                collapsed
+                                    ? 'mingcute:layout-leftbar-open-fill'
+                                    : 'mingcute:layout-leftbar-close-fill'
+                            "
+                            variant="ghost"
+                            size="sm"
+                            :class="cn(!collapsed && 'ml-auto')"
+                            @click="sidebarCollapsed = !sidebarCollapsed"
                         />
                     </div>
                 </template>
@@ -69,7 +91,11 @@ const { data: posts } = useFetch('/api/posts', { key: 'posts' })
                         :collapsed
                     />
 
-                    <AdminNavSection title="Blogs">
+                    <AdminNavSection
+                        title="Blogs"
+                        icon="mingcute:book-3-fill"
+                        :collapsed="sidebarCollapsed"
+                    >
                         <UScrollArea class="modern-scrollbar max-h-42">
                             <AdminNav
                                 :links="[
@@ -100,7 +126,11 @@ const { data: posts } = useFetch('/api/posts', { key: 'posts' })
                         </UScrollArea>
                     </AdminNavSection>
 
-                    <AdminNavSection title="Users">
+                    <AdminNavSection
+                        title="Users"
+                        icon="mingcute:user-2-fill"
+                        :collapsed="sidebarCollapsed"
+                    >
                         <AdminNav
                             :links="
                                 users?.users.map((user) => ({

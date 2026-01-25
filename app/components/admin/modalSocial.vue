@@ -10,7 +10,7 @@ const props = defineProps<Props>()
 
 const emit = defineEmits(['success'])
 
-const { saveSocial, submitting } = useSocial()
+const { createSocial, updateSocial } = useSocial()
 
 const state = reactive({
     href: props.data?.href || '',
@@ -21,15 +21,13 @@ const state = reactive({
 
 const onSubmit = async () => {
     try {
-        await saveSocial({
-            ...(props.data?.id ? { id: props.data.id } : {}),
-            ...state,
-        })
+        if (props.data?.id) await updateSocial(props.data.id, state)
+        else await createSocial(state)
 
-        state.href = ''
         state.alias = ''
         state.label = ''
         state.icon = ''
+        state.href = ''
 
         open.value = false
         emit('success')
@@ -106,18 +104,18 @@ const onSubmit = async () => {
                         </template>
                     </UPopover>
                 </UFormField>
-
-                <USeparator />
-
-                <UButton
-                    type="submit"
-                    :label="props.data?.id ? 'Update' : 'Add'"
-                    color="neutral"
-                    size="lg"
-                    block
-                    :loading="submitting.state"
-                />
             </UForm>
+        </template>
+
+        <template #footer>
+            <UButton
+                :label="props.data?.id ? 'Update' : 'Add'"
+                color="neutral"
+                size="lg"
+                block
+                loading-auto
+                @click="onSubmit"
+            />
         </template>
     </UModal>
 </template>

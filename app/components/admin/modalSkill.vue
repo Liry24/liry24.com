@@ -11,7 +11,7 @@ const props = defineProps<Props>()
 
 const emit = defineEmits(['success'])
 
-const { saveSkill, submitting } = useSkill()
+const { createSkill, updateSkill } = useSkill()
 
 const state = reactive({
     name: props.data?.name || '',
@@ -21,10 +21,8 @@ const state = reactive({
 
 const onSubmit = async () => {
     try {
-        await saveSkill({
-            ...(props.data?.id ? { id: props.data.id } : {}),
-            ...state,
-        })
+        if (props.data?.id) await updateSkill(props.data.id, state)
+        else await createSkill(state)
 
         state.name = ''
         state.icon = ''
@@ -111,18 +109,18 @@ const onSubmit = async () => {
                         />
                     </div>
                 </UFormField>
-
-                <USeparator />
-
-                <UButton
-                    type="submit"
-                    :label="props.data?.id ? 'Update' : 'Add'"
-                    color="neutral"
-                    size="lg"
-                    block
-                    :loading="submitting.state"
-                />
             </UForm>
+        </template>
+
+        <template #footer>
+            <UButton
+                :label="props.data?.id ? 'Update' : 'Add'"
+                color="neutral"
+                size="lg"
+                block
+                loading-auto
+                @click="onSubmit"
+            />
         </template>
     </UModal>
 </template>

@@ -1,12 +1,17 @@
 <script setup lang="ts">
-import type z from 'zod'
+import z from 'zod'
 
 const open = defineModel<boolean>('open', {
     default: false,
 })
 
 interface Props {
-    data?: Serialized<Work>
+    data?: Serialized<Work> & {
+        image: {
+            src: string
+            alt: string | undefined
+        }
+    }
     fields?: {
         slug?: boolean
     }
@@ -21,7 +26,12 @@ const emit = defineEmits(['success'])
 
 const { categories, createWork, updateWork } = useWork()
 
-const schema = worksInsertSchema
+const schema = worksInsertSchema.extend({
+    image: z.object({
+        src: z.string(),
+        alt: z.string().optional(),
+    }),
+})
 type Schema = z.infer<typeof schema>
 
 const state = reactive<Schema>({
@@ -29,21 +39,35 @@ const state = reactive<Schema>({
     title: props.data?.title || '',
     description: props.data?.description || '',
     category: props.data?.category || '',
-    image: props.data?.image || '',
+    image: props.data?.image || {
+        src: '',
+        alt: undefined,
+    },
     icon: props.data?.icon || '',
     href: props.data?.href || '',
 })
 
 const onSubmit = async () => {
     try {
-        if (props.data?.slug) await updateWork(props.data.slug, state)
-        else await createWork(state)
+        if (props.data?.slug)
+            await updateWork(props.data.slug, {
+                ...state,
+                image: state.image.src,
+            })
+        else
+            await createWork({
+                ...state,
+                image: state.image.src,
+            })
 
         state.slug = undefined
         state.title = ''
         state.category = ''
         state.description = ''
-        state.image = ''
+        state.image = {
+            src: '',
+            alt: undefined,
+        }
         state.icon = ''
         state.href = ''
 

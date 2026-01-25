@@ -1,19 +1,5 @@
 <script setup lang="ts">
-import { AdminModalCareer } from '#components'
-import equal from 'fast-deep-equal'
-
-const { careers, originalCareers, fetchCareers, reorderCareers, deleteCareer } = useCareer()
-const overlay = useOverlay()
-
-const modalCareer = overlay.create(AdminModalCareer)
-
-await fetchCareers()
-
-const shouldBeSaved = computed(() => !equal(originalCareers.value, careers.value))
-
-const handleRefresh = async () => {
-    await fetchCareers()
-}
+const { careers, changed, fetchCareers, reorderCareers, deleteCareer, modalCareer } = useCareer()
 
 defineShortcuts({
     n: () => {
@@ -37,13 +23,13 @@ defineShortcuts({
                             icon="mingcute:refresh-2-line"
                             variant="ghost"
                             size="sm"
-                            @click="handleRefresh"
+                            @click="fetchCareers()"
                         />
                     </template>
 
                     <template #right>
                         <UButton
-                            v-if="shouldBeSaved"
+                            v-if="changed"
                             loading-auto
                             icon="mingcute:check-line"
                             label="Save"
@@ -51,7 +37,7 @@ defineShortcuts({
                             @click="reorderCareers"
                         />
 
-                        <AdminModalCareer @success="handleRefresh">
+                        <AdminModalCareer @success="fetchCareers">
                             <UButton
                                 icon="mingcute:add-line"
                                 label="New Career"
@@ -95,7 +81,7 @@ defineShortcuts({
                                         icon="mingcute:close-line"
                                         variant="ghost"
                                         size="sm"
-                                        @click="deleteCareer(career)"
+                                        @click="deleteCareer(career.id)"
                                     />
                                 </div>
                             </div>

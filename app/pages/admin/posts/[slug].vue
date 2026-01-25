@@ -78,6 +78,14 @@ const onDelete = async () => {
                                 />
                             </template>
                         </UModal>
+
+                        <UButton
+                            icon="mingcute:save-2-fill"
+                            label="Save"
+                            color="neutral"
+                            loading-auto
+                            @click="onSubmit"
+                        />
                     </template>
                 </UDashboardNavbar>
             </template>

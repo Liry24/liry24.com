@@ -1,25 +1,6 @@
 <script setup lang="ts">
-import { AdminModalSkill } from '#components'
-import equal from 'fast-deep-equal'
-
-const { skills, originalSkills, fetchSkills, reorderSkills, deleteSkill } = useSkill()
-const overlay = useOverlay()
-
-const modalSkill = overlay.create(AdminModalSkill)
-
-await fetchSkills()
-
-const categories = computed<string[]>(() =>
-    [...new Set(skills.value.map((skill) => skill.category))].filter(
-        (category): category is string => !!category
-    )
-)
-
-const shouldBeSaved = computed(() => !equal(originalSkills.value, skills.value))
-
-const handleRefresh = async () => {
-    await fetchSkills()
-}
+const { skills, changed, categories, fetchSkills, reorderSkills, deleteSkill, modalSkill } =
+    useSkill()
 
 defineShortcuts({
     n: () => {
@@ -43,13 +24,13 @@ defineShortcuts({
                             icon="mingcute:refresh-2-line"
                             variant="ghost"
                             size="sm"
-                            @click="handleRefresh"
+                            @click="fetchSkills()"
                         />
                     </template>
 
                     <template #right>
                         <UButton
-                            v-if="shouldBeSaved"
+                            v-if="changed"
                             loading-auto
                             icon="mingcute:check-line"
                             label="Save"
@@ -57,7 +38,7 @@ defineShortcuts({
                             @click="reorderSkills"
                         />
 
-                        <AdminModalSkill :categories @success="handleRefresh">
+                        <AdminModalSkill :categories @success="fetchSkills">
                             <UButton
                                 icon="mingcute:add-line"
                                 label="New Skill"
@@ -102,7 +83,7 @@ defineShortcuts({
                                         icon="mingcute:close-line"
                                         variant="ghost"
                                         size="sm"
-                                        @click="deleteSkill(skill)"
+                                        @click="deleteSkill(skill.id)"
                                     />
                                 </div>
                             </div>

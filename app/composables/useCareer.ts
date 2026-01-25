@@ -1,49 +1,39 @@
+import type { z } from 'zod'
+
+import { AdminModalCareer } from '#components'
+import equal from 'fast-deep-equal'
+
 export const useCareer = () => {
     const toast = useToast()
+    const overlay = useOverlay()
 
-    const careers = useState<Serialized<Career>[]>('careers', () => [])
-    const originalCareers = useState<Serialized<Career>[]>('careers-original', () => [])
+    const modalCareer = overlay.create(AdminModalCareer)
 
-    const submitting = ref<{
-        state: boolean
-        progress: number
-        logs: ConsoleLog[]
-    }>({
-        state: false,
-        progress: 0,
-        logs: [],
+    const { data: careers, refresh: fetchCareers } = useFetch('/api/careers', {
+        dedupe: 'defer',
+        default: () => [],
+        getCachedData: (key, n, ctx) =>
+            ctx.cause !== 'refresh:manual' && n.isHydrating
+                ? n.payload.data[key]
+                : n.static.data[key],
+        onResponse: (value) => {
+            original.value = value.response._data || []
+        },
     })
+    const original = shallowRef(careers.value)
 
-    const fetchCareers = async () => {
-        const { data } = await useFetch('/api/careers', {
-            key: 'careers-list',
-            default: () => [],
-        })
+    const changed = computed(() => !equal(careers.value, original.value))
 
-        if (data.value) {
-            careers.value = [...data.value]
-            originalCareers.value = [...data.value]
-        }
-    }
+    const submitting = ref(false)
 
-    const saveCareer = async (state: Partial<Career>) => {
-        submitting.value.state = true
-        submitting.value.progress = 0
-        submitting.value.logs = []
+    const createCareer = async (state: Partial<Career>) => {
+        submitting.value = true
 
         try {
-            if (state.id)
-                await $fetch('/api/admin/careers', {
-                    method: 'PATCH',
-                    body: state,
-                })
-            else
-                await $fetch('/api/admin/careers', {
-                    method: 'POST',
-                    body: state,
-                })
-
-            submitting.value.progress = 100
+            await $fetch('/api/admin/careers', {
+                method: 'POST',
+                body: state,
+            })
 
             toast.add({
                 icon: 'mingcute:check-line',
@@ -63,14 +53,34 @@ export const useCareer = () => {
             })
             throw e
         } finally {
-            submitting.value.state = false
+            submitting.value = false
         }
     }
 
-    const deleteCareer = async (item: Serialized<Career>) => {
-        const index = careers.value.findIndex((c) => c.id === item.id)
-        if (index > -1) {
-            careers.value.splice(index, 1)
+    const updateCareer = async (id: Career['id'], item: z.infer<typeof careersUpdateSchema>) => {
+        try {
+            await $fetch(`/api/admin/careers/${id}`, {
+                method: 'PATCH',
+                body: item,
+            })
+
+            await fetchCareers()
+
+            toast.add({
+                icon: 'mingcute:check-line',
+                title: 'Success',
+                description: 'Career saved successfully',
+                color: 'success',
+            })
+        } catch (e) {
+            console.error(e)
+            toast.add({
+                icon: 'mingcute:close-line',
+                title: 'Error',
+                description: 'An error occurred while saving the career',
+                color: 'error',
+            })
+            throw e
         }
     }
 
@@ -101,13 +111,43 @@ export const useCareer = () => {
         }
     }
 
+    const deleteCareer = async (id: Career['id']) => {
+        try {
+            if (!(await confirm('Are you sure you want to delete this career?'))) return
+
+            await $fetch(`/api/admin/careers/${id}`, {
+                method: 'DELETE',
+            })
+
+            await fetchCareers()
+
+            toast.add({
+                icon: 'mingcute:check-line',
+                title: 'Success',
+                description: 'Career deleted successfully',
+                color: 'success',
+            })
+        } catch (e) {
+            console.error(e)
+            toast.add({
+                icon: 'mingcute:close-line',
+                title: 'Error',
+                description: 'An error occurred while deleting the work',
+                color: 'error',
+            })
+            throw e
+        }
+    }
+
     return {
         careers,
-        originalCareers,
+        changed,
         fetchCareers,
-        saveCareer,
+        createCareer,
+        updateCareer,
         deleteCareer,
         reorderCareers,
         submitting,
+        modalCareer,
     }
 }
