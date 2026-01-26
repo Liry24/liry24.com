@@ -66,10 +66,14 @@ const handleMouseLeave = () => {
                     >
                         <NuxtImg
                             v-if="route.path === '/'"
-                            src="/avatar.png"
+                            v-slot="{ src, imgAttrs, isLoaded }"
+                            src="https://images.liry24.com/avatar.png"
                             alt=""
-                            class="size-14 rounded-full"
-                        />
+                            class="aspect-square size-14 rounded-full object-cover"
+                        >
+                            <img v-if="isLoaded" v-bind="imgAttrs" :src />
+                            <USkeleton v-else class="aspect-square size-14 rounded-full" />
+                        </NuxtImg>
                         <Icon v-if="titleHovered" name="mingcute:arrow-left-fill" size="58" />
                         <HyperText
                             :text="title"

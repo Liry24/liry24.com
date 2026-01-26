@@ -91,6 +91,17 @@ const sidebarCollapsed = ref(false)
                         :collapsed
                     />
 
+                    <AdminNav
+                        :links="[
+                            {
+                                to: '/admin/avatar',
+                                icon: 'mingcute:user-4-fill',
+                                label: 'Avatar',
+                            },
+                        ]"
+                        :collapsed
+                    />
+
                     <AdminNavSection
                         title="Blogs"
                         icon="mingcute:book-3-fill"

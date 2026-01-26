@@ -1,13 +1,6 @@
 <script setup lang="ts">
 definePageMeta({
-    middleware: async () => {
-        const { getSession } = useAuth()
-        const session = await getSession()
-
-        if (session.value) return navigateTo('/admin')
-    },
     layout: 'minimal',
-    pageTransition: false,
 })
 
 const { signIn } = useAuth()

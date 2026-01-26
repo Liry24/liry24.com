@@ -4,6 +4,8 @@ import { upload } from '@tigrisdata/storage/client'
 import { nanoid } from 'nanoid'
 import { joinURL, parseURL } from 'ufo'
 
+const config = useRuntimeConfig()
+
 interface Props extends FileUploadProps<M> {
     prefix?: string
 }
@@ -83,8 +85,8 @@ watch(files, async (value) => {
                 }
                 ;(model.value as Image[]).push({
                     src: createCleanURL(result.data.url).replace(
-                        'liry24com.t3.storage.dev',
-                        'images.liry24.com'
+                        `https://${config.tigrisStorage.bucket}.t3.storage.dev`,
+                        config.public.imagesDomain
                     ),
                     alt: undefined,
                 })
@@ -100,8 +102,8 @@ watch(files, async (value) => {
                 throw result.error
             }
             const newUrl = createCleanURL(result.data.url).replace(
-                'liry24com.t3.storage.dev',
-                'images.liry24.com'
+                `https://${config.tigrisStorage.bucket}.t3.storage.dev`,
+                config.public.imagesDomain
             )
             await nextTick()
             model.value = {

@@ -1,3 +1,5 @@
+import { parseURL } from 'ufo'
+
 const title = 'Liry24'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
@@ -26,6 +28,7 @@ export default defineNuxtConfig({
     runtimeConfig: {
         public: {
             domain: process.env.DOMAIN,
+            imagesDomain: process.env.TIGRIS_STORAGE_DOMAIN,
         },
         aiGateway: {
             apiKey: process.env.AI_GATEWAY_API_KEY,
@@ -40,6 +43,12 @@ export default defineNuxtConfig({
         github: {
             clientId: process.env.GITHUB_CLIENT_ID,
             clientSecret: process.env.GITHUB_CLIENT_SECRET,
+        },
+        tigrisStorage: {
+            accessKeyId: process.env.TIGRIS_STORAGE_ACCESS_KEY_ID,
+            secretAccessKey: process.env.TIGRIS_STORAGE_SECRET_ACCESS_KEY,
+            bucket: process.env.TIGRIS_STORAGE_BUCKET,
+            domain: process.env.TIGRIS_STORAGE_DOMAIN,
         },
         turso: {
             databaseUrl: process.env.TURSO_DATABASE_URL,
@@ -159,7 +168,10 @@ export default defineNuxtConfig({
     },
 
     image: {
-        domains: ['images.liry24.com', 'avatars.githubusercontent.com'],
+        domains: [
+            parseURL(process.env.TIGRIS_STORAGE_DOMAIN).host!,
+            'avatars.githubusercontent.com',
+        ],
     },
 
     ui: {
