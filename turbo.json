@@ -10,6 +10,11 @@
         "check-types": {
             "dependsOn": ["^check-types"]
         },
+        "build": {
+            "dependsOn": ["^build"],
+            "inputs": ["$TURBO_DEFAULT$", ".env"],
+            "outputs": [".data/**", ".output/**"]
+        },
         "home#dev": {
             "cache": false,
             "persistent": true,
