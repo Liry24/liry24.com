@@ -17,6 +17,9 @@
         "@iconify-json/lucide": "catalog:",
         "@iconify-json/mingcute": "catalog:",
         "@iconify-json/simple-icons": "catalog:",
+        "@nuxt/content": "catalog:",
+        "@nuxt/image": "catalog:",
+        "@nuxt/ui": "catalog:",
         "@repo/database": "workspace:*",
         "@repo/nuxt": "workspace:*",
         "@repo/utils": "workspace:*",
@@ -25,18 +28,15 @@
         "@vercel/functions": "^3.3.6",
         "@yeger/vue-masonry-wall": "^5.1.5",
         "motion-v": "catalog:",
+        "nuxt": "catalog:",
         "zod": "catalog:"
     },
     "devDependencies": {
+        "@nuxt/a11y": "catalog:",
+        "@nuxt/hints": "catalog:",
         "vue-tsc": "^3.2.4"
     },
     "peerDependencies": {
-        "@nuxt/a11y": "*",
-        "@nuxt/content": "*",
-        "@nuxt/ui": "*",
-        "@nuxtjs/mdc": "*",
-        "nuxt": "*",
-        "reka-ui": "*",
         "sharp": "*",
         "tailwindcss": "*",
         "ufo": "*"

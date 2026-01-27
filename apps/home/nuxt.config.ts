@@ -4,7 +4,7 @@ const title = 'Liry24'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-    extends: ['../../packages/nuxt/src/layer'],
+    extends: ['@repo/nuxt'],
 
     modules: ['motion-v/nuxt'],
 
@@ -14,12 +14,6 @@ export default defineNuxtConfig({
         public: {
             domain: process.env.DOMAIN,
             imagesDomain: process.env.TIGRIS_STORAGE_DOMAIN,
-        },
-        tigrisStorage: {
-            accessKeyId: process.env.TIGRIS_STORAGE_ACCESS_KEY_ID,
-            secretAccessKey: process.env.TIGRIS_STORAGE_SECRET_ACCESS_KEY,
-            bucket: process.env.TIGRIS_STORAGE_BUCKET,
-            domain: process.env.TIGRIS_STORAGE_DOMAIN,
         },
     },
 
