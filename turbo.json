@@ -26,6 +26,7 @@
             "persistent": true,
             "inputs": ["$TURBO_DEFAULT$", ".env"],
             "env": [
+                "DOMAIN",
                 "BETTER_AUTH_SECRET",
                 "GITHUB_CLIENT_ID",
                 "GITHUB_CLIENT_SECRET",
@@ -49,6 +50,7 @@
             "inputs": ["$TURBO_DEFAULT$", ".env"],
             "outputs": [".data/**", ".output/**"],
             "env": [
+                "DOMAIN",
                 "BETTER_AUTH_SECRET",
                 "GITHUB_CLIENT_ID",
                 "GITHUB_CLIENT_SECRET",
