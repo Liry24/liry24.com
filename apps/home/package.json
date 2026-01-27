@@ -1,0 +1,50 @@
+{
+    "name": "home",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "nuxt build",
+        "dev": "nuxt dev",
+        "preview": "nuxt preview",
+        "postinstall": "nuxt prepare",
+        "lint": "oxlint",
+        "lint:fix": "oxlint --fix",
+        "fmt": "oxfmt",
+        "fmt:check": "oxfmt --check",
+        "typecheck": "nuxt typecheck"
+    },
+    "dependencies": {
+        "@iconify-json/lucide": "catalog:",
+        "@iconify-json/mingcute": "catalog:",
+        "@iconify-json/simple-icons": "catalog:",
+        "@repo/database": "workspace:*",
+        "@repo/nuxt": "workspace:*",
+        "@repo/utils": "workspace:*",
+        "@vercel/analytics": "catalog:",
+        "@vercel/config": "catalog:",
+        "@vercel/functions": "^3.3.6",
+        "@yeger/vue-masonry-wall": "^5.1.5",
+        "motion-v": "catalog:",
+        "zod": "catalog:"
+    },
+    "devDependencies": {
+        "vue-tsc": "^3.2.4"
+    },
+    "peerDependencies": {
+        "@nuxt/a11y": "*",
+        "@nuxt/content": "*",
+        "@nuxt/ui": "*",
+        "@nuxtjs/mdc": "*",
+        "nuxt": "*",
+        "reka-ui": "*",
+        "sharp": "*",
+        "tailwindcss": "*",
+        "ufo": "*"
+    },
+    "overrides": {
+        "vite": "8.0.0-beta.10"
+    },
+    "engines": {
+        "node": "24.x"
+    }
+}

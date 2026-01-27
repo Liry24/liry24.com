@@ -1,0 +1,32 @@
+{
+    "name": "@repo/database",
+    "private": true,
+    "type": "module",
+    "exports": {
+        ".": {
+            "types": "./src/index.ts",
+            "default": "./src/index.ts"
+        },
+        "./schema": {
+            "types": "./src/schema.ts",
+            "default": "./src/schema.ts"
+        },
+        "./types": {
+            "types": "./src/types.ts",
+            "default": "./src/types.ts"
+        }
+    },
+    "scripts": {
+        "check-types": "tsc --noEmit",
+        "push": "drizzle-kit push"
+    },
+    "dependencies": {
+        "@libsql/client": "^0.17.0",
+        "drizzle-orm": "catalog:",
+        "drizzle-zod": "catalog:",
+        "zod": "catalog:"
+    },
+    "devDependencies": {
+        "drizzle-kit": "catalog:"
+    }
+}
