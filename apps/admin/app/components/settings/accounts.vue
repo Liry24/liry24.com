@@ -81,7 +81,7 @@ onMounted(async () => {
                     @click="
                         authClient.linkSocial({
                             provider: item.providerId,
-                            callbackURL: `${config.public.domain}/settings#accounts`,
+                            callbackURL: `${config.public.adminDomain}/settings#accounts`,
                         })
                     "
                 />

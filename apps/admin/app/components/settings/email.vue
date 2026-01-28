@@ -30,7 +30,7 @@ const requestChangeEmail = async () => {
     try {
         await authClient.changeEmail({
             newEmail: newEmail.value,
-            callbackURL: `${config.public.domain}/confirm-change-email`,
+            callbackURL: `${config.public.adminDomain}/confirm-change-email`,
         })
         emailChangeEmailSent.value = true
         toast.add({
@@ -56,7 +56,7 @@ const requestPasswordReset = async () => {
     try {
         await authClient.requestPasswordReset({
             email: props.session.user.email,
-            redirectTo: `${config.public.domain}/reset-password`,
+            redirectTo: `${config.public.adminDomain}/reset-password`,
         })
         passwordResetEmailSent.value = true
         toast.add({

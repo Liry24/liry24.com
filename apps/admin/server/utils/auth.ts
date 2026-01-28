@@ -7,7 +7,7 @@ import { admin, lastLoginMethod } from 'better-auth/plugins'
 const config = useRuntimeConfig()
 
 export const auth = betterAuth({
-    baseURL: config.public.domain,
+    baseURL: config.public.adminDomain,
     secret: config.betterAuth.secret,
     appName: 'liry24',
 
@@ -18,7 +18,7 @@ export const auth = betterAuth({
     }),
 
     trustedOrigins: [
-        config.public.domain,
+        config.public.adminDomain,
         'https://liry24com-*-liria.vercel.app',
         'http://localhost:*',
     ],

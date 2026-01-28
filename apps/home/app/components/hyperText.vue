@@ -10,13 +10,14 @@ interface Props {
     as?: string
     class?: HTMLAttributes['class']
 }
-const props = withDefaults(defineProps<Props>(), {
-    case: 'lower',
-    duration: 800,
-    animateOnLoad: false,
-    as: 'span',
-    class: undefined,
-})
+const {
+    text,
+    case: textCase = 'lower',
+    duration = 800,
+    animateOnLoad = false,
+    as = 'span',
+    class: className = undefined,
+} = defineProps<Props>()
 
 const emit = defineEmits(['mouseenter', 'mouseleave'])
 
@@ -24,11 +25,11 @@ const alphabets = {
     upper: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
     lower: 'abcdefghijklmnopqrstuvwxyz',
 }
-const displayText = ref(props.text.split(''))
+const displayText = ref(text.split(''))
 const iterations = ref(0)
 
 const getRandomLetter = () =>
-    alphabets[props.case][Math.floor(Math.random() * alphabets[props.case].length)] || ''
+    alphabets[textCase][Math.floor(Math.random() * alphabets[textCase].length)] || ''
 
 const triggerAnimation = () => {
     iterations.value = 0
@@ -37,16 +38,16 @@ const triggerAnimation = () => {
 
 const { pause, resume } = useIntervalFn(
     () => {
-        if (iterations.value < props.text.length) {
+        if (iterations.value < text.length) {
             displayText.value = displayText.value.map((l, i) =>
-                l === ' ' ? l : i <= iterations.value ? (props.text[i] ?? '') : getRandomLetter()
+                l === ' ' ? l : i <= iterations.value ? (text[i] ?? '') : getRandomLetter()
             )
             iterations.value += 0.1
         } else {
             pause()
         }
     },
-    computed(() => props.duration / (props.text.length * 10))
+    computed(() => duration / (text.length * 10))
 )
 
 const startAnimation = () => {
@@ -55,20 +56,20 @@ const startAnimation = () => {
 }
 
 watch(
-    () => props.text,
+    () => text,
     (newText) => {
         displayText.value = newText.split('')
         triggerAnimation()
     }
 )
 
-if (props.animateOnLoad) triggerAnimation()
+if (animateOnLoad) triggerAnimation()
 </script>
 
 <template>
     <Primitive
-        :as="props.as"
-        :class="cn('flex', props.class)"
+        :as="as"
+        :class="cn('flex', className)"
         @mouseenter="emit('mouseenter')"
         @mouseleave="emit('mouseleave')"
     >

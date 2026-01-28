@@ -14,32 +14,27 @@
         "typecheck": "nuxt typecheck"
     },
     "dependencies": {
-        "@iconify-json/lucide": "catalog:",
-        "@iconify-json/mingcute": "catalog:",
-        "@iconify-json/simple-icons": "catalog:",
-        "@nuxt/content": "catalog:",
-        "@nuxt/image": "catalog:",
-        "@nuxt/ui": "catalog:",
+        "@iconify-json/lucide": "^1.2.87",
+        "@iconify-json/mingcute": "^1.2.7",
+        "@iconify-json/simple-icons": "^1.2.68",
+        "@nuxt/content": "^3.11.0",
+        "@nuxt/image": "^2.0.0",
+        "@nuxt/ui": "^4.4.0",
         "@repo/database": "workspace:*",
         "@repo/nuxt": "workspace:*",
         "@repo/utils": "workspace:*",
-        "@vercel/analytics": "catalog:",
-        "@vercel/config": "catalog:",
-        "@vercel/functions": "^3.3.6",
+        "@vercel/analytics": "^1.6.1",
+        "@vercel/config": "^0.0.28",
+        "@vercel/functions": "^3.4.0",
         "@yeger/vue-masonry-wall": "^5.1.5",
-        "motion-v": "catalog:",
-        "nuxt": "catalog:",
-        "zod": "catalog:"
+        "motion-v": "^1.10.2",
+        "nuxt": "^4.3.0",
+        "zod": "^4.3.6"
     },
     "devDependencies": {
-        "@nuxt/a11y": "catalog:",
-        "@nuxt/hints": "catalog:",
+        "@nuxt/a11y": "^1.0.0-alpha.1",
+        "@nuxt/hints": "^1.0.0-alpha.6",
         "vue-tsc": "^3.2.4"
-    },
-    "peerDependencies": {
-        "sharp": "*",
-        "tailwindcss": "*",
-        "ufo": "*"
     },
     "overrides": {
         "vite": "8.0.0-beta.10"

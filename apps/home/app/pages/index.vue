@@ -129,12 +129,12 @@ defineSeo({
                 <NuxtLink
                     :to="app.liria.liriaGraphics"
                     target="_blank"
-                    class="group hover:bg-muted relative flex size-full flex-col items-center justify-center gap-4 rounded-xl p-10 transition-colors"
+                    class="group relative flex size-full flex-col items-center justify-center gap-4 rounded-xl p-10"
                 >
                     <NuxtImg
                         src="/graphics-ss.png"
                         alt=""
-                        class="absolute inset-0 size-full overflow-clip object-cover object-[0%_10%] opacity-0 transition-opacity group-hover:opacity-20"
+                        class="absolute inset-0 size-full overflow-clip mask-x-from-60% mask-x-to-90% object-cover object-[0%_10%] opacity-10 transition-opacity group-hover:opacity-30"
                     />
 
                     <span class="z-1 text-5xl font-extrabold tracking-tight">
@@ -149,13 +149,13 @@ defineSeo({
                 <NuxtLink
                     :to="app.liria.avatio"
                     target="_blank"
-                    class="group hover:bg-muted relative flex size-full flex-col items-center justify-center gap-4 rounded-xl p-10 transition-colors"
+                    class="group relative flex size-full flex-col items-center justify-center gap-4 rounded-xl p-10"
                 >
                     <UColorModeImage
                         light="/avatio-ss-light.png"
                         dark="/avatio-ss-dark.png"
                         alt=""
-                        class="absolute inset-0 size-full overflow-clip object-cover object-[0%_10%] opacity-0 transition-opacity group-hover:opacity-20"
+                        class="absolute inset-0 size-full overflow-clip mask-x-from-60% mask-x-to-90% object-cover object-[0%_10%] opacity-10 transition-opacity group-hover:opacity-30"
                     />
 
                     <span class="z-1 text-5xl font-extrabold tracking-tight"> Avatio </span>

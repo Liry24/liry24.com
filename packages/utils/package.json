@@ -4,29 +4,30 @@
     "type": "module",
     "exports": {
         "./client": {
-            "types": "./src/client.ts",
-            "default": "./src/client.ts"
+            "types": "./src/client/index.ts",
+            "default": "./src/client/index.ts"
         },
         "./server": {
-            "types": "./src/server.ts",
-            "default": "./src/server.ts"
+            "types": "./src/server/index.ts",
+            "default": "./src/server/index.ts"
         }
     },
     "scripts": {
+        "postinstall": "nuxt prepare",
         "check-types": "tsc --noEmit"
     },
     "dependencies": {
         "clsx": "^2.1.1",
         "http-status-codes": "^2.3.0",
         "sanitize-html": "^2.17.0",
-        "zod": "catalog:"
+        "zod": "^4.3.6"
     },
     "devDependencies": {
         "@types/sanitize-html": "^2.16.0"
     },
     "peerDependencies": {
-        "destr": "*",
-        "nuxt": "*",
-        "tailwind-merge": "*"
+        "destr": "^2.0.5",
+        "nuxt": "^4.3.0",
+        "tailwind-merge": "^3.4.0"
     }
 }

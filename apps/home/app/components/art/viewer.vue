@@ -1,10 +1,9 @@
 <script setup lang="ts">
 const open = defineModel<boolean>('open', { default: false })
 
-interface Props {
+const { item } = defineProps<{
     item: Serialized<Art>
-}
-const props = defineProps<Props>()
+}>()
 
 const historyStateAdded = ref(false)
 
@@ -43,7 +42,7 @@ onUnmounted(() => {
     <UModal
         v-model:open="open"
         scrollable
-        :title="props.item.title"
+        :title="item.title"
         :ui="{
             content: 'max-w-full h-[calc(100dvh-4rem)] w-[calc(100dvw-4rem)] rounded-2xl',
         }"
@@ -53,12 +52,12 @@ onUnmounted(() => {
         <template #content>
             <div class="grid grid-cols-3 gap-12 p-16">
                 <div class="col-span-2 flex h-full flex-col gap-4">
-                    <ArtCarousel :data="props.item.images" />
+                    <ArtCarousel :data="item.images" />
                 </div>
 
                 <div class="flex flex-col gap-4">
                     <div class="flex items-start justify-between gap-2">
-                        <h1 class="text-4xl font-bold">{{ props.item.title }}</h1>
+                        <h1 class="text-4xl font-bold">{{ item.title }}</h1>
 
                         <UButton
                             aria-label="Close"
@@ -69,7 +68,7 @@ onUnmounted(() => {
                             @click="open = false"
                         />
                     </div>
-                    <p>{{ props.item.description }}</p>
+                    <p>{{ item.description }}</p>
                 </div>
             </div>
         </template>
