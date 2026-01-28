@@ -59,8 +59,6 @@ export default defineEventHandler(async (event) => {
 
         const resultBuffer = await sharpImg.toBuffer()
 
-        await defineCDNCache(60 * 60 * 24 * 30, 'avatar')
-
         setResponseHeader(event, 'Content-Type', `image/${format === 'jpg' ? 'jpeg' : format}`)
         return resultBuffer
     } catch (error) {

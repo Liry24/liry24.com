@@ -12,13 +12,13 @@
         "remark-breaks": "^4.0.0"
     },
     "peerDependencies": {
-        "@nuxt/content": "catalog:",
-        "@nuxt/image": "catalog:",
-        "@nuxt/ui": "catalog:",
+        "@nuxt/content": "^3.11.0",
+        "@nuxt/image": "^2.0.0",
+        "@nuxt/ui": "^4.4.0",
         "@repo/database": "workspace:*",
-        "@vueuse/nuxt": "catalog:",
-        "clsx": "*",
-        "nuxt": "catalog:",
-        "tailwind-merge": "*"
+        "@vueuse/nuxt": "^14.1.0",
+        "clsx": "^2.1.1",
+        "nuxt": "^4.3.0",
+        "tailwind-merge": "^3.4.0"
     }
 }

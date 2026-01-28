@@ -53,11 +53,7 @@ const handleMouseLeave = () => {
     <MotionConfig :transition="{ duration: 0.6 }" reduced-motion="user">
         <div class="flex flex-col gap-16">
             <div class="mx-8 my-12 flex min-h-dvh flex-col gap-12 md:mx-12 lg:mx-24 lg:mt-24">
-                <motion.header
-                    :initial="{ opacity: 0 }"
-                    :animate="{ opacity: 1 }"
-                    class="flex w-full flex-col items-center gap-3"
-                >
+                <header class="fade-in flex w-full flex-col items-center gap-3">
                     <MotionNuxtLink
                         to="/"
                         class="flex items-center gap-3"
@@ -100,27 +96,25 @@ const handleMouseLeave = () => {
 
                         <ColorModeButton />
                     </div>
-                </motion.header>
+                </header>
 
                 <main class="contents">
                     <slot />
                 </main>
             </div>
 
-            <motion.footer
-                :initial="{ opacity: 0 }"
-                :animate="{ opacity: 1 }"
-                class="@container mx-8 mb-10 flex flex-col items-center gap-3 md:mx-12 lg:mx-24"
+            <footer
+                class="fade-in @container mx-8 mb-10 flex flex-col items-center gap-3 md:mx-12 lg:mx-24"
             >
                 <span
-                    class="text-dimmed/30 font-[Special_Gothic_Expanded_One] text-[28cqw] select-none"
+                    class="text-dimmed/30 max-w-dvw overflow-clip mask-b-from-40% mask-b-to-80% font-[Special_Gothic_Expanded_One] text-[28cqw] select-none"
                 >
                     Liry24
                 </span>
                 <p class="text-dimmed text-sm leading-none text-nowrap">
                     {{ new Date().getFullYear() }} © Liry24
                 </p>
-            </motion.footer>
+            </footer>
         </div>
     </MotionConfig>
 </template>
