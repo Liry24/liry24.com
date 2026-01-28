@@ -13,7 +13,7 @@ const state = reactive<Schema>({
 const onSubmit = async () => {
     try {
         const slug = await savePost(state)
-        await navigateTo(`/admin/posts/${slug}`)
+        await navigateTo(`/posts/${slug}`)
     } catch {
         // Error handled in composable
     }
