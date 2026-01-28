@@ -16,7 +16,8 @@ export default defineNuxtConfig({
 
     runtimeConfig: {
         public: {
-            domain: process.env.DOMAIN,
+            homeDomain: process.env.HOME_DOMAIN,
+            adminDomain: process.env.ADMIN_DOMAIN,
             imagesDomain: process.env.TIGRIS_STORAGE_DOMAIN,
         },
         aiGateway: {

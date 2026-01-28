@@ -25,7 +25,7 @@
         "@repo/utils": "workspace:*",
         "@vercel/analytics": "catalog:",
         "@vercel/config": "catalog:",
-        "@vercel/functions": "^3.3.6",
+        "@vercel/functions": "^3.4.0",
         "@yeger/vue-masonry-wall": "^5.1.5",
         "motion-v": "catalog:",
         "nuxt": "catalog:",
@@ -37,6 +37,8 @@
         "vue-tsc": "^3.2.4"
     },
     "peerDependencies": {
+        "@nuxtjs/mdc": "*",
+        "reka-ui": "*",
         "sharp": "*",
         "tailwindcss": "*",
         "ufo": "*"

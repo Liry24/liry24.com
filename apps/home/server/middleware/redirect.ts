@@ -1,17 +1,15 @@
-import { socials } from '@repo/database/schema'
-
 const getSocials = defineCachedFunction(
-    async () => {
-        return await db
-            .select({
-                href: socials.href,
-                alias: socials.alias,
-            })
-            .from(socials)
-    },
+    async () =>
+        await db.query.socials.findMany({
+            columns: {
+                href: true,
+                alias: true,
+            },
+        }),
     {
-        maxAge: 60,
-        name: 'social-redirects',
+        maxAge: 60 * 60 * 24 * 30,
+        name: 'getSocials',
+        getKey: () => 'default',
     }
 )
 

@@ -15,6 +15,7 @@ export default adminSessionEventHandler(async () => {
     })
 
     await revalidateISR()
+    await purgeRuntimeCache()
 
     return {
         success: true,

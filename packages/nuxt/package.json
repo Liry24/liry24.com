@@ -4,6 +4,7 @@
     "type": "module",
     "main": "./nuxt.config.ts",
     "scripts": {
+        "postinstall": "nuxt prepare",
         "check-types": "tsc --noEmit"
     },
     "dependencies": {

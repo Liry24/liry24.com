@@ -22,6 +22,7 @@ export default adminSessionEventHandler(async () => {
         .where(eq(socials.id, id))
 
     await revalidateISR()
+    await purgeRuntimeCache()
 
     return {
         success: true,

@@ -2,7 +2,13 @@
     "$schema": "https://turborepo.dev/schema.json",
     "ui": "tui",
     "globalDependencies": [".env"],
-    "globalEnv": ["TURSO_DATABASE_URL", "TURSO_AUTH_TOKEN", "TIGRIS_STORAGE_DOMAIN"],
+    "globalEnv": [
+        "HOME_DOMAIN",
+        "BYPASS_TOKEN",
+        "TURSO_DATABASE_URL",
+        "TURSO_AUTH_TOKEN",
+        "TIGRIS_STORAGE_DOMAIN"
+    ],
     "tasks": {
         "lint": {
             "dependsOn": ["^lint"]
@@ -19,14 +25,14 @@
             "cache": false,
             "persistent": true,
             "inputs": ["$TURBO_DEFAULT$", ".env"],
-            "env": ["DOMAIN"]
+            "env": []
         },
         "admin#dev": {
             "cache": false,
             "persistent": true,
             "inputs": ["$TURBO_DEFAULT$", ".env"],
             "env": [
-                "DOMAIN",
+                "ADMIN_DOMAIN",
                 "BETTER_AUTH_SECRET",
                 "GITHUB_CLIENT_ID",
                 "GITHUB_CLIENT_SECRET",
@@ -43,14 +49,14 @@
             "dependsOn": ["^build"],
             "inputs": ["$TURBO_DEFAULT$", ".env"],
             "outputs": [".data/**", ".output/**"],
-            "env": ["DOMAIN"]
+            "env": []
         },
         "admin#build": {
             "dependsOn": ["^build"],
             "inputs": ["$TURBO_DEFAULT$", ".env"],
             "outputs": [".data/**", ".output/**"],
             "env": [
-                "DOMAIN",
+                "ADMIN_DOMAIN",
                 "BETTER_AUTH_SECRET",
                 "GITHUB_CLIENT_ID",
                 "GITHUB_CLIENT_SECRET",

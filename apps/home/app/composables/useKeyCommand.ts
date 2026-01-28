@@ -30,11 +30,13 @@ export default (callback: () => void) => {
         }
     }
 
-    onMounted(() => {
-        window.addEventListener('keydown', handleKeyDown)
-    })
+    if (import.meta.client) {
+        onMounted(() => {
+            window.addEventListener('keydown', handleKeyDown)
+        })
 
-    onUnmounted(() => {
-        window.removeEventListener('keydown', handleKeyDown)
-    })
+        onUnmounted(() => {
+            window.removeEventListener('keydown', handleKeyDown)
+        })
+    }
 }

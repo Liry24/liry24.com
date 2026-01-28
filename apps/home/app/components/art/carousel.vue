@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { ImageViewer } from '#components'
 
-interface Props {
+const { data } = defineProps<{
     data: ArtImage[]
-}
-const props = defineProps<Props>()
+}>()
 
 const overlay = useOverlay()
 
@@ -35,7 +34,7 @@ const select = (index: number) => {
         <UCarousel
             ref="carousel"
             v-slot="{ item }"
-            :items="props.data"
+            :items="data"
             :prev="{ onClick: onClickPrev }"
             :next="{ onClick: onClickNext }"
             :ui="{ container: 'items-center' }"
@@ -57,7 +56,7 @@ const select = (index: number) => {
 
         <div class="mx-auto flex gap-2">
             <div
-                v-for="(item, index) in props.data"
+                v-for="(item, index) in data"
                 :key="index"
                 class="opacity-25 transition-opacity hover:opacity-100"
                 :class="{ 'opacity-100': activeIndex === index }"

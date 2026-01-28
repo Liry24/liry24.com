@@ -12,9 +12,10 @@ export default defineNuxtConfig({
 
     runtimeConfig: {
         public: {
-            domain: process.env.DOMAIN,
+            homeDomain: process.env.HOME_DOMAIN,
             imagesDomain: process.env.TIGRIS_STORAGE_DOMAIN,
         },
+        bypassToken: process.env.BYPASS_TOKEN,
     },
 
     nitro: {
@@ -29,6 +30,16 @@ export default defineNuxtConfig({
                 driver: 'null',
             },
         },
+    },
+
+    routeRules: {
+        '/': { isr: 60 * 60 * 24 * 30 },
+        '/arts': { isr: 60 * 60 * 24 * 30 },
+        '/arts/**': { isr: 60 * 60 * 24 * 30 },
+        '/works': { isr: 60 * 60 * 24 * 30 },
+        '/works/**': { isr: 60 * 60 * 24 * 30 },
+        '/posts': { isr: 60 * 60 * 24 * 30 },
+        '/posts/**': { isr: 60 * 60 * 24 * 30 },
     },
 
     app: {
