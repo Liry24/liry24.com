@@ -6,6 +6,7 @@ export default defineConfig({
     install: false,
     interactive: true,
     recursive: true,
+    includeLocked: true,
     ignorePaths: ['**/node_modules/**'],
     ignoreOtherWorkspaces: true,
     depFields: {
