@@ -32,7 +32,7 @@ const sidebarCollapsed = ref(false)
                         "
                     >
                         <UButton
-                            to="/admin"
+                            to="/"
                             icon="liria:liria"
                             :label="collapsed ? undefined : 'Admin'"
                             variant="link"

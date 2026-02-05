@@ -6,7 +6,7 @@ const { updatePost, deletePost } = usePost()
 
 const { data, refresh } = await useFetch(`/api/posts/${route.params.slug}`)
 
-if (!data.value) navigateTo('/admin')
+if (!data.value) navigateTo('/')
 
 const state = reactive<Schema>({
     slug: data.value!.slug,
@@ -30,7 +30,7 @@ const onDelete = async () => {
     try {
         await deletePost(route.params.slug as string)
         openModalDelete.value = false
-        navigateTo('/admin')
+        navigateTo('/')
     } catch {
         // Error handled in composable
     }

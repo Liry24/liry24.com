@@ -40,7 +40,6 @@ export default defineNuxtConfig({
         '/works/**': { isr: 60 * 60 * 24 * 30 },
         '/posts': { isr: 60 * 60 * 24 * 30 },
         '/posts/**': { isr: 60 * 60 * 24 * 30 },
-        '/avatar.*': { isr: 60 * 60 * 24 * 30 },
     },
 
     app: {

@@ -60,6 +60,7 @@ export default defineEventHandler(async (event) => {
         const resultBuffer = await sharpImg.toBuffer()
 
         setResponseHeader(event, 'Content-Type', `image/${format === 'jpg' ? 'jpeg' : format}`)
+        setResponseHeader(event, 'CDN-Cache-Control', `max-age=${60 * 60 * 24 * 30}`)
         return resultBuffer
     } catch (error) {
         if (isError(error)) throw error
