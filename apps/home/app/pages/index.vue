@@ -26,6 +26,8 @@ defineSeo({
     title: 'Liry24',
     type: 'website',
 })
+
+defineOgImage('Home')
 </script>
 
 <template>
