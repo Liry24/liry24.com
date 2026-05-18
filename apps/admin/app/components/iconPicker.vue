@@ -45,7 +45,7 @@ const fetchIcons = async () => {
             if (allCollectionIcons.value.length === 0) {
                 const currentPrefix = provider.value
                 const res = await $fetch<IconifyCollectionResponse>(
-                    `https://api.iconify.design/collection?prefix=${currentPrefix}`
+                    `https://api.iconify.design/collection?prefix=${currentPrefix}`,
                 )
                 const all: string[] = []
                 if (res.uncategorized)
@@ -53,7 +53,7 @@ const fetchIcons = async () => {
 
                 if (res.categories)
                     Object.values(res.categories).forEach((cats) =>
-                        all.push(...cats.map((i) => `${currentPrefix}:${i}`))
+                        all.push(...cats.map((i) => `${currentPrefix}:${i}`)),
                     )
 
                 allCollectionIcons.value = all
@@ -98,7 +98,7 @@ watch(
         canLoadMore.value = true
         fetchIcons()
     },
-    { immediate: true }
+    { immediate: true },
 )
 
 useInfiniteScroll(
@@ -106,7 +106,7 @@ useInfiniteScroll(
     () => {
         fetchIcons()
     },
-    { distance: 10 }
+    { distance: 10 },
 )
 
 const selectIcon = (icon: string) => {

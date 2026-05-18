@@ -1,5 +1,12 @@
 import { sql } from 'drizzle-orm'
-import { foreignKey, index, integer, sqliteTable as table, text } from 'drizzle-orm/sqlite-core'
+import {
+    foreignKey,
+    index,
+    integer,
+    sqliteTable as table,
+    text,
+    type SQLiteTableExtraConfigValue,
+} from 'drizzle-orm/sqlite-core'
 
 export const users = table('users', {
     id: text().primaryKey(),
@@ -45,14 +52,14 @@ export const accounts = table(
         scope: text(),
         password: text(),
     },
-    (table) => [
+    (table): SQLiteTableExtraConfigValue[] => [
         index('accounts_userId_idx').on(table.userId),
         foreignKey({
             name: 'accounts_userId_fkey',
             columns: [table.userId],
             foreignColumns: [users.id],
         }).onDelete('cascade'),
-    ]
+    ],
 )
 
 export const passkeys = table(
@@ -70,7 +77,7 @@ export const passkeys = table(
         transports: text(),
         aaguid: text(),
     },
-    (table) => [
+    (table): SQLiteTableExtraConfigValue[] => [
         index('passkeys_userId_idx').on(table.userId),
         index('passkeys_credentialID_idx').on(table.credentialID),
         foreignKey({
@@ -78,7 +85,7 @@ export const passkeys = table(
             columns: [table.userId],
             foreignColumns: [users.id],
         }).onDelete('cascade'),
-    ]
+    ],
 )
 
 export const socials = table('socials', {
@@ -131,14 +138,14 @@ export const artImages = table(
         src: text().notNull(),
         alt: text(),
     },
-    (table) => [
+    (table): SQLiteTableExtraConfigValue[] => [
         index('art_images_artSlug_idx').on(table.artSlug),
         foreignKey({
             name: 'art_images_artSlug_fkey',
             columns: [table.artSlug],
             foreignColumns: [arts.slug],
         }).onDelete('cascade'),
-    ]
+    ],
 )
 
 export const skills = table('skills', {

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { ArtImage } from '@repo/database/types'
+
 import { ImageViewer } from '#components'
 
 const { data } = defineProps<{

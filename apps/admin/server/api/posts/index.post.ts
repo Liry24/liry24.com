@@ -49,7 +49,7 @@ export default adminSessionEventHandler(async () => {
                 tags.map((tag) => ({
                     postSlug: slug || generatedSlug,
                     tag,
-                }))
+                })),
             )
     })
 

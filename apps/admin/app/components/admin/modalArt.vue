@@ -68,7 +68,12 @@ const onSubmit = async () => {
         <template #body>
             <UForm :state :schema class="grid gap-4" @submit="onSubmit">
                 <UFormField label="Images" name="images" required>
-                    <FileUpload v-model="state.images" multiple accept="image/*" class="min-h-32" />
+                    <FileUpload
+                        v-model="state.images as any"
+                        multiple
+                        accept="image/*"
+                        class="min-h-32"
+                    />
                 </UFormField>
 
                 <UFormField label="Title" name="title" required>

@@ -1,9 +1,9 @@
-import type { Editor } from '@tiptap/vue-3'
-
 import { useCompletion } from '@ai-sdk/vue'
 import { Extension } from '@tiptap/core'
+import type { EditorState } from '@tiptap/pm/state'
 import { Plugin } from '@tiptap/pm/state'
 import { Decoration, DecorationSet } from '@tiptap/pm/view'
+import type { Editor } from '@tiptap/vue-3'
 import { useDebounceFn } from '@vueuse/core'
 
 type CompletionMode =
@@ -85,7 +85,7 @@ export const Completion = Extension.create<CompletionOptions, CompletionStorage>
         return [
             new Plugin({
                 props: {
-                    decorations(state) {
+                    decorations(state: EditorState) {
                         if (
                             !storage.visible ||
                             !storage.suggestion ||
@@ -103,7 +103,7 @@ export const Completion = Extension.create<CompletionOptions, CompletionStorage>
                                     'color: var(--ui-text-muted); opacity: 0.6; pointer-events: none;'
                                 return span
                             },
-                            { side: 1 }
+                            { side: 1 },
                         )
 
                         return DecorationSet.create(state.doc, [widget])
@@ -217,7 +217,7 @@ export interface UseEditorCompletionOptions {
 
 export const useEditorCompletion = (
     editorRef: Ref<{ editor: Editor | undefined } | null | undefined>,
-    options: UseEditorCompletionOptions = {}
+    options: UseEditorCompletionOptions = {},
 ) => {
     // State for direct insertion/transform mode
     const insertState = ref<{
@@ -286,7 +286,7 @@ export const useEditorCompletion = (
                 if (mode.value === 'continue' && !oldCompletion) {
                     const textBefore = editor.state.doc.textBetween(
                         Math.max(0, insertState.value.pos - 1),
-                        insertState.value.pos
+                        insertState.value.pos,
                     )
                     if (textBefore && !/\s/.test(textBefore)) {
                         delta = ' ' + delta
@@ -309,7 +309,7 @@ export const useEditorCompletion = (
     const triggerTransform = (
         editor: Editor,
         transformMode: Exclude<CompletionMode, 'continue'>,
-        lang?: string
+        lang?: string,
     ) => {
         if (isLoading.value) return
 
@@ -330,7 +330,7 @@ export const useEditorCompletion = (
             deleteRange: { from: selection.from, to: selection.to },
         }
 
-        complete(selectedText)
+        void complete(selectedText)
     }
 
     const triggerContinue = (editor: Editor) => {
@@ -345,12 +345,12 @@ export const useEditorCompletion = (
             // No selection: continue from cursor position
             const textBefore = state.doc.textBetween(0, selection.from, '\n')
             insertState.value = { pos: selection.from }
-            complete(textBefore)
+            void complete(textBefore)
         } else {
             // Text selected: append completion after the selection
             const selectedText = state.doc.textBetween(selection.from, selection.to)
             insertState.value = { pos: selection.to }
-            complete(selectedText)
+            void complete(selectedText)
         }
     }
 
@@ -359,7 +359,7 @@ export const useEditorCompletion = (
         onTrigger: (textBefore) => {
             if (isLoading.value) return
             mode.value = 'continue'
-            complete(textBefore)
+            void complete(textBefore)
         },
         onAccept: () => {
             setCompletion('')

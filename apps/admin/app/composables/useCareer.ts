@@ -113,7 +113,7 @@ export const useCareer = () => {
 
     const deleteCareer = async (id: Career['id']) => {
         try {
-            if (!(await confirm('Are you sure you want to delete this career?'))) return
+            if (!confirm('Are you sure you want to delete this career?')) return
 
             await $fetch(`/api/careers/${id}`, {
                 method: 'DELETE',

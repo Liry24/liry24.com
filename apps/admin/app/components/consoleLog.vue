@@ -18,7 +18,7 @@ onMounted(() => {
         ([entry]) => {
             isAtBottom.value = entry?.isIntersecting ?? true
         },
-        { threshold: 0.1 }
+        { threshold: 0.1 },
     )
 
     if (bottomSentinel.value) observer.observe(bottomSentinel.value)
@@ -33,7 +33,7 @@ watch(
                 scrollContainer.value.scrollTop = scrollContainer.value.scrollHeight
         }
     },
-    { deep: true }
+    { deep: true },
 )
 
 const scrollToBottom = () => {

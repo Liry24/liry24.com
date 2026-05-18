@@ -9,7 +9,7 @@ const request = {
 export default adminSessionEventHandler(async () => {
     const { slug: workSlug } = await validateParams(request.params)
     const { slug, href, title, description, category, image, icon, sortIndex } = await validateBody(
-        request.body
+        request.body,
     )
 
     await db

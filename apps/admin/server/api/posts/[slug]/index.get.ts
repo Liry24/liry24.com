@@ -1,4 +1,4 @@
-import { validateParams } from '@repo/utils/server'
+import { validateParams } from '@repo/nuxt/server/utils'
 import z from 'zod'
 
 const request = {

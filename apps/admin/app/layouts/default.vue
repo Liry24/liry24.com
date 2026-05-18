@@ -27,7 +27,7 @@ const sidebarCollapsed = ref(false)
                         :class="
                             cn(
                                 'flex w-full items-center gap-2 pl-2',
-                                collapsed && 'mt-8 mb-8 flex-col pl-0'
+                                collapsed && 'mt-8 mb-8 flex-col pl-0',
                             )
                         "
                     >

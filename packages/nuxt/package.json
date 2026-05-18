@@ -5,24 +5,31 @@
     "main": "./nuxt.config.ts",
     "scripts": {
         "postinstall": "nuxt prepare",
-        "check-types": "tsc --noEmit"
+        "typecheck": "nuxt typecheck",
+        "lint": "oxlint --type-aware",
+        "lint:fix": "oxlint --type-aware --fix"
     },
     "dependencies": {
-        "@nuxt/content": "^3.12.0",
+        "@nuxt/content": "^3.13.0",
         "@nuxt/image": "^2.0.0",
-        "@nuxt/ui": "^4.5.1",
+        "@nuxt/ui": "^4.7.1",
         "@repo/database": "workspace:*",
-        "@repo/utils": "workspace:*",
         "@vercel/analytics": "^2.0.1",
-        "@vueuse/nuxt": "^14.2.1",
+        "@vueuse/nuxt": "^14.3.0",
         "clsx": "^2.1.1",
-        "nuxt": "^4.4.2",
+        "destr": "^2.0.5",
+        "http-status-codes": "^2.3.0",
+        "nitropack": "^2.13.4",
+        "nuxt": "^4.4.5",
         "remark-breaks": "^4.0.0",
-        "tailwind-merge": "^3.5.0"
+        "sanitize-html": "^2.17.4",
+        "tailwind-merge": "^3.6.0",
+        "zod": "^4.4.3"
     },
     "devDependencies": {
         "@nuxt/a11y": "^1.0.0-alpha.1",
-        "@nuxt/hints": "^1.0.0",
-        "vue-tsc": "^3.2.6"
+        "@nuxt/hints": "^1.1.1",
+        "@types/sanitize-html": "^2.16.1",
+        "vue-tsc": "^3.2.9"
     }
 }

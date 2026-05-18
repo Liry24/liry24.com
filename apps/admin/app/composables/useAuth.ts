@@ -17,7 +17,7 @@ export const _useAuth = () => {
 
         const headers = useRequestHeaders()
         const { data } = await authClient.useSession((url, options) =>
-            useFetch(withoutHost(url), { ...options, dedupe: 'defer', headers })
+            useFetch(withoutHost(url), { ...options, dedupe: 'defer', headers }),
         )
 
         globalSession.value = data.value
@@ -32,7 +32,7 @@ export const _useAuth = () => {
                 dedupe: 'defer',
                 credentials: 'include',
                 headers,
-            })
+            }),
         )
 
         globalSession.value = data.value
@@ -47,7 +47,7 @@ export const _useAuth = () => {
 
     const signOut = async () => {
         const result = await authClient.signOut()
-        if (result.data?.success) navigateTo('/', { external: true })
+        if (result.data?.success) void navigateTo('/', { external: true })
     }
 
     const returnObject = {
@@ -65,7 +65,7 @@ export const _useAuth = () => {
     const awaitableResult = Object.assign(initPromise, returnObject)
 
     // Make Promise methods enumerable
-    Object.defineProperties(awaitableResult, {
+    void Object.defineProperties(awaitableResult, {
         then: { enumerable: true, value: initPromise.then.bind(initPromise) },
         catch: { enumerable: true, value: initPromise.catch.bind(initPromise) },
         finally: { enumerable: true, value: initPromise.finally.bind(initPromise) },

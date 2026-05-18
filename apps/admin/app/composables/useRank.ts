@@ -113,7 +113,7 @@ export const useRank = () => {
 
     const deleteRank = async (id: Rank['id']) => {
         try {
-            if (!(await confirm('Are you sure you want to delete this rank?'))) return
+            if (!confirm('Are you sure you want to delete this rank?')) return
 
             await $fetch(`/api/ranks/${id}`, {
                 method: 'DELETE',

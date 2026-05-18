@@ -113,7 +113,7 @@ export const useSocial = () => {
 
     const deleteSocial = async (id: Social['id']) => {
         try {
-            if (!(await confirm('Are you sure you want to delete this social?'))) return
+            if (!confirm('Are you sure you want to delete this social?')) return
 
             await $fetch(`/api/socials/${id}`, {
                 method: 'DELETE',

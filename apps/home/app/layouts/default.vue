@@ -34,7 +34,7 @@ watch(
         originalTitle.value = text
         titleHovered.value = false
     },
-    { immediate: true }
+    { immediate: true },
 )
 
 const handleMouseEnter = () => {
@@ -80,7 +80,7 @@ const handleMouseLeave = () => {
                                 cn(
                                     'font-[Special_Gothic_Expanded_One] text-6xl leading-none tracking-tight',
                                     route.path === '/' && 'w-56',
-                                    titleHovered && 'w-117'
+                                    titleHovered && 'w-117',
                                 )
                             "
                         />
@@ -92,6 +92,14 @@ const handleMouseLeave = () => {
                             color="neutral"
                             variant="link"
                             orientation="horizontal"
+                            :delay-duration="0"
+                            :disable-click-trigger="false"
+                            :disable-hover-trigger="false"
+                            :skip-delay-duration="0"
+                            :disable-pointer-leave-close="false"
+                            :unmount-on-hide="false"
+                            :disabled="false"
+                            :collapsible="false"
                             class="text-toned ml-auto font-mono text-lg font-medium"
                         />
 
@@ -107,7 +115,7 @@ const handleMouseLeave = () => {
             <footer
                 class="fade-in @container mx-8 mb-10 flex flex-col items-center gap-3 md:mx-12 lg:mx-24"
             >
-                <USeparator />
+                <USeparator decorative />
 
                 <div
                     class="text-dimmed mt-8 flex w-full items-center justify-between gap-3 text-sm sm:px-10"

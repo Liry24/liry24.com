@@ -1,9 +1,8 @@
+import { getReasonPhrase, StatusCodes } from '@repo/nuxt/server/utils'
 import type { H3Event } from 'h3'
 
-import { getReasonPhrase, StatusCodes } from '@repo/utils/server'
-
 export const sessionEventHandler = <T = unknown>(
-    handler: ({ event, session }: { event: H3Event; session: Session | null }) => Promise<T> | T
+    handler: ({ event, session }: { event: H3Event; session: Session | null }) => Promise<T> | T,
 ) =>
     eventHandler(async (event) => {
         const session = await auth.api.getSession({ headers: event.headers })
@@ -18,7 +17,7 @@ export const authedSessionEventHandler = <T = unknown>(
     }: {
         event: H3Event
         session: NonNullable<Session>
-    }) => Promise<T> | T
+    }) => Promise<T> | T,
 ) =>
     sessionEventHandler(async ({ event, session }) => {
         if (!session)
@@ -37,7 +36,7 @@ export const adminSessionEventHandler = <T = unknown>(
     }: {
         event: H3Event
         session: NonNullable<Session>
-    }) => Promise<T> | T
+    }) => Promise<T> | T,
 ) =>
     sessionEventHandler(async ({ event, session }) => {
         if (session?.user?.role !== 'admin')

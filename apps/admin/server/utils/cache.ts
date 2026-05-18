@@ -1,12 +1,14 @@
 export const revalidateISR = async () => {
     const runtimeConfig = useRuntimeConfig()
+    const token = runtimeConfig.bypassToken as string | undefined
 
-    if (!import.meta.dev)
+    if (!import.meta.dev && token) {
         await $fetch(runtimeConfig.public.homeDomain, {
             headers: {
-                'x-prerender-revalidate': runtimeConfig.bypassToken,
+                'x-prerender-revalidate': token,
             },
         })
+    }
 }
 
 export const purgeRuntimeCache = async () => {

@@ -1,12 +1,14 @@
-import type { OgImageComponents } from '#og-image/components'
-
 type OgImageInput = {
-    [T in keyof OgImageComponents]: {
-        component: T
-        props?: Parameters<typeof defineOgImage<T>>[1]
-        options?: Parameters<typeof defineOgImage<T>>[2]
-    }
-}[keyof OgImageComponents]
+    component: string
+    props?: Record<string, unknown>
+    options?: Record<string, unknown> | Record<string, unknown>[]
+}
+
+type DefineOgImageFn = (
+    component: string,
+    props?: Record<string, unknown>,
+    options?: Record<string, unknown> | Record<string, unknown>[],
+) => void
 
 export default ({
     title,
@@ -37,5 +39,10 @@ export default ({
         meta: [{ property: 'og:type', content: type || 'article' }],
         link: [{ rel: 'icon', href: '/favicon.ico' }],
     })
-    if (image) defineOgImage(image.component, image.props, image.options)
+    if (image) {
+        const maybeFn = (globalThis as Record<string, unknown>).defineOgImage
+        if (typeof maybeFn === 'function') {
+            ;(maybeFn as DefineOgImageFn)(image.component, image.props, image.options)
+        }
+    }
 }

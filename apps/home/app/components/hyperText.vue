@@ -40,14 +40,14 @@ const { pause, resume } = useIntervalFn(
     () => {
         if (iterations.value < text.length) {
             displayText.value = displayText.value.map((l, i) =>
-                l === ' ' ? l : i <= iterations.value ? (text[i] ?? '') : getRandomLetter()
+                l === ' ' ? l : i <= iterations.value ? (text[i] ?? '') : getRandomLetter(),
             )
             iterations.value += 0.1
         } else {
             pause()
         }
     },
-    computed(() => duration / (text.length * 10))
+    computed(() => duration / (text.length * 10)),
 )
 
 const startAnimation = () => {
@@ -60,7 +60,7 @@ watch(
     (newText) => {
         displayText.value = newText.split('')
         triggerAnimation()
-    }
+    },
 )
 
 if (animateOnLoad) triggerAnimation()

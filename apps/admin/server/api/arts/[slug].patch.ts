@@ -30,7 +30,7 @@ export default adminSessionEventHandler(async () => {
                     artSlug: slug || workSlug,
                     src: image.src,
                     alt: image.alt,
-                }))
+                })),
             )
         }
     })

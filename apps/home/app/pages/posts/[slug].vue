@@ -64,7 +64,7 @@ defineSeo({
             </div>
 
             <div class="flex max-w-4xl flex-col gap-6">
-                <USeparator class="my-4" />
+                <USeparator decorative class="my-4" />
 
                 <MDC :value="data.content" class="sentence px-1 *:first:mt-0 *:last:mb-0" />
             </div>

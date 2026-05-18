@@ -26,7 +26,7 @@ export default adminSessionEventHandler(async () => {
                     artSlug: result.slug,
                     src: image.src,
                     alt: image.alt,
-                }))
+                })),
             )
         }
     })

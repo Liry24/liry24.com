@@ -26,8 +26,8 @@ export const useWork = () => {
 
     const categories = computed<string[]>(() =>
         [...new Set(works.value.map((work) => work.category))].filter(
-            (category): category is string => !!category
-        )
+            (category): category is string => !!category,
+        ),
     )
 
     const submitting = ref(false)
@@ -119,7 +119,7 @@ export const useWork = () => {
 
     const deleteWork = async (slug: Work['slug']) => {
         try {
-            if (!(await confirm('Are you sure you want to delete this work?'))) return
+            if (!confirm('Are you sure you want to delete this work?')) return
 
             await $fetch(`/api/works/${slug}`, {
                 method: 'DELETE',

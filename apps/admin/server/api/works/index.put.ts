@@ -17,7 +17,7 @@ export default adminSessionEventHandler(async () => {
                 ...work,
                 createdAt: work.createdAt ? new Date(work.createdAt) : undefined,
                 sortIndex: index,
-            }))
+            })),
         )
     })
 

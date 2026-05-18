@@ -8,7 +8,7 @@ const request = {
 
 export default adminSessionEventHandler(async () => {
     const { slug, title, description, category, image, icon, href, sortIndex } = await validateBody(
-        request.body
+        request.body,
     )
 
     let generatedSlug: string = ''

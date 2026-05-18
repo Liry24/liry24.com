@@ -10,7 +10,7 @@ const getSocials = defineCachedFunction(
         maxAge: 60 * 60 * 24 * 30,
         name: 'getSocials',
         getKey: () => 'default',
-    }
+    },
 )
 
 export default eventHandler(async (event) => {

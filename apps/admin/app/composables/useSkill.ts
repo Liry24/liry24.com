@@ -24,8 +24,8 @@ export const useSkill = () => {
 
     const categories = computed<string[]>(() =>
         [...new Set(skills.value.map((skill) => skill.category))].filter(
-            (category): category is string => !!category
-        )
+            (category): category is string => !!category,
+        ),
     )
 
     const submitting = ref(false)
@@ -123,7 +123,7 @@ export const useSkill = () => {
 
     const deleteSkill = async (id: Skill['id']) => {
         try {
-            if (!(await confirm('Are you sure you want to delete this skill?'))) return
+            if (!confirm('Are you sure you want to delete this skill?')) return
 
             await $fetch(`/api/skills/${id}`, {
                 method: 'DELETE',

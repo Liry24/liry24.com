@@ -63,7 +63,7 @@ const emit = defineEmits(['submit'])
                 <span>0</span>
             </template>
 
-            <TextEditor v-model="model.content" content-type="markdown" class="grow">
+            <TextEditor v-model="model.content" content-type="markdown" :ui="{}" class="grow">
                 <template #top="{ editor }">
                     <TextEditorFixedToolbar :editor />
                 </template>

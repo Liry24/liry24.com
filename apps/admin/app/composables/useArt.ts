@@ -113,7 +113,7 @@ export const useArt = () => {
 
     const deleteArt = async (id: Art['slug']) => {
         try {
-            if (!(await confirm('Are you sure you want to delete this art?'))) return
+            if (!confirm('Are you sure you want to delete this art?')) return
 
             await $fetch(`/api/arts/${id}`, {
                 method: 'DELETE',

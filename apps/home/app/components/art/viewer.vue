@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import type { Art } from '@repo/database/types'
+import type { Serialized } from '@repo/nuxt/shared/types'
+
 const open = defineModel<boolean>('open', { default: false })
 
 const { item } = defineProps<{
@@ -30,7 +33,7 @@ watch(
                 }
             }
     },
-    { immediate: true }
+    { immediate: true },
 )
 
 onUnmounted(() => {

@@ -86,7 +86,7 @@ watch(files, async (value) => {
                 ;(model.value as Image[]).push({
                     src: createCleanURL(result.data.url).replace(
                         `https://${config.tigrisStorage.bucket}.t3.storage.dev`,
-                        config.public.imagesDomain
+                        config.public.imagesDomain,
                     ),
                     alt: undefined,
                 })
@@ -103,7 +103,7 @@ watch(files, async (value) => {
             }
             const newUrl = createCleanURL(result.data.url).replace(
                 `https://${config.tigrisStorage.bucket}.t3.storage.dev`,
-                config.public.imagesDomain
+                config.public.imagesDomain,
             )
             await nextTick()
             model.value = {
@@ -115,7 +115,7 @@ watch(files, async (value) => {
 
         // Reset files after upload completes
         await nextTick()
-        files.value = (props.multiple ? [] : null) as
+        files.value = (Array.isArray(value) ? [] : null) as
             | (M extends true ? File[] : File)
             | null
             | undefined
@@ -193,7 +193,7 @@ const uploadedFiles = computed(() => {
                     color="neutral"
                     size="sm"
                     @click="
-                        props.multiple
+                        Array.isArray(model)
                             ? (model as Image[]).splice(index, 1)
                             : (model = null as unknown as M extends true ? Image[] : Image | null)
                     "

@@ -52,7 +52,7 @@ export default adminSessionEventHandler(async () => {
                 artSlug: slug || generatedSlug,
                 src: image.src,
                 alt: image.alt,
-            }))
+            })),
         )
     })
 

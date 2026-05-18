@@ -1,4 +1,5 @@
 import { createInsertSchema, createSelectSchema, createUpdateSchema } from 'drizzle-orm/zod'
+import type { ZodNumber, ZodString } from 'zod'
 import { z } from 'zod'
 
 import { artImages, arts, careers, posts, postTags, ranks, skills, socials, works } from './schema'
@@ -42,14 +43,14 @@ export const artsSelectSchema = createSelectSchema(arts).extend({
         .array(),
 })
 export const artsInsertSchema = createInsertSchema(arts, {
-    slug: (s) => s.optional(),
-    title: (s) => s.min(1),
+    slug: (s: ZodString) => s.optional(),
+    title: (s: ZodString) => s.min(1),
 }).extend({
     images: artImagesInsertSchema.omit({ artSlug: true }).array().min(1),
 })
 export const artsUpdateSchema = createUpdateSchema(arts, {
-    slug: (s) => s.optional(),
-    title: (s) => s.min(1),
+    slug: (s: ZodString) => s.optional(),
+    title: (s: ZodString) => s.min(1),
 }).extend({
     images: artImagesUpdateSchema
         .omit({ artSlug: true })
@@ -63,16 +64,16 @@ export const worksSelectSchema = createSelectSchema(works, {
     createdAt: z.iso.datetime(),
 })
 export const worksInsertSchema = createInsertSchema(works, {
-    slug: (s) => s.optional(),
+    slug: (s: ZodString) => s.optional(),
     createdAt: () => z.iso.datetime().optional(),
-    title: (s) => s.min(1),
-    sortIndex: (s) => s.optional(),
+    title: (s: ZodString) => s.min(1),
+    sortIndex: (s: ZodNumber) => s.optional(),
 })
 export const worksUpdateSchema = createUpdateSchema(works, {
-    slug: (s) => s.optional(),
+    slug: (s: ZodString) => s.optional(),
     createdAt: () => z.iso.datetime().optional(),
-    title: (s) => s.min(1),
-    sortIndex: (s) => s.optional(),
+    title: (s: ZodString) => s.min(1),
+    sortIndex: (s: ZodNumber) => s.optional(),
 })
 export type Work = z.infer<typeof worksSelectSchema>
 
@@ -92,10 +93,10 @@ export type Rank = z.infer<typeof ranksSelectSchema>
 
 export const postTagsSelectSchema = createSelectSchema(postTags)
 export const postTagsInsertSchema = createInsertSchema(postTags, {
-    tag: (s) => s.min(1),
+    tag: (s: ZodString) => s.min(1),
 })
 export const postTagsUpdateSchema = createUpdateSchema(postTags, {
-    tag: (s) => s.min(1),
+    tag: (s: ZodString) => s.min(1),
 })
 export type PostTag = z.infer<typeof postTagsSelectSchema>
 
@@ -103,16 +104,16 @@ export const postsSelectSchema = createSelectSchema(posts).extend({
     tags: postTagsSelectSchema.omit({ postSlug: true }).array(),
 })
 export const postsInsertSchema = createInsertSchema(posts, {
-    slug: (s) => s.optional(),
-    title: (s) => s.min(1, { error: 'Title is required' }),
-    content: (s) => s.min(1, { error: 'Content is required' }),
+    slug: (s: ZodString) => s.optional(),
+    title: (s: ZodString) => s.min(1, { error: 'Title is required' }),
+    content: (s: ZodString) => s.min(1, { error: 'Content is required' }),
 }).extend({
     tags: z.string().array().optional(),
 })
 export const postsUpdateSchema = createUpdateSchema(posts, {
-    slug: (s) => s.optional(),
-    title: (s) => s.min(1),
-    content: (s) => s.min(1),
+    slug: (s: ZodString) => s.optional(),
+    title: (s: ZodString) => s.min(1),
+    content: (s: ZodString) => s.min(1),
 }).extend({
     tags: z.string().array().min(1).optional(),
 })

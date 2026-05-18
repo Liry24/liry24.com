@@ -33,7 +33,7 @@ watch(
             editor.off('selectionUpdate', updateUrl)
         })
     },
-    { immediate: true }
+    { immediate: true },
 )
 
 watch(active, (isActive) => {
