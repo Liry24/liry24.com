@@ -1,1 +1,6 @@
-export default eventHandler((event) => auth.handler(toWebRequest(event)))
+import { getAuth } from '../../utils/authRuntime'
+
+export default eventHandler(async (event) => {
+    const auth = await getAuth()
+    return auth.handler(toWebRequest(event))
+})
