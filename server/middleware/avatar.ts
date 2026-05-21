@@ -1,4 +1,4 @@
-import sharp from 'sharp'
+import { PhotonImage, resize, SamplingFilter } from '@cf-wasm/photon'
 import { z } from 'zod'
 
 const AVATAR_REGEX = /^\/avatar\.(png|jpg|jpeg|webp|avif)$/i
@@ -30,11 +30,7 @@ export default defineEventHandler(async (event) => {
 
     try {
         const result = await getValidatedQuery(event, (q) => query.safeParse(q))
-        if (!result.success)
-            throw createError({
-                status: 400,
-                statusText: 'Invalid query parameters',
-            })
+        if (!result.success) throw serverError.badRequest()
 
         const { size } = result.data
 
@@ -42,32 +38,38 @@ export default defineEventHandler(async (event) => {
             baseURL: config.public.imagesDomain,
         })
 
-        if (!imageBlob) {
-            throw createError({
-                status: 404,
-                statusText: 'Source image not found',
-            })
+        if (!imageBlob) throw serverError.internalServerError()
+
+        const imageBytes = new Uint8Array(await imageBlob.arrayBuffer())
+        const photonImage = PhotonImage.new_from_byteslice(imageBytes)
+        const resized = resize(photonImage, size, size, SamplingFilter.Lanczos3)
+
+        let outputBytes: Uint8Array
+        let contentType: string
+
+        if (format === 'webp') {
+            outputBytes = resized.get_bytes_webp()
+            contentType = 'image/webp'
+        } else if (format === 'avif') {
+            outputBytes = resized.get_bytes_webp()
+            contentType = 'image/webp'
+        } else if (format === 'jpg' || format === 'jpeg') {
+            outputBytes = resized.get_bytes_jpeg(90)
+            contentType = 'image/jpeg'
+        } else {
+            outputBytes = resized.get_bytes()
+            contentType = 'image/png'
         }
 
-        const imageBuffer = Buffer.from(await imageBlob.arrayBuffer())
-        const sharpImg = sharp(imageBuffer).resize(size, size, { fit: 'cover' })
+        photonImage.free()
+        resized.free()
 
-        if (format === 'webp') sharpImg.webp()
-        else if (format === 'png') sharpImg.png()
-        else if (format === 'jpg' || format === 'jpeg') sharpImg.jpeg()
-        else if (format === 'avif') sharpImg.avif()
-
-        const resultBuffer = await sharpImg.toBuffer()
-
-        setResponseHeader(event, 'Content-Type', `image/${format === 'jpg' ? 'jpeg' : format}`)
+        setResponseHeader(event, 'Content-Type', contentType)
         setResponseHeader(event, 'CDN-Cache-Control', `max-age=${60 * 60 * 24 * 30}`)
-        return resultBuffer
+        return outputBytes
     } catch (error) {
         if (isError(error)) throw error
         console.error('Error processing avatar image:', error)
-        throw createError({
-            status: 500,
-            statusText: 'Failed to process image',
-        })
+        throw serverError.internalServerError()
     }
 })
