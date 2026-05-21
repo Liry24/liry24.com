@@ -24,10 +24,10 @@
     },
     "dependencies": {
         "@libsql/client": "^0.17.3",
-        "drizzle-orm": "1.0.0-rc.2",
+        "drizzle-orm": "1.0.0-rc.3",
         "zod": "^4.4.3"
     },
     "devDependencies": {
-        "drizzle-kit": "1.0.0-rc.2"
+        "drizzle-kit": "1.0.0-rc.3"
     }
 }

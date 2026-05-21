@@ -23,8 +23,7 @@ logs
 .env.*
 !.env.example
 
-.turbo
-.vercel
-
 .agents
 .agent
+
+.wrangler

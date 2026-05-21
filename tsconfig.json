@@ -1,15 +1,4 @@
 {
-    "compilerOptions": {
-        "target": "ESNext",
-        "module": "ESNext",
-        "moduleResolution": "bundler",
-        "strict": true,
-        "noEmit": true,
-        "skipLibCheck": true
-    },
-    "include": [],
-    "references": [
-        { "path": "./packages/database" },
-        { "path": "./packages/nuxt" }
-    ]
+    // https://nuxt.com/docs/guide/concepts/typescript
+    "extends": "./.nuxt/tsconfig.node.json"
 }
