@@ -5,7 +5,7 @@ const title = 'Liry24'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-    compatibilityDate: 'latest',
+    compatibilityDate: '2026-05-21',
 
     future: {
         compatibilityVersion: 5,
@@ -140,7 +140,7 @@ export default defineNuxtConfig({
     typescript: {
         // typeCheck: true,
         tsConfig: {
-            include: ['../drizzle.config.*'],
+            include: ['../drizzle.config.*', '../database/*'],
             compilerOptions: {
                 noUncheckedIndexedAccess: true,
             },
