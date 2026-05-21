@@ -1,9 +1,6 @@
 <script setup lang="ts">
 const { socials, changed, fetchSocials, reorderSocials, deleteSocial, modalSocial } = useSocial()
 
-const location = useBrowserLocation()
-const config = useRuntimeConfig()
-
 defineShortcuts({
     n: () => {
         modalSocial.open()
