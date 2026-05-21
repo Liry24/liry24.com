@@ -1,10 +1,8 @@
 <script setup lang="ts" generic="M extends boolean = false">
 import type { FileUploadProps } from '@nuxt/ui'
-import { upload } from '@tigrisdata/storage/client'
+import type { SignedUpload } from 'files-sdk'
 import { nanoid } from 'nanoid'
 import { joinURL, parseURL } from 'ufo'
-
-const config = useRuntimeConfig()
 
 interface Props extends FileUploadProps<M> {
     prefix?: string
@@ -47,16 +45,65 @@ const createCleanURL = (url: string) => {
     return `${parsed.protocol || ''}//${joinURL(parsed.host || '', parsed.pathname)}`
 }
 
-const handleUpload = async (file: File, options: { name: string; totalSteps: number }) => {
-    const result = await upload(options.name, file, {
-        access: 'public',
-        url: '/api/upload',
-        onUploadProgress: (progress) => {
-            const currentFileProgress = progress.percentage / 100
-            uploading.value.progress = Math.floor((currentFileProgress / options.totalSteps) * 100)
-        },
+const uploadWithProgress = (uploadInfo: SignedUpload, file: File): Promise<void> => {
+    return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest()
+
+        xhr.upload.addEventListener('progress', (event) => {
+            if (event.lengthComputable)
+                uploading.value.progress = Math.round((event.loaded / event.total) * 100)
+        })
+
+        xhr.addEventListener('load', () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                uploading.value.progress = 100
+                resolve()
+            } else {
+                reject(new Error(`Upload failed: ${xhr.status} ${xhr.statusText}`))
+            }
+        })
+
+        xhr.addEventListener('error', () => reject(new Error('Upload network error')))
+        xhr.addEventListener('abort', () => reject(new Error('Upload aborted')))
+
+        if (uploadInfo.method === 'POST') {
+            const formData = new FormData()
+            for (const [k, v] of Object.entries(uploadInfo.fields)) formData.append(k, v)
+
+            formData.append('file', file)
+            xhr.open('POST', uploadInfo.url)
+            xhr.send(formData)
+        } else {
+            xhr.open('PUT', uploadInfo.url)
+            if (uploadInfo.headers) {
+                for (const [k, v] of Object.entries(uploadInfo.headers)) {
+                    xhr.setRequestHeader(k, v)
+                }
+            }
+            xhr.setRequestHeader('Content-Type', file.type)
+            xhr.send(file)
+        }
     })
-    return result
+}
+
+const handleUpload = async (file: File, options: { name: string }) => {
+    try {
+        uploading.value.progress = 0
+        const { uploadInfo, publicUrl } = await $fetch<{
+            uploadInfo: SignedUpload
+            publicUrl: string
+            key: string
+        }>('/api/admin/upload', {
+            method: 'POST',
+            body: { key: options.name, contentType: file.type },
+        })
+
+        await uploadWithProgress(uploadInfo, file)
+
+        return { data: { url: publicUrl }, error: null }
+    } catch (err) {
+        return { data: null, error: err instanceof Error ? err : new Error(String(err)) }
+    }
 }
 
 watch(files, async (value) => {
@@ -75,19 +122,13 @@ watch(files, async (value) => {
                 addLog(`Uploading ${uploadItem.name}...`)
                 const ext = uploadItem.name.split('.').pop()
                 const name = `${props.prefix || ''}/${nanoid()}.${ext}`
-                const result = await handleUpload(uploadItem, {
-                    name,
-                    totalSteps: value.length + 1,
-                })
+                const result = await handleUpload(uploadItem, { name })
                 if (result.error || !result.data) {
                     addLog(result.error?.message || 'Failed to upload', 'error')
                     throw result.error
                 }
                 ;(model.value as Image[]).push({
-                    src: createCleanURL(result.data.url).replace(
-                        `https://${config.tigrisStorage.bucket}.t3.storage.dev`,
-                        config.public.imagesDomain,
-                    ),
+                    src: createCleanURL(result.data.url),
                     alt: undefined,
                 })
                 addLog('Uploaded successfully.')
@@ -96,15 +137,12 @@ watch(files, async (value) => {
             addLog(`Uploading ${value.name}...`)
             const ext = value.name.split('.').pop()
             const name = `${props.prefix || ''}/${nanoid(6)}.${ext}`
-            const result = await handleUpload(value, { name, totalSteps: 2 })
+            const result = await handleUpload(value, { name })
             if (result.error || !result.data) {
                 addLog(result.error?.message || 'Failed to upload', 'error')
                 throw result.error
             }
-            const newUrl = createCleanURL(result.data.url).replace(
-                `https://${config.tigrisStorage.bucket}.t3.storage.dev`,
-                config.public.imagesDomain,
-            )
+            const newUrl = createCleanURL(result.data.url)
             await nextTick()
             model.value = {
                 src: newUrl,
