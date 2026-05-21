@@ -1,4 +1,3 @@
-import { artImages, arts } from '@repo/database/schema'
 import { generateText } from 'ai'
 
 const request = {
@@ -40,14 +39,14 @@ export default adminSessionEventHandler(async () => {
     }
 
     await db.transaction(async (tx) => {
-        await tx.insert(arts).values({
+        await tx.insert(schema.arts).values({
             slug: slug || generatedSlug,
             title,
             description,
             href,
         })
 
-        await tx.insert(artImages).values(
+        await tx.insert(schema.artImages).values(
             images.map((image) => ({
                 artSlug: slug || generatedSlug,
                 src: image.src,

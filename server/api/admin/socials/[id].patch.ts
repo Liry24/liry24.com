@@ -1,4 +1,3 @@
-import { socials } from '@repo/database/schema'
 import { eq } from 'drizzle-orm'
 
 const request = {
@@ -11,7 +10,7 @@ export default adminSessionEventHandler(async () => {
     const { href, alias, icon, label, sortIndex } = await validateBody(request.body)
 
     await db
-        .update(socials)
+        .update(schema.socials)
         .set({
             href,
             alias,
@@ -19,7 +18,7 @@ export default adminSessionEventHandler(async () => {
             label,
             sortIndex,
         })
-        .where(eq(socials.id, id))
+        .where(eq(schema.socials.id, id))
 
     await purgeRuntimeCache()
 

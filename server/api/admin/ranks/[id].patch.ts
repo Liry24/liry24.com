@@ -1,4 +1,3 @@
-import { ranks } from '@repo/database/schema'
 import { eq } from 'drizzle-orm'
 
 const request = {
@@ -11,7 +10,7 @@ export default adminSessionEventHandler(async () => {
     const { game, season, rank, imageUrl, href, sortIndex } = await validateBody(request.body)
 
     await db
-        .update(ranks)
+        .update(schema.ranks)
         .set({
             game,
             season,
@@ -20,7 +19,7 @@ export default adminSessionEventHandler(async () => {
             href,
             sortIndex,
         })
-        .where(eq(ranks.id, id))
+        .where(eq(schema.ranks.id, id))
 
     return {
         success: true,

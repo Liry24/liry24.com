@@ -1,4 +1,3 @@
-import { posts, postTags } from '@repo/database/schema'
 import { generateText } from 'ai'
 
 const request = {
@@ -39,13 +38,13 @@ export default adminSessionEventHandler(async () => {
     }
 
     await db.transaction(async (tx) => {
-        await tx.insert(posts).values({
+        await tx.insert(schema.posts).values({
             slug: slug || generatedSlug,
             title,
             content,
         })
         if (tags?.length)
-            await tx.insert(postTags).values(
+            await tx.insert(schema.postTags).values(
                 tags.map((tag) => ({
                     postSlug: slug || generatedSlug,
                     tag,

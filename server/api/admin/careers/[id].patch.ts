@@ -1,4 +1,3 @@
-import { careers } from '@repo/database/schema'
 import { eq } from 'drizzle-orm'
 
 const request = {
@@ -11,14 +10,14 @@ export default adminSessionEventHandler(async () => {
     const { period, position, company, sortIndex } = await validateBody(request.body)
 
     await db
-        .update(careers)
+        .update(schema.careers)
         .set({
             period,
             position,
             company,
             sortIndex,
         })
-        .where(eq(careers.id, id))
+        .where(eq(schema.careers.id, id))
 
     return {
         success: true,

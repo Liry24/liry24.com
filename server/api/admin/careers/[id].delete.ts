@@ -1,4 +1,3 @@
-import { careers } from '@repo/database/schema'
 import { eq } from 'drizzle-orm'
 
 const request = {
@@ -8,7 +7,7 @@ const request = {
 export default adminSessionEventHandler(async () => {
     const { id } = await validateParams(request.params)
 
-    await db.delete(careers).where(eq(careers.id, id))
+    await db.delete(schema.careers).where(eq(schema.careers.id, id))
 
     return {
         success: true,

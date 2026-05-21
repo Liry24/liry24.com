@@ -1,4 +1,3 @@
-import { artImages as artImagesTable, arts as artsTable } from '@repo/database/schema'
 import z from 'zod'
 
 const request = {
@@ -11,17 +10,17 @@ export default adminSessionEventHandler(async () => {
     const { arts } = await validateBody(request.body)
 
     await db.transaction(async (tx) => {
-        await tx.delete(artsTable)
+        await tx.delete(schema.arts)
 
         for (const art of arts) {
             const [result] = await tx
-                .insert(artsTable)
+                .insert(schema.arts)
                 .values(art)
-                .returning({ slug: artsTable.slug })
+                .returning({ slug: schema.arts.slug })
 
             if (!result) return tx.rollback()
 
-            await tx.insert(artImagesTable).values(
+            await tx.insert(schema.artImages).values(
                 art.images.map((image) => ({
                     artSlug: result.slug,
                     src: image.src,

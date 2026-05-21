@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type { Art } from '@repo/database/types'
-
 const open = defineModel<boolean>('open', { default: false })
 
 const { item } = defineProps<{

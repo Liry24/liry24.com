@@ -1,4 +1,3 @@
-import { socials } from '@repo/database/schema'
 import { eq } from 'drizzle-orm'
 
 const request = {
@@ -8,7 +7,7 @@ const request = {
 export default adminSessionEventHandler(async () => {
     const { id } = await validateParams(request.params)
 
-    await db.delete(socials).where(eq(socials.id, id))
+    await db.delete(schema.socials).where(eq(schema.socials.id, id))
 
     await purgeRuntimeCache()
 

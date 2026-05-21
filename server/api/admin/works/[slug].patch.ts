@@ -1,4 +1,3 @@
-import { works } from '@repo/database/schema'
 import { eq } from 'drizzle-orm'
 
 const request = {
@@ -13,7 +12,7 @@ export default adminSessionEventHandler(async () => {
     )
 
     await db
-        .update(works)
+        .update(schema.works)
         .set({
             slug,
             href,
@@ -24,7 +23,7 @@ export default adminSessionEventHandler(async () => {
             icon,
             sortIndex,
         })
-        .where(eq(works.slug, workSlug))
+        .where(eq(schema.works.slug, workSlug))
 
     return {
         success: true,

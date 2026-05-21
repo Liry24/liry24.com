@@ -1,8 +1,9 @@
 import { drizzleAdapter } from '@better-auth/drizzle-adapter'
 import { passkey } from '@better-auth/passkey'
-import { schema } from '@repo/database'
 import { betterAuth } from 'better-auth/minimal'
 import { admin, lastLoginMethod } from 'better-auth/plugins'
+
+import { schema } from '../../database'
 
 export const auth = betterAuth({
     appName: 'liry24',

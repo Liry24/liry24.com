@@ -1,4 +1,3 @@
-import { arts } from '@repo/database/schema'
 import { eq } from 'drizzle-orm'
 
 const request = {
@@ -8,7 +7,7 @@ const request = {
 export default adminSessionEventHandler(async () => {
     const { slug } = await validateParams(request.params)
 
-    await db.delete(arts).where(eq(arts.slug, slug))
+    await db.delete(schema.arts).where(eq(schema.arts.slug, slug))
 
     return {
         success: true,

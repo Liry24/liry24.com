@@ -8,5 +8,5 @@ export interface ConsoleLog {
     type?: 'log' | 'warn' | 'error'
 }
 
-export { db, relations, schema } from '@repo/database'
-export * from '@repo/database/types'
+export { db, relations, schema } from '../../database'
+export * from '../../database/types'

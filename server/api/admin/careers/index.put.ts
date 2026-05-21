@@ -1,4 +1,3 @@
-import { careers as careersTable } from '@repo/database/schema'
 import z from 'zod'
 
 const request = {
@@ -11,8 +10,8 @@ export default adminSessionEventHandler(async () => {
     const { careers } = await validateBody(request.body)
 
     await db.transaction(async (tx) => {
-        await tx.delete(careersTable)
-        await tx.insert(careersTable).values(careers)
+        await tx.delete(schema.careers)
+        await tx.insert(schema.careers).values(careers)
     })
 
     return {

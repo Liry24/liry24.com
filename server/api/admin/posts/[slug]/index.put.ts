@@ -1,4 +1,3 @@
-import { posts, postTags } from '@repo/database/schema'
 import { eq } from 'drizzle-orm'
 import z from 'zod'
 
@@ -14,16 +13,16 @@ export default adminSessionEventHandler(async () => {
     const { title, tags, content } = await validateBody(request.body)
 
     await db
-        .update(posts)
+        .update(schema.posts)
         .set({
             title,
             content,
         })
-        .where(eq(posts.slug, slug))
+        .where(eq(schema.posts.slug, slug))
 
-    await db.delete(postTags).where(eq(postTags.postSlug, slug))
+    await db.delete(schema.postTags).where(eq(schema.postTags.postSlug, slug))
     if (tags) {
-        await db.insert(postTags).values(
+        await db.insert(schema.postTags).values(
             tags.map((tag) => ({
                 postSlug: slug,
                 tag,

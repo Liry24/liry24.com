@@ -1,4 +1,3 @@
-import { artImages, arts } from '@repo/database/schema'
 import { eq } from 'drizzle-orm'
 
 const request = {
@@ -12,7 +11,7 @@ export default adminSessionEventHandler(async () => {
 
     await db.transaction(async (tx) => {
         await db
-            .update(arts)
+            .update(schema.arts)
             .set({
                 slug,
                 href,
@@ -20,12 +19,12 @@ export default adminSessionEventHandler(async () => {
                 description,
                 sortIndex,
             })
-            .where(eq(arts.slug, workSlug))
+            .where(eq(schema.arts.slug, workSlug))
 
         if (images?.length) {
-            await tx.delete(artImages).where(eq(artImages.artSlug, workSlug))
+            await tx.delete(schema.artImages).where(eq(schema.artImages.artSlug, workSlug))
 
-            await tx.insert(artImages).values(
+            await tx.insert(schema.artImages).values(
                 images.map((image) => ({
                     artSlug: slug || workSlug,
                     src: image.src,

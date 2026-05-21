@@ -1,5 +1,6 @@
-import { parseURL } from 'ufo'
+import { parseURL, withoutProtocol } from 'ufo'
 
+const baseURL = import.meta.env.NUXT_PUBLIC_SITE_URL || 'https://liry24.com'
 const title = 'Liry24'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
@@ -18,9 +19,9 @@ export default defineNuxtConfig({
     },
 
     modules: [
+        '@comark/nuxt',
         '@nuxt/ui',
         '@nuxt/image',
-        '@nuxt/content',
         '@nuxtjs/sitemap',
         'nuxt-og-image',
         '@vueuse/nuxt',
@@ -33,7 +34,7 @@ export default defineNuxtConfig({
 
     runtimeConfig: {
         public: {
-            imagesDomain: process.env.TIGRIS_STORAGE_DOMAIN,
+            imagesDomain: process.env.R2_DOMAIN,
         },
         aiGateway: {
             apiKey: process.env.AI_GATEWAY_API_KEY,
@@ -47,15 +48,12 @@ export default defineNuxtConfig({
             clientId: process.env.GITHUB_CLIENT_ID,
             clientSecret: process.env.GITHUB_CLIENT_SECRET,
         },
-        tigrisStorage: {
-            accessKeyId: process.env.TIGRIS_STORAGE_ACCESS_KEY_ID,
-            secretAccessKey: process.env.TIGRIS_STORAGE_SECRET_ACCESS_KEY,
-            bucket: process.env.TIGRIS_STORAGE_BUCKET,
-            domain: process.env.TIGRIS_STORAGE_DOMAIN,
-        },
-        turso: {
-            databaseUrl: process.env.TURSO_DATABASE_URL,
-            authToken: process.env.TURSO_AUTH_TOKEN,
+        r2: {
+            accountId: process.env.R2_ACCOUNT_ID,
+            accessKeyId: process.env.R2_ACCESS_KEY_ID,
+            secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
+            bucket: process.env.R2_BUCKET,
+            domain: process.env.R2_DOMAIN,
         },
         vercel: {
             clientId: process.env.VERCEL_CLIENT_ID,
@@ -75,7 +73,6 @@ export default defineNuxtConfig({
         },
         optimizeDeps: {
             include: [
-                // 'drizzle-orm',
                 '@nuxt/ui > prosemirror-state',
                 '@nuxt/ui > prosemirror-transform',
                 '@nuxt/ui > prosemirror-model',
@@ -86,22 +83,47 @@ export default defineNuxtConfig({
     },
 
     nitro: {
-        preset: 'vercel',
-        compressPublicAssets: true,
-        vercel: {
-            config: {
-                images: {
-                    minimumCacheTTL: 2678400, // 31 days
+        preset: 'cloudflare_module',
+        cloudflare: {
+            deployConfig: true,
+            nodeCompat: true,
+            wrangler: {
+                name: 'liry24-com',
+                routes: [
+                    {
+                        pattern: withoutProtocol(baseURL),
+                        custom_domain: true,
+                    },
+                ],
+                d1_databases: [
+                    {
+                        binding: 'DB',
+                        database_name: process.env.D1_NAME!,
+                        database_id: process.env.D1_ID!,
+                    },
+                ],
+                r2_buckets: [
+                    {
+                        binding: 'R2',
+                        bucket_name: process.env.R2_BUCKET!,
+                    },
+                ],
+                kv_namespaces: [
+                    {
+                        binding: 'KV',
+                        id: process.env.KV_ID!,
+                    },
+                ],
+                vars: {
+                    NUXT_PUBLIC_SITE_URL: baseURL,
                 },
             },
         },
-        // externals: {
-        //     inline: ['drizzle-orm'],
-        // },
+        compressPublicAssets: true,
         storage: {
             auth: {
-                driver: 'vercel-runtime-cache',
-                tags: ['auth'],
+                driver: 'cloudflare-kv-binding',
+                binding: 'AUTH_KV',
             },
         },
         devStorage: {
@@ -118,6 +140,7 @@ export default defineNuxtConfig({
     typescript: {
         // typeCheck: true,
         tsConfig: {
+            include: ['../drizzle.config.*'],
             compilerOptions: {
                 noUncheckedIndexedAccess: true,
             },
@@ -143,17 +166,6 @@ export default defineNuxtConfig({
                 { name: 'viewport', content: 'width=device-width, initial-scale=1' },
             ],
         },
-    },
-
-    content: {
-        build: {
-            markdown: {
-                remarkPlugins: {
-                    'remark-breaks': {},
-                },
-            },
-        },
-        experimental: { sqliteConnector: 'native' },
     },
 
     icon: {
@@ -196,10 +208,11 @@ export default defineNuxtConfig({
     },
 
     image: {
-        domains: [
-            parseURL(process.env.TIGRIS_STORAGE_DOMAIN).host!,
-            'avatars.githubusercontent.com',
-        ],
+        provider: 'cloudflare',
+        cloudflare: {
+            baseURL,
+        },
+        domains: [parseURL(process.env.R2_DOMAIN).host!, 'avatars.githubusercontent.com'],
     },
 
     sitemap: {

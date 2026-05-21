@@ -1,5 +1,3 @@
-import { skills } from '@repo/database/schema'
-
 const request = {
     body: skillsInsertSchema,
 }
@@ -7,7 +5,7 @@ const request = {
 export default adminSessionEventHandler(async () => {
     const { name, icon, category } = await validateBody(request.body)
 
-    await db.insert(skills).values({
+    await db.insert(schema.skills).values({
         name,
         icon,
         category,

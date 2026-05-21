@@ -1,4 +1,3 @@
-import { works } from '@repo/database/schema'
 import { generateText } from 'ai'
 import { sql } from 'drizzle-orm'
 
@@ -43,7 +42,7 @@ export default adminSessionEventHandler(async () => {
         generatedSlug = result.text.trim()
     }
 
-    await db.insert(works).values({
+    await db.insert(schema.works).values({
         slug: slug || generatedSlug,
         title,
         description,

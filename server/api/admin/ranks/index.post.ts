@@ -1,5 +1,3 @@
-import { ranks } from '@repo/database/schema'
-
 const request = {
     body: ranksInsertSchema,
 }
@@ -7,7 +5,7 @@ const request = {
 export default adminSessionEventHandler(async () => {
     const { game, season, rank, href, imageUrl } = await validateBody(request.body)
 
-    await db.insert(ranks).values({
+    await db.insert(schema.ranks).values({
         game,
         season,
         rank,

@@ -1,4 +1,3 @@
-import { ranks as ranksTable } from '@repo/database/schema'
 import z from 'zod'
 
 const request = {
@@ -11,8 +10,8 @@ export default adminSessionEventHandler(async () => {
     const { ranks } = await validateBody(request.body)
 
     await db.transaction(async (tx) => {
-        await tx.delete(ranksTable)
-        await tx.insert(ranksTable).values(ranks)
+        await tx.delete(schema.ranks)
+        await tx.insert(schema.ranks).values(ranks)
     })
 
     return {

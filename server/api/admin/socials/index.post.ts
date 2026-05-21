@@ -1,5 +1,3 @@
-import { socials } from '@repo/database/schema'
-
 const request = {
     body: socialsInsertSchema,
 }
@@ -7,7 +5,7 @@ const request = {
 export default adminSessionEventHandler(async () => {
     const { href, alias, label, icon } = await validateBody(request.body)
 
-    await db.insert(socials).values({
+    await db.insert(schema.socials).values({
         href,
         alias,
         label,
