@@ -156,25 +156,11 @@ const sidebarCollapsed = ref(false)
                                 label: 'GitHub',
                             },
                             {
-                                to: app.vercel,
-                                target: '_blank',
-                                external: true,
-                                icon: 'mingcute:triangle-fill',
-                                label: 'Vercel',
-                            },
-                            {
                                 to: app.turso,
                                 target: '_blank',
                                 external: true,
                                 icon: 'mingcute:coin-2-fill',
                                 label: 'Turso',
-                            },
-                            {
-                                to: app.tigris,
-                                target: '_blank',
-                                external: true,
-                                icon: 'mingcute:storage-fill',
-                                label: 'Tigris',
                             },
                             {
                                 to: '/',

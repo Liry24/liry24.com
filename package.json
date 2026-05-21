@@ -57,7 +57,8 @@
         "oxlint-tsgolint": "^0.23.0",
         "taze": "^19.13.0",
         "typescript": "^6.0.3",
-        "vue-tsc": "^3.3.1"
+        "vue-tsc": "^3.3.1",
+        "wrangler": "^4.93.0"
     },
     "overrides": {
         "vite": "^8.0.0",

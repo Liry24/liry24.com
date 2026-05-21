@@ -10,7 +10,7 @@ export const auth = betterAuth({
     secret: process.env.BETTER_AUTH_SECRET,
 
     baseURL: {
-        allowedHosts: ['localhost:3000', process.env.ADMIN_DOMAIN!, '*.workers.dev'],
+        allowedHosts: ['localhost:3000', 'liry24.com', '*.workers.dev'],
     },
 
     database: drizzleAdapter(db, {

@@ -64,7 +64,7 @@ const handleMouseLeave = () => {
                         <NuxtImg
                             v-if="route.path === '/'"
                             v-slot="{ src, imgAttrs, isLoaded }"
-                            src="https://images.liry24.com/avatar.png"
+                            src="/avatar.png"
                             alt=""
                             class="aspect-square size-14 rounded-full object-cover"
                         >
