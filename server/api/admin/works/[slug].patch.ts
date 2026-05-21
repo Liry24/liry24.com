@@ -26,8 +26,6 @@ export default adminSessionEventHandler(async () => {
         })
         .where(eq(works.slug, workSlug))
 
-    await revalidateISR()
-
     return {
         success: true,
     }

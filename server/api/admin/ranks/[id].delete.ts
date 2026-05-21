@@ -10,8 +10,6 @@ export default adminSessionEventHandler(async () => {
 
     await db.delete(ranks).where(eq(ranks.id, id))
 
-    await revalidateISR()
-
     return {
         success: true,
     }

@@ -20,8 +20,6 @@ export default adminSessionEventHandler(async () => {
         })
         .where(eq(skills.id, id))
 
-    await revalidateISR()
-
     return {
         success: true,
     }

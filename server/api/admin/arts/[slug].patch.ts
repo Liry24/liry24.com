@@ -35,8 +35,6 @@ export default adminSessionEventHandler(async () => {
         }
     })
 
-    await revalidateISR()
-
     return {
         success: true,
     }

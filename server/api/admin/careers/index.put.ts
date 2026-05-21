@@ -15,8 +15,6 @@ export default adminSessionEventHandler(async () => {
         await tx.insert(careersTable).values(careers)
     })
 
-    await revalidateISR()
-
     return {
         success: true,
     }

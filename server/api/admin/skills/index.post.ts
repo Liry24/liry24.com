@@ -13,8 +13,6 @@ export default adminSessionEventHandler(async () => {
         category,
     })
 
-    await revalidateISR()
-
     return {
         success: true,
     }

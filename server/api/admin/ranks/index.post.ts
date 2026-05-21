@@ -15,8 +15,6 @@ export default adminSessionEventHandler(async () => {
         imageUrl,
     })
 
-    await revalidateISR()
-
     return {
         success: true,
     }

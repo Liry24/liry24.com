@@ -16,8 +16,6 @@ export default adminSessionEventHandler(async () => {
         await tx.delete(posts).where(eq(posts.slug, slug))
     })
 
-    await revalidateISR()
-
     return {
         success: true,
     }

@@ -14,7 +14,6 @@ export default adminSessionEventHandler(async () => {
         icon,
     })
 
-    await revalidateISR()
     await purgeRuntimeCache()
 
     return {

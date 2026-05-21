@@ -13,8 +13,6 @@ export default adminSessionEventHandler(async () => {
         company,
     })
 
-    await revalidateISR()
-
     return {
         success: true,
     }

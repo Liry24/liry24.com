@@ -54,8 +54,6 @@ export default adminSessionEventHandler(async () => {
         sortIndex: sortIndex || sql`coalesce(max(sortIndex), 0) + 1`,
     })
 
-    await revalidateISR()
-
     return {
         success: true,
     }

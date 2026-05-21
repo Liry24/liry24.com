@@ -15,8 +15,6 @@ export default adminSessionEventHandler(async () => {
         await tx.insert(ranksTable).values(ranks)
     })
 
-    await revalidateISR()
-
     return {
         success: true,
     }

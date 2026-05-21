@@ -22,8 +22,6 @@ export default adminSessionEventHandler(async () => {
         })
         .where(eq(ranks.id, id))
 
-    await revalidateISR()
-
     return {
         success: true,
     }

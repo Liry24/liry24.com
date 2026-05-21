@@ -15,7 +15,6 @@ export default adminSessionEventHandler(async () => {
         await tx.insert(socials).values(links)
     })
 
-    await revalidateISR()
     await purgeRuntimeCache()
 
     return {

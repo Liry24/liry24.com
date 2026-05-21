@@ -53,8 +53,6 @@ export default adminSessionEventHandler(async () => {
             )
     })
 
-    await revalidateISR()
-
     return {
         success: true,
         slug: slug || generatedSlug,
