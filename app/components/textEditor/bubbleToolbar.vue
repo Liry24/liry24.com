@@ -10,7 +10,7 @@ const props = defineProps<Props>()
 const bubbleToolbarItems = computed<EditorToolbarItem[][]>(() => [
     [
         {
-            icon: 'lucide:heading',
+            icon: 'mingcute:hashtag-line',
             tooltip: { text: 'Headings' },
             content: {
                 align: 'start',
@@ -19,26 +19,20 @@ const bubbleToolbarItems = computed<EditorToolbarItem[][]>(() => [
                 {
                     kind: 'heading',
                     level: 1,
-                    icon: 'lucide:heading-1',
+                    icon: 'mingcute:heading-1-line',
                     label: 'Heading 1',
                 },
                 {
                     kind: 'heading',
                     level: 2,
-                    icon: 'lucide:heading-2',
+                    icon: 'mingcute:heading-2-line',
                     label: 'Heading 2',
                 },
                 {
                     kind: 'heading',
                     level: 3,
-                    icon: 'lucide:heading-3',
+                    icon: 'mingcute:heading-3-line',
                     label: 'Heading 3',
-                },
-                {
-                    kind: 'heading',
-                    level: 4,
-                    icon: 'lucide:heading-4',
-                    label: 'Heading 4',
                 },
             ],
         },
@@ -47,31 +41,31 @@ const bubbleToolbarItems = computed<EditorToolbarItem[][]>(() => [
         {
             kind: 'mark',
             mark: 'bold',
-            icon: 'lucide:bold',
+            icon: 'mingcute:bold-line',
             tooltip: { text: 'Bold' },
         },
         {
             kind: 'mark',
             mark: 'italic',
-            icon: 'lucide:italic',
+            icon: 'mingcute:italic-line',
             tooltip: { text: 'Italic' },
         },
         {
             kind: 'mark',
             mark: 'underline',
-            icon: 'lucide:underline',
+            icon: 'mingcute:underline-line',
             tooltip: { text: 'Underline' },
         },
         {
             kind: 'mark',
             mark: 'strike',
-            icon: 'lucide:strikethrough',
+            icon: 'mingcute:strikethrough-line',
             tooltip: { text: 'Strikethrough' },
         },
         {
             kind: 'mark',
             mark: 'code',
-            icon: 'lucide:code',
+            icon: 'mingcute:code-line',
             tooltip: { text: 'Code' },
         },
     ],

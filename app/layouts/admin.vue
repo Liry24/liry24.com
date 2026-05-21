@@ -179,7 +179,7 @@ const sidebarCollapsed = ref(false)
                             {
                                 to: '/',
                                 label: 'Back to site',
-                                icon: 'lucide:arrow-left',
+                                icon: 'mingcute:arrow-left-line',
                             },
                         ]"
                         :collapsed
@@ -214,7 +214,7 @@ const sidebarCollapsed = ref(false)
                                 v-if="collapsed"
                                 :src="session?.user.image || undefined"
                                 :alt="session?.user.name || undefined"
-                                icon="lucide:user-round"
+                                icon="mingcute:user-3-fill"
                                 size="sm"
                             />
                             <UUser
@@ -224,7 +224,7 @@ const sidebarCollapsed = ref(false)
                                 :avatar="{
                                     src: session?.user.image || undefined,
                                     alt: session?.user.name || undefined,
-                                    icon: 'lucide:user-round',
+                                    icon: 'mingcute:user-3-fill',
                                 }"
                                 size="sm"
                                 class="text-left"

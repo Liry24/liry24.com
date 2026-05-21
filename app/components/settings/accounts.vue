@@ -9,12 +9,12 @@ const list = [
     {
         providerId: 'github',
         name: 'GitHub',
-        icon: 'simple-icons:github',
+        icon: 'mingcute:github-fill',
     },
     {
         providerId: 'vercel',
         name: 'Vercel',
-        icon: 'simple-icons:vercel',
+        icon: 'mingcute:triangle-fill',
     },
 ]
 
@@ -28,14 +28,14 @@ const unlink = async (providerId: string) => {
         accounts.value = (await client.listAccounts()).data || []
 
         toast.add({
-            icon: 'lucide:check',
+            icon: 'mingcute:check-line',
             title: 'Account unlinked successfully',
             color: 'success',
         })
     } catch (error) {
         console.error(error)
         toast.add({
-            icon: 'lucide:x',
+            icon: 'mingcute:close-line',
             title: 'Failed to unlink account',
             color: 'error',
         })

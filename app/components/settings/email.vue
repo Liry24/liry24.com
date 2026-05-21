@@ -19,7 +19,7 @@ const requestChangeEmail = async () => {
     const parseResult = z.email().safeParse(newEmail.value)
     if (!parseResult.success) {
         toast.add({
-            icon: 'lucide:x',
+            icon: 'mingcute:close-line',
             title: 'Invalid email',
             description: 'Please enter a valid email address.',
             color: 'error',
@@ -34,7 +34,7 @@ const requestChangeEmail = async () => {
         })
         emailChangeEmailSent.value = true
         toast.add({
-            icon: 'lucide:check',
+            icon: 'mingcute:check-line',
             title: 'Email change email sent',
             description:
                 'Check your inbox and click the link in the email to complete the email address change.',
@@ -42,7 +42,7 @@ const requestChangeEmail = async () => {
         })
     } catch {
         toast.add({
-            icon: 'lucide:x',
+            icon: 'mingcute:close-line',
             title: 'Failed to send email',
             description: 'Please try again later.',
             color: 'error',
@@ -60,14 +60,14 @@ const requestPasswordReset = async () => {
         })
         passwordResetEmailSent.value = true
         toast.add({
-            icon: 'lucide:check',
+            icon: 'mingcute:check-line',
             title: 'Password reset email sent',
             description: 'Check your inbox and click the link in the email to reset your password.',
             color: 'success',
         })
     } catch {
         toast.add({
-            icon: 'lucide:x',
+            icon: 'mingcute:close-line',
             title: 'Failed to send email',
             description: 'Please try again later.',
             color: 'error',
@@ -91,7 +91,7 @@ watch(passwordResetEmailSent, (value) => {
 
                 <UBadge
                     v-if="props.session.user.emailVerified"
-                    icon="lucide:check"
+                    icon="mingcute:check-line"
                     label="Email verified"
                     variant="soft"
                     color="success"
@@ -149,7 +149,7 @@ watch(passwordResetEmailSent, (value) => {
                 variant="naked"
             >
                 <UButton
-                    :icon="passwordResetEmailSent ? 'lucide:check' : undefined"
+                    :icon="passwordResetEmailSent ? 'mingcute:check-line' : undefined"
                     :label="passwordResetEmailSent ? 'Email sent' : 'Password reset'"
                     :color="passwordResetEmailSent ? 'success' : 'neutral'"
                     variant="subtle"

@@ -149,7 +149,7 @@ const onSubmit = async () => {
                 <UFormField label="Icon" name="icon">
                     <UInput
                         v-model="state.icon"
-                        placeholder="lucide:globe"
+                        placeholder="mingcute:world-2-fill"
                         variant="soft"
                         class="w-full"
                     >

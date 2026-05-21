@@ -68,7 +68,7 @@ const scrollToBottom = () => {
 
         <UButton
             v-if="!isAtBottom && props.autoScroll"
-            icon="lucide:arrow-down"
+            icon="mingcute:arrow-down-line"
             label="Latest"
             color="neutral"
             class="absolute right-4 bottom-4 rounded-full px-4"

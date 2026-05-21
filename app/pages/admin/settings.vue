@@ -75,7 +75,7 @@ const { session } = useAuth()
 
                                 <template #body>
                                     <UAlert
-                                        icon="lucide:trash"
+                                        icon="mingcute:delete-fill"
                                         title="Are you sure you want to delete your account?"
                                         description="This action cannot be undone."
                                         color="error"

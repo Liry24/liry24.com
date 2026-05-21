@@ -16,25 +16,25 @@ const suggestionItems = computed<EditorSuggestionMenuItem[][]>(() => [
         {
             kind: 'paragraph',
             label: 'Paragraph',
-            icon: 'lucide:type',
+            icon: 'mingcute:text-line',
         },
         {
             kind: 'heading',
             level: 1,
             label: 'Heading 1',
-            icon: 'lucide:heading-1',
+            icon: 'mingcute:heading-1-line',
         },
         {
             kind: 'heading',
             level: 2,
             label: 'Heading 2',
-            icon: 'lucide:heading-2',
+            icon: 'mingcute:heading-2-line',
         },
         {
             kind: 'heading',
             level: 3,
             label: 'Heading 3',
-            icon: 'lucide:heading-3',
+            icon: 'mingcute:heading-3-line',
         },
     ],
     [
@@ -45,12 +45,12 @@ const suggestionItems = computed<EditorSuggestionMenuItem[][]>(() => [
         {
             kind: 'bulletList',
             label: 'Bullet List',
-            icon: 'lucide:list',
+            icon: 'mingcute:list-check-line',
         },
         {
             kind: 'orderedList',
             label: 'Numbered List',
-            icon: 'lucide:list-ordered',
+            icon: 'mingcute:list-ordered-line',
         },
     ],
     [
@@ -61,17 +61,17 @@ const suggestionItems = computed<EditorSuggestionMenuItem[][]>(() => [
         {
             kind: 'blockquote',
             label: 'Blockquote',
-            icon: 'lucide:text-quote',
+            icon: 'mingcute:quote-right-line',
         },
         {
             kind: 'codeBlock',
             label: 'Code Block',
-            icon: 'lucide:square-code',
+            icon: 'mingcute:code-line',
         },
         {
             kind: 'horizontalRule',
             label: 'Divider',
-            icon: 'lucide:separator-horizontal',
+            icon: 'mingcute:dividing-line-line',
         },
     ],
 ])

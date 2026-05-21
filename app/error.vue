@@ -26,7 +26,7 @@ const props = defineProps({
             <UButton
                 to="/"
                 label="Back to Home"
-                icon="lucide:arrow-left"
+                icon="mingcute:arrow-left-line"
                 variant="soft"
                 size="lg"
                 class="mt-4"
