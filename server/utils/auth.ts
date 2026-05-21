@@ -1,6 +1,6 @@
 import { drizzleAdapter } from '@better-auth/drizzle-adapter'
 import { passkey } from '@better-auth/passkey'
-import { db, schema } from '@repo/database'
+import { schema } from '@repo/database'
 import { betterAuth } from 'better-auth/minimal'
 import { admin, lastLoginMethod } from 'better-auth/plugins'
 
@@ -9,7 +9,7 @@ export const auth = betterAuth({
     secret: process.env.BETTER_AUTH_SECRET,
 
     baseURL: {
-        allowedHosts: ['localhost:3000', process.env.ADMIN_DOMAIN!, '*.vercel.app'],
+        allowedHosts: ['localhost:3000', process.env.ADMIN_DOMAIN!, '*.workers.dev'],
     },
 
     database: drizzleAdapter(db, {
