@@ -1,7 +1,15 @@
-import { PhotonImage, resize, SamplingFilter } from '@cf-wasm/photon'
 import { z } from 'zod'
 
-const AVATAR_REGEX = /^\/avatar\.(png|jpg|jpeg|webp|avif)$/i
+const AVATAR_REGEX = /^\/avatar\.(png|jpg|jpeg|webp)$/i
+
+const formatToWsrv = {
+    jpeg: 'jpg',
+    jpg: 'jpg',
+    png: 'png',
+    webp: 'webp',
+} as const
+
+type AvatarFormat = keyof typeof formatToWsrv
 
 const sizeValidator = z
     .union([z.string().regex(/^\d+$/), z.number()])
@@ -26,50 +34,25 @@ export default defineEventHandler(async (event) => {
 
     if (!match) return
 
-    const format = match[1]?.toLowerCase()
+    const format = match[1]!.toLowerCase() as AvatarFormat
 
-    try {
-        const result = await getValidatedQuery(event, (q) => query.safeParse(q))
-        if (!result.success) throw serverError.badRequest()
+    const result = await getValidatedQuery(event, (q) => query.safeParse(q))
+    if (!result.success) throw serverError.badRequest()
 
-        const { size } = result.data
+    const params = new URLSearchParams({
+        url: `${config.public.imagesDomain}/avatar.png`,
+        w: String(result.data.size),
+        h: String(result.data.size),
+        fit: 'inside',
+        output: formatToWsrv[format],
+    })
 
-        const imageBlob = await $fetch<Blob>('/avatar.png', {
-            baseURL: config.public.imagesDomain,
-        })
+    const upstream = await fetch(`https://wsrv.nl/?${params}&we`)
 
-        if (!imageBlob) throw serverError.internalServerError()
-
-        const imageBytes = new Uint8Array(await imageBlob.arrayBuffer())
-        const photonImage = PhotonImage.new_from_byteslice(imageBytes)
-        const resized = resize(photonImage, size, size, SamplingFilter.Lanczos3)
-
-        let outputBytes: Uint8Array
-        let contentType: string
-
-        if (format === 'webp') {
-            outputBytes = resized.get_bytes_webp()
-            contentType = 'image/webp'
-        } else if (format === 'avif') {
-            outputBytes = resized.get_bytes_webp()
-            contentType = 'image/webp'
-        } else if (format === 'jpg' || format === 'jpeg') {
-            outputBytes = resized.get_bytes_jpeg(90)
-            contentType = 'image/jpeg'
-        } else {
-            outputBytes = resized.get_bytes()
-            contentType = 'image/png'
-        }
-
-        photonImage.free()
-        resized.free()
-
-        setResponseHeader(event, 'Content-Type', contentType)
-        setResponseHeader(event, 'CDN-Cache-Control', `max-age=${60 * 60 * 24 * 30}`)
-        return outputBytes
-    } catch (error) {
-        if (isError(error)) throw error
-        console.error('Error processing avatar image:', error)
-        throw serverError.internalServerError()
-    }
+    return new Response(upstream.body, {
+        status: upstream.status,
+        headers: {
+            'Content-Type': upstream.headers.get('Content-Type') ?? 'application/octet-stream',
+        },
+    })
 })
