@@ -1,5 +1,6 @@
 import { generateText } from 'ai'
 import { sql } from 'drizzle-orm'
+import { createWorkersAI } from 'workers-ai-provider'
 
 const request = {
     body: worksInsertSchema,
@@ -27,8 +28,9 @@ export default adminSessionEventHandler(async () => {
                 content: `The short slug must not overlap with any of the existing slugs: ${exists.map((b) => b.slug).join(', ')}`,
             })
 
+        const workersai = createWorkersAI({ binding: useEvent().context.cloudflare.env.AI })
         const result = await generateText({
-            model: 'google/gemini-3-flash',
+            model: workersai('@cf/google/gemini-3.1-flash-lite'),
             messages: [
                 ...messages,
                 {

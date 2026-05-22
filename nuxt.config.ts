@@ -116,6 +116,9 @@ export default defineNuxtConfig({
                         id: process.env.KV_ID!,
                     },
                 ],
+                ai: {
+                    binding: 'AI',
+                },
                 vars: {
                     NUXT_PUBLIC_SITE_URL: baseURL,
                     D1_NAME: 'liry24-com',
