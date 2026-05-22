@@ -116,6 +116,15 @@ export default defineNuxtConfig({
                 ],
                 vars: {
                     NUXT_PUBLIC_SITE_URL: baseURL,
+                    D1_NAME: 'liry24-com',
+                    R2_BUCKET: 'liry24-com',
+                    R2_DOMAIN: 'https://images.liry24.com',
+                },
+                observability: {
+                    logs: {
+                        enabled: true,
+                        invocation_logs: true,
+                    },
                 },
             },
         },
@@ -123,7 +132,7 @@ export default defineNuxtConfig({
         storage: {
             auth: {
                 driver: 'cloudflare-kv-binding',
-                binding: 'AUTH_KV',
+                binding: 'KV',
             },
         },
         devStorage: {

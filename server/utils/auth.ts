@@ -131,3 +131,11 @@ export const auth = betterAuth({
 })
 
 export type Session = Awaited<ReturnType<typeof auth.api.getSession>>
+
+// Load the reflect polyfill before importing Better Auth's passkey stack in Workers.
+export const getAuth = async () => {
+    await import('reflect-metadata')
+    const { auth } = await import('./auth')
+
+    return auth
+}

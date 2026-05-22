@@ -1,5 +1,3 @@
-import { getAuth } from '../../utils/authRuntime'
-
 export default adminSessionEventHandler(async () => {
     const { headers } = useEvent()
     const auth = await getAuth()

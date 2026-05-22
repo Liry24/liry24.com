@@ -1,7 +1,4 @@
 import type { H3Event } from 'h3'
-import type { Session } from './auth'
-
-import { getAuth } from './authRuntime'
 
 export const promiseEventHandler = <T = unknown>(
     handler: ({ event }: { event: H3Event }) => Promise<T> | T,
