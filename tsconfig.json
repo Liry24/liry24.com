@@ -1,15 +1,9 @@
 {
-    "compilerOptions": {
-        "target": "ESNext",
-        "module": "ESNext",
-        "moduleResolution": "bundler",
-        "strict": true,
-        "noEmit": true,
-        "skipLibCheck": true
-    },
-    "include": [],
+    "files": [],
     "references": [
-        { "path": "./packages/database" },
-        { "path": "./packages/nuxt" }
+        { "path": "./.nuxt/tsconfig.app.json" },
+        { "path": "./.nuxt/tsconfig.server.json" },
+        { "path": "./.nuxt/tsconfig.shared.json" },
+        { "path": "./.nuxt/tsconfig.node.json" }
     ]
 }
