@@ -1,6 +1,7 @@
 import { parseURL, withoutProtocol } from 'ufo'
 
 const baseURL = import.meta.env.NUXT_PUBLIC_SITE_URL || 'https://liry24.com'
+const imagesDomain = 'https://images.liry24.com'
 const title = 'Liry24'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
@@ -34,7 +35,8 @@ export default defineNuxtConfig({
 
     runtimeConfig: {
         public: {
-            imagesDomain: process.env.R2_DOMAIN,
+            siteURL: baseURL,
+            imagesDomain,
         },
         aiGateway: {
             apiKey: process.env.AI_GATEWAY_API_KEY,
@@ -118,7 +120,7 @@ export default defineNuxtConfig({
                     NUXT_PUBLIC_SITE_URL: baseURL,
                     D1_NAME: 'liry24-com',
                     R2_BUCKET: 'liry24-com',
-                    R2_DOMAIN: 'https://images.liry24.com',
+                    R2_DOMAIN: imagesDomain,
                 },
                 observability: {
                     logs: {
