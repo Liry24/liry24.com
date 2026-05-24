@@ -61,7 +61,6 @@ defineSeo({
                 }"
                 :src="art.images[0]?.src"
                 :alt="art.title"
-                :width="320"
                 :height="320"
                 format="webp"
                 class="aspect-square size-64 cursor-pointer rounded-xl object-cover md:size-72 lg:size-80"
