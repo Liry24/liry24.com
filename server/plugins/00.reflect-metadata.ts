@@ -1,3 +1,3 @@
-import 'reflect-metadata'
-
-export default defineNitroPlugin(() => {})
+export default defineNitroPlugin(async () => {
+    await import('reflect-metadata')
+})

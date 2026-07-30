@@ -85,6 +85,7 @@ export default defineNuxtConfig({
 
     nitro: {
         preset: 'cloudflare_module',
+        plugins: ['~~/server/plugins/00.reflect-metadata'],
         cloudflare: {
             deployConfig: true,
             nodeCompat: true,
