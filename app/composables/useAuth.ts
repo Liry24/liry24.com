@@ -1,10 +1,10 @@
 import { passkeyClient } from '@better-auth/passkey/client'
-import { adminClient, lastLoginMethodClient, twoFactorClient } from 'better-auth/client/plugins'
+import { adminClient, lastLoginMethodClient } from 'better-auth/client/plugins'
 import { createAuthClient } from 'better-auth/vue'
 import { withoutHost } from 'ufo'
 
 export const authClient = createAuthClient({
-    plugins: [twoFactorClient(), passkeyClient(), adminClient(), lastLoginMethodClient()],
+    plugins: [passkeyClient(), adminClient(), lastLoginMethodClient()],
 })
 
 type Session = typeof authClient.$Infer.Session

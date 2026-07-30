@@ -8,5 +8,6 @@ export const storage = new Files({
         secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
         bucket: process.env.R2_BUCKET!,
         publicBaseUrl: process.env.R2_DOMAIN!,
+        client: 'fetch',
     }),
 })

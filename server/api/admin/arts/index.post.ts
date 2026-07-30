@@ -40,24 +40,28 @@ export default adminSessionEventHandler(async () => {
         generatedSlug = result.text.trim()
     }
 
-    await db.transaction(async (tx) => {
-        await tx.insert(schema.arts).values({
-            slug: slug || generatedSlug,
-            title,
-            description,
-            href,
-        })
-
-        await tx.insert(schema.artImages).values(
-            images.map((image) => ({
-                artSlug: slug || generatedSlug,
-                src: image.src,
-                alt: image.alt,
-            })),
-        )
+    const artSlug = slug || generatedSlug
+    const insertArt = db.insert(schema.arts).values({
+        slug: artSlug,
+        title,
+        description,
+        href,
     })
 
+    if (images.length)
+        await db.batch([
+            insertArt,
+            db.insert(schema.artImages).values(
+                images.map((image) => ({
+                    artSlug,
+                    src: image.src,
+                    alt: image.alt,
+                })),
+            ),
+        ])
+    else await insertArt
+
     return {
-        slug: slug || generatedSlug,
+        slug: artSlug,
     }
 })

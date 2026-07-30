@@ -9,26 +9,24 @@ const request = {
 export default adminSessionEventHandler(async () => {
     const { arts } = await validateBody(request.body)
 
-    await db.transaction(async (tx) => {
-        await tx.delete(schema.arts)
+    const deleteArts = db.delete(schema.arts)
+    if (arts.length === 0) await deleteArts
+    else {
+        const images = arts.flatMap((art) =>
+            art.images.map((image) => ({
+                artSlug: art.slug,
+                src: image.src,
+                alt: image.alt,
+            })),
+        )
+        const insertArts = db
+            .insert(schema.arts)
+            .values(arts.map(({ images: _images, ...art }) => art))
 
-        for (const art of arts) {
-            const [result] = await tx
-                .insert(schema.arts)
-                .values(art)
-                .returning({ slug: schema.arts.slug })
-
-            if (!result) return tx.rollback()
-
-            await tx.insert(schema.artImages).values(
-                art.images.map((image) => ({
-                    artSlug: result.slug,
-                    src: image.src,
-                    alt: image.alt,
-                })),
-            )
-        }
-    })
+        if (images.length)
+            await db.batch([deleteArts, insertArts, db.insert(schema.artImages).values(images)])
+        else await db.batch([deleteArts, insertArts])
+    }
 
     return {
         success: true,

@@ -40,5 +40,12 @@ export const adminSessionEventHandler = <T = unknown>(
     sessionEventHandler(async ({ event, session }) => {
         if (!session || session.user.role !== 'admin') throw serverError.forbidden()
 
-        return await handler({ event, session })
+        const result = await handler({ event, session })
+
+        if (event.method !== 'GET' && event.method !== 'HEAD') {
+            const tags = getAdminMutationCacheTags(getRequestURL(event).pathname)
+            event.context.cloudflare.context.waitUntil(purgePublicCache(tags))
+        }
+
+        return result
     })

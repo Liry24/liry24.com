@@ -45,7 +45,6 @@ export default defineNuxtConfig({
         betterAuth: {
             secret: process.env.BETTER_AUTH_SECRET,
         },
-        bypassToken: process.env.BYPASS_TOKEN,
         github: {
             clientId: process.env.GITHUB_CLIENT_ID,
             clientSecret: process.env.GITHUB_CLIENT_SECRET,
@@ -89,6 +88,10 @@ export default defineNuxtConfig({
         cloudflare: {
             deployConfig: true,
             nodeCompat: true,
+            dev: {
+                configPath: './.data/wrangler.dev.jsonc',
+                persistDir: './.data/wrangler/state/v3',
+            },
             wrangler: {
                 name: 'liry24-com',
                 routes: [
@@ -102,18 +105,20 @@ export default defineNuxtConfig({
                         binding: 'DB',
                         database_name: process.env.D1_NAME!,
                         database_id: process.env.D1_ID!,
+                        migrations_dir: '../../drizzle',
+                        migrations_pattern: '../../drizzle/*/migration.sql',
+                    } as {
+                        binding: string
+                        database_name: string
+                        database_id: string
+                        migrations_dir: string
+                        migrations_pattern: string
                     },
                 ],
                 r2_buckets: [
                     {
                         binding: 'R2',
                         bucket_name: process.env.R2_BUCKET!,
-                    },
-                ],
-                kv_namespaces: [
-                    {
-                        binding: 'KV',
-                        id: process.env.KV_ID!,
                     },
                 ],
                 ai: {
@@ -131,21 +136,14 @@ export default defineNuxtConfig({
                         invocation_logs: true,
                     },
                 },
+                // @ts-expect-error Nitro's bundled Wrangler types do not include Workers Caching yet.
+                cache: {
+                    enabled: true,
+                    cross_version_cache: false,
+                },
             },
         },
         compressPublicAssets: true,
-        storage: {
-            auth: {
-                driver: 'cloudflare-kv-binding',
-                binding: 'KV',
-            },
-        },
-        devStorage: {
-            auth: {
-                driver: 'fs-lite',
-                base: '.data/devStorage/auth',
-            },
-        },
         experimental: {
             asyncContext: true,
         },
@@ -157,6 +155,7 @@ export default defineNuxtConfig({
             include: ['../drizzle.config.*', '../database/*'],
             compilerOptions: {
                 noUncheckedIndexedAccess: true,
+                types: ['@cloudflare/workers-types'],
             },
         },
     },

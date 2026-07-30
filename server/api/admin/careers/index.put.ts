@@ -9,10 +9,9 @@ const request = {
 export default adminSessionEventHandler(async () => {
     const { careers } = await validateBody(request.body)
 
-    await db.transaction(async (tx) => {
-        await tx.delete(schema.careers)
-        await tx.insert(schema.careers).values(careers)
-    })
+    if (careers.length)
+        await db.batch([db.delete(schema.careers), db.insert(schema.careers).values(careers)])
+    else await db.delete(schema.careers)
 
     return {
         success: true,

@@ -10,10 +10,10 @@ const request = {
 export default adminSessionEventHandler(async () => {
     const { slug } = await validateParams(request.params)
 
-    await db.transaction(async (tx) => {
-        await tx.delete(schema.postTags).where(eq(schema.postTags.postSlug, slug))
-        await tx.delete(schema.posts).where(eq(schema.posts.slug, slug))
-    })
+    await db.batch([
+        db.delete(schema.postTags).where(eq(schema.postTags.postSlug, slug)),
+        db.delete(schema.posts).where(eq(schema.posts.slug, slug)),
+    ])
 
     return {
         success: true,

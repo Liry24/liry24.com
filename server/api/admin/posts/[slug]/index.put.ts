@@ -12,7 +12,7 @@ export default adminSessionEventHandler(async () => {
     const { slug } = await validateParams(request.params)
     const { title, tags, content } = await validateBody(request.body)
 
-    await db
+    const updatePost = db
         .update(schema.posts)
         .set({
             title,
@@ -20,15 +20,19 @@ export default adminSessionEventHandler(async () => {
         })
         .where(eq(schema.posts.slug, slug))
 
-    await db.delete(schema.postTags).where(eq(schema.postTags.postSlug, slug))
-    if (tags) {
-        await db.insert(schema.postTags).values(
-            tags.map((tag) => ({
-                postSlug: slug,
-                tag,
-            })),
-        )
-    }
+    const deleteTags = db.delete(schema.postTags).where(eq(schema.postTags.postSlug, slug))
+    if (tags?.length)
+        await db.batch([
+            updatePost,
+            deleteTags,
+            db.insert(schema.postTags).values(
+                tags.map((tag) => ({
+                    postSlug: slug,
+                    tag,
+                })),
+            ),
+        ])
+    else await db.batch([updatePost, deleteTags])
 
     return {
         success: true,
