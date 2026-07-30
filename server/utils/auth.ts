@@ -1,4 +1,3 @@
-import 'reflect-metadata'
 import { drizzleAdapter } from '@better-auth/drizzle-adapter'
 import { passkey } from '@better-auth/passkey'
 import { betterAuth } from 'better-auth/minimal'
