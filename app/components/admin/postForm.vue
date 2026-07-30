@@ -6,12 +6,6 @@ export type Schema = z.infer<typeof schema>
 
 const model = defineModel<Schema>({
     required: true,
-    default: {
-        slug: '',
-        title: '',
-        tags: [],
-        content: '',
-    },
 })
 
 interface Props {

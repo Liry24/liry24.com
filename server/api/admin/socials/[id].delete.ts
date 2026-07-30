@@ -9,8 +9,6 @@ export default adminSessionEventHandler(async () => {
 
     await db.delete(schema.socials).where(eq(schema.socials.id, id))
 
-    await purgeRuntimeCache()
-
     return {
         success: true,
     }

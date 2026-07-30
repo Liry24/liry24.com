@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const accounts = ref<{ providerId: string }[]>([])
+const accounts = ref<{ id: string; providerId: string }[]>([])
 
 const config = useRuntimeConfig()
 const toast = useToast()
@@ -21,8 +21,11 @@ const list = [
 const unlink = async (providerId: string) => {
     try {
         await refreshSession()
+        const account = accounts.value.find((item) => item.providerId === providerId)
+        if (!account) throw new Error(`No linked ${providerId} account found`)
+
         const { error } = await client.unlinkAccount({
-            providerId,
+            accountId: account.id,
         })
         if (error) throw error
         accounts.value = (await client.listAccounts()).data || []

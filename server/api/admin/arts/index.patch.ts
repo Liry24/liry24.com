@@ -7,7 +7,7 @@ const request = {
 export default adminSessionEventHandler(async () => {
     const { slug, title, description, href, images } = await validateBody(request.body)
 
-    await db
+    const updateArt = db
         .update(schema.arts)
         .set({
             slug,
@@ -17,16 +17,19 @@ export default adminSessionEventHandler(async () => {
         })
         .where(eq(schema.arts.slug, slug))
 
-    if (images?.length) {
-        await db.delete(schema.artImages).where(eq(schema.artImages.artSlug, slug))
-
-        for (const image of images)
-            await db.insert(schema.artImages).values({
-                artSlug: slug,
-                src: image.src,
-                alt: image.alt,
-            })
-    }
+    if (images?.length)
+        await db.batch([
+            updateArt,
+            db.delete(schema.artImages).where(eq(schema.artImages.artSlug, slug)),
+            db.insert(schema.artImages).values(
+                images.map((image) => ({
+                    artSlug: slug,
+                    src: image.src,
+                    alt: image.alt,
+                })),
+            ),
+        ])
+    else await updateArt
 
     return {
         success: true,

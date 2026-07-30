@@ -9,12 +9,9 @@ const request = {
 export default adminSessionEventHandler(async () => {
     const { links } = await validateBody(request.body)
 
-    await db.transaction(async (tx) => {
-        await tx.delete(schema.socials)
-        await tx.insert(schema.socials).values(links)
-    })
-
-    await purgeRuntimeCache()
+    if (links.length)
+        await db.batch([db.delete(schema.socials), db.insert(schema.socials).values(links)])
+    else await db.delete(schema.socials)
 
     return {
         success: true,

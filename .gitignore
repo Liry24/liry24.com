@@ -27,3 +27,4 @@ logs
 .agent
 
 .wrangler
+.tmp

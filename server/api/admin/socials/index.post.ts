@@ -12,8 +12,6 @@ export default adminSessionEventHandler(async () => {
         icon,
     })
 
-    await purgeRuntimeCache()
-
     return {
         success: true,
     }

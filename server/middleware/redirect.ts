@@ -1,25 +1,23 @@
-const getSocials = defineCachedFunction(
-    async () =>
-        await db.query.socials.findMany({
-            columns: {
-                href: true,
-                alias: true,
-            },
-        }),
-    {
-        maxAge: 60 * 60 * 24 * 30,
-        name: 'getSocials',
-        getKey: () => 'default',
-    },
-)
-
 export default eventHandler(async (event) => {
+    if (event.method !== 'GET' && event.method !== 'HEAD') return
+
     let path = getRequestURL(event).pathname.slice(1)
 
     if (path.endsWith('/')) path = path.slice(0, -1)
+    if (!path || path.includes('/')) return
+    if (path.includes('.')) return
+    if (['admin', 'api', 'arts', 'login', 'posts', 'works'].includes(path)) return
 
-    const socialsList = await getSocials()
-    const social = socialsList.find((s) => s.alias === path)
+    const social = await db.query.socials.findFirst({
+        columns: {
+            href: true,
+        },
+        where: {
+            alias: {
+                eq: path,
+            },
+        },
+    })
 
     if (social?.href) return sendRedirect(event, social.href)
 })

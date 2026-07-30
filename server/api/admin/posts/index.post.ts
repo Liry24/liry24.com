@@ -39,23 +39,27 @@ export default adminSessionEventHandler(async () => {
         generatedSlug = result.text.trim()
     }
 
-    await db.transaction(async (tx) => {
-        await tx.insert(schema.posts).values({
-            slug: slug || generatedSlug,
-            title,
-            content,
-        })
-        if (tags?.length)
-            await tx.insert(schema.postTags).values(
+    const postSlug = slug || generatedSlug
+    const insertPost = db.insert(schema.posts).values({
+        slug: postSlug,
+        title,
+        content,
+    })
+
+    if (tags?.length)
+        await db.batch([
+            insertPost,
+            db.insert(schema.postTags).values(
                 tags.map((tag) => ({
-                    postSlug: slug || generatedSlug,
+                    postSlug,
                     tag,
                 })),
-            )
-    })
+            ),
+        ])
+    else await insertPost
 
     return {
         success: true,
-        slug: slug || generatedSlug,
+        slug: postSlug,
     }
 })

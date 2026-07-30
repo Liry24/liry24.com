@@ -6,6 +6,7 @@ import {
     sqliteTable as table,
     text,
     type SQLiteTableExtraConfigValue,
+    uniqueIndex,
 } from 'drizzle-orm/sqlite-core'
 
 export const users = table('users', {
@@ -31,13 +32,8 @@ export const accounts = table(
     'accounts',
     {
         id: text().primaryKey(),
-        createdAt: integer('created_at', { mode: 'timestamp_ms' })
-            .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
-            .notNull(),
-        updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
-            .$onUpdate(() => /* @__PURE__ */ new Date())
-            .notNull(),
-        accountId: text('account_id').notNull(),
+        issuer: text().notNull(),
+        providerAccountId: text('provider_account_id').notNull(),
         providerId: text('provider_id').notNull(),
         userId: text('user_id').notNull(),
         accessToken: text('access_token'),
@@ -51,14 +47,71 @@ export const accounts = table(
         }),
         scope: text(),
         password: text(),
+        createdAt: integer('created_at', { mode: 'timestamp_ms' })
+            .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+            .notNull(),
+        updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
+            .$onUpdate(() => /* @__PURE__ */ new Date())
+            .notNull(),
     },
     (table): SQLiteTableExtraConfigValue[] => [
+        uniqueIndex('accounts_issuer_providerAccountId_uidx').on(
+            table.issuer,
+            table.providerAccountId,
+        ),
         index('accounts_userId_idx').on(table.userId),
         foreignKey({
             name: 'accounts_userId_fkey',
             columns: [table.userId],
             foreignColumns: [users.id],
         }).onDelete('cascade'),
+    ],
+)
+
+export const sessions = table(
+    'sessions',
+    {
+        id: text().primaryKey(),
+        expiresAt: integer('expires_at', { mode: 'timestamp_ms' }).notNull(),
+        token: text().notNull().unique(),
+        createdAt: integer('created_at', { mode: 'timestamp_ms' })
+            .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+            .notNull(),
+        updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
+            .$onUpdate(() => /* @__PURE__ */ new Date())
+            .notNull(),
+        ipAddress: text('ip_address'),
+        userAgent: text('user_agent'),
+        userId: text('user_id').notNull(),
+        impersonatedBy: text('impersonated_by'),
+    },
+    (table): SQLiteTableExtraConfigValue[] => [
+        index('sessions_userId_idx').on(table.userId),
+        foreignKey({
+            name: 'sessions_userId_fkey',
+            columns: [table.userId],
+            foreignColumns: [users.id],
+        }).onDelete('cascade'),
+    ],
+)
+
+export const verifications = table(
+    'verifications',
+    {
+        id: text().primaryKey(),
+        identifier: text().notNull(),
+        value: text().notNull(),
+        expiresAt: integer('expires_at', { mode: 'timestamp_ms' }).notNull(),
+        createdAt: integer('created_at', { mode: 'timestamp_ms' })
+            .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+            .notNull(),
+        updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
+            .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+            .$onUpdate(() => /* @__PURE__ */ new Date())
+            .notNull(),
+    },
+    (table): SQLiteTableExtraConfigValue[] => [
+        index('verifications_identifier_idx').on(table.identifier),
     ],
 )
 
@@ -88,53 +141,83 @@ export const passkeys = table(
     ],
 )
 
-export const socials = table('socials', {
-    id: integer({ mode: 'number' }).primaryKey({ autoIncrement: true }),
-    href: text().notNull(),
-    alias: text(),
-    icon: text().notNull(),
-    label: text().notNull(),
-    sortIndex: integer({ mode: 'number' }).notNull().default(0),
+export const rateLimits = table('rate_limits', {
+    id: text().primaryKey(),
+    key: text().notNull().unique(),
+    count: integer().notNull(),
+    lastRequest: integer('last_request').notNull(),
 })
 
-export const careers = table('careers', {
-    id: integer({ mode: 'number' }).primaryKey({ autoIncrement: true }),
-    period: text().notNull(),
-    position: text().notNull(),
-    company: text().notNull(),
-    sortIndex: integer({ mode: 'number' }).notNull().default(0),
-})
+export const socials = table(
+    'socials',
+    {
+        id: integer({ mode: 'number' }).primaryKey({ autoIncrement: true }),
+        href: text().notNull(),
+        alias: text(),
+        icon: text().notNull(),
+        label: text().notNull(),
+        sortIndex: integer('sort_index', { mode: 'number' }).notNull().default(0),
+    },
+    (table): SQLiteTableExtraConfigValue[] => [
+        index('socials_alias_idx').on(table.alias),
+        index('socials_sortIndex_idx').on(table.sortIndex),
+    ],
+)
 
-export const works = table('works', {
-    slug: text().primaryKey(),
-    createdAt: integer('created_at', { mode: 'timestamp_ms' })
-        .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
-        .notNull(),
-    title: text().notNull(),
-    description: text(),
-    category: text(),
-    image: text(),
-    icon: text(),
-    href: text(),
-    sortIndex: integer({ mode: 'number' }).notNull().default(0),
-})
+export const careers = table(
+    'careers',
+    {
+        id: integer({ mode: 'number' }).primaryKey({ autoIncrement: true }),
+        period: text().notNull(),
+        position: text().notNull(),
+        company: text().notNull(),
+        sortIndex: integer('sort_index', { mode: 'number' }).notNull().default(0),
+    },
+    (table): SQLiteTableExtraConfigValue[] => [index('careers_sortIndex_idx').on(table.sortIndex)],
+)
 
-export const arts = table('arts', {
-    slug: text().primaryKey(),
-    createdAt: integer('created_at', { mode: 'timestamp_ms' })
-        .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
-        .notNull(),
-    title: text().notNull(),
-    description: text(),
-    href: text(),
-    sortIndex: integer({ mode: 'number' }).notNull().default(0),
-})
+export const works = table(
+    'works',
+    {
+        slug: text().primaryKey(),
+        createdAt: integer('created_at', { mode: 'timestamp_ms' })
+            .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+            .notNull(),
+        title: text().notNull(),
+        description: text(),
+        category: text(),
+        image: text(),
+        icon: text(),
+        href: text(),
+        sortIndex: integer('sort_index', { mode: 'number' }).notNull().default(0),
+    },
+    (table): SQLiteTableExtraConfigValue[] => [
+        index('works_sortIndex_createdAt_idx').on(table.sortIndex, table.createdAt),
+    ],
+)
+
+export const arts = table(
+    'arts',
+    {
+        slug: text().primaryKey(),
+        createdAt: integer('created_at', { mode: 'timestamp_ms' })
+            .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+            .notNull(),
+        title: text().notNull(),
+        description: text(),
+        href: text(),
+        sortIndex: integer('sort_index', { mode: 'number' }).notNull().default(0),
+    },
+    (table): SQLiteTableExtraConfigValue[] => [
+        index('arts_sortIndex_createdAt_idx').on(table.sortIndex, table.createdAt),
+    ],
+)
 
 export const artImages = table(
     'art_images',
     {
         id: integer({ mode: 'number' }).primaryKey({ autoIncrement: true }),
-        artSlug: text().notNull(),
+        artSlug: text('art_slug').notNull(),
         src: text().notNull(),
         alt: text(),
     },
@@ -148,38 +231,61 @@ export const artImages = table(
     ],
 )
 
-export const skills = table('skills', {
-    id: integer({ mode: 'number' }).primaryKey({ autoIncrement: true }),
-    name: text().notNull(),
-    icon: text().notNull(),
-    category: text(),
-    sortIndex: integer({ mode: 'number' }).notNull().default(0),
-})
+export const skills = table(
+    'skills',
+    {
+        id: integer({ mode: 'number' }).primaryKey({ autoIncrement: true }),
+        name: text().notNull(),
+        icon: text().notNull(),
+        category: text(),
+        sortIndex: integer('sort_index', { mode: 'number' }).notNull().default(0),
+    },
+    (table): SQLiteTableExtraConfigValue[] => [index('skills_sortIndex_idx').on(table.sortIndex)],
+)
 
-export const ranks = table('ranks', {
-    id: integer({ mode: 'number' }).primaryKey({ autoIncrement: true }),
-    game: text().notNull(),
-    season: text(),
-    rank: text().notNull(),
-    imageUrl: text().notNull(),
-    href: text(),
-    sortIndex: integer({ mode: 'number' }).notNull().default(0),
-})
+export const ranks = table(
+    'ranks',
+    {
+        id: integer({ mode: 'number' }).primaryKey({ autoIncrement: true }),
+        game: text().notNull(),
+        season: text(),
+        rank: text().notNull(),
+        imageUrl: text('image_url').notNull(),
+        href: text(),
+        sortIndex: integer('sort_index', { mode: 'number' }).notNull().default(0),
+    },
+    (table): SQLiteTableExtraConfigValue[] => [index('ranks_sortIndex_idx').on(table.sortIndex)],
+)
 
-export const posts = table('posts', {
-    slug: text().primaryKey(),
-    createdAt: integer('created_at', { mode: 'timestamp_ms' })
-        .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
-        .notNull(),
-    updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
-        .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
-        .$onUpdate(() => /* @__PURE__ */ new Date())
-        .notNull(),
-    title: text().notNull(),
-    content: text().notNull(),
-})
+export const posts = table(
+    'posts',
+    {
+        slug: text().primaryKey(),
+        createdAt: integer('created_at', { mode: 'timestamp_ms' })
+            .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+            .notNull(),
+        updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
+            .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+            .$onUpdate(() => /* @__PURE__ */ new Date())
+            .notNull(),
+        title: text().notNull(),
+        content: text().notNull(),
+    },
+    (table): SQLiteTableExtraConfigValue[] => [index('posts_createdAt_idx').on(table.createdAt)],
+)
 
-export const postTags = table('post_tags', {
-    postSlug: text().notNull(),
-    tag: text().notNull(),
-})
+export const postTags = table(
+    'post_tags',
+    {
+        postSlug: text('post_slug').notNull(),
+        tag: text().notNull(),
+    },
+    (table): SQLiteTableExtraConfigValue[] => [
+        index('post_tags_postSlug_idx').on(table.postSlug),
+        foreignKey({
+            name: 'post_tags_postSlug_fkey',
+            columns: [table.postSlug],
+            foreignColumns: [posts.slug],
+        }).onDelete('cascade'),
+    ],
+)

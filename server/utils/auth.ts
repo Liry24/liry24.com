@@ -1,3 +1,4 @@
+import 'reflect-metadata'
 import { drizzleAdapter } from '@better-auth/drizzle-adapter'
 import { passkey } from '@better-auth/passkey'
 import { betterAuth } from 'better-auth/minimal'
@@ -16,19 +17,9 @@ export const auth = betterAuth({
     database: drizzleAdapter(db, {
         provider: 'sqlite',
         schema,
+        transaction: false,
         usePlural: true,
     }),
-
-    secondaryStorage: {
-        get: async (key) => await useStorage('auth').get(encodeURIComponent(key)),
-        set: async (key, value, ttl) => {
-            if (ttl) await useStorage('auth').set(encodeURIComponent(key), value, { ttl })
-            else await useStorage('auth').set(encodeURIComponent(key), value)
-        },
-        delete: async (key) => {
-            await useStorage('auth').del(encodeURIComponent(key))
-        },
-    },
 
     account: {
         storeStateStrategy: 'cookie',
@@ -40,12 +31,7 @@ export const auth = betterAuth({
         },
     },
 
-    verification: {
-        storeInDatabase: false,
-    },
-
     session: {
-        storeSessionInDatabase: false,
         expiresIn: 60 * 60 * 24 * 30,
         updateAge: 60 * 60 * 24,
         freshAge: 0,
@@ -57,6 +43,7 @@ export const auth = betterAuth({
 
     rateLimit: {
         enabled: true,
+        storage: 'database',
         window: 60,
         max: 100,
         customRules: {
@@ -116,6 +103,9 @@ export const auth = betterAuth({
     },
 
     advanced: {
+        backgroundTasks: {
+            handler: (promise) => useEvent().context.cloudflare.context.waitUntil(promise),
+        },
         ipAddress: {
             ipAddressHeaders: ['x-forwarded-for', 'x-real-ip', 'cf-connecting-ip'],
             disableIpTracking: false,
@@ -132,10 +122,4 @@ export const auth = betterAuth({
 
 export type Session = Awaited<ReturnType<typeof auth.api.getSession>>
 
-// Load the reflect polyfill before importing Better Auth's passkey stack in Workers.
-export const getAuth = async () => {
-    await import('reflect-metadata')
-    const { auth } = await import('./auth')
-
-    return auth
-}
+export const getAuth = async () => auth
