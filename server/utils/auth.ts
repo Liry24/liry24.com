@@ -12,6 +12,7 @@ export const auth = betterAuth({
 
     baseURL: {
         allowedHosts: ['localhost:3000', 'liry24.com', '*.workers.dev'],
+        fallback: 'https://liry24.com',
     },
 
     database: drizzleAdapter(db, {
