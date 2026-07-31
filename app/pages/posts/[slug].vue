@@ -15,6 +15,7 @@ const { isSupported: isCopySupported, copy, copied } = useClipboard()
 defineSeo({
     title: data.value?.title,
     titleTemplate: '%s | Liry24',
+    description: data.value?.excerpt,
 })
 </script>
 

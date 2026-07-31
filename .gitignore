@@ -27,4 +27,5 @@ logs
 .agent
 
 .wrangler
+workers/**/worker-configuration.d.ts
 .tmp

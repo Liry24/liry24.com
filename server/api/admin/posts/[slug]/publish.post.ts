@@ -6,8 +6,10 @@ const request = {
     }),
 }
 
-export default adminSessionEventHandler(async () => {
+export default adminSessionEventHandler(async ({ event }) => {
     const { slug } = await validateParams(request.params)
-    await publishPost(db, slug)
+    await publishPost(db, slug, {
+        publishWorkflow: event.context.cloudflare.env.POST_PUBLISH_WORKFLOW,
+    })
     return { success: true, slug }
 })

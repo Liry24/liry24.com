@@ -130,6 +130,29 @@ export default defineNuxtConfig({
                 ai: {
                     binding: 'AI',
                 },
+                queues: {
+                    producers: [
+                        {
+                            binding: 'POST_REVIEW_QUEUE',
+                            queue: 'liry24-post-reviews',
+                        },
+                    ],
+                    consumers: [
+                        {
+                            queue: 'liry24-post-reviews',
+                            max_batch_size: 1,
+                            max_retries: 4,
+                        },
+                    ],
+                },
+                workflows: [
+                    {
+                        binding: 'POST_PUBLISH_WORKFLOW',
+                        name: 'liry24-post-publish-v1',
+                        class_name: 'PublishPostWorkflow',
+                        script_name: 'liry24-post-publisher',
+                    },
+                ],
                 vars: {
                     NUXT_PUBLIC_SITE_URL: baseURL,
                     GITHUB_CLIENT_ID: productionGithubClientId,
@@ -143,9 +166,6 @@ export default defineNuxtConfig({
                         invocation_logs: true,
                     },
                 },
-                triggers: {
-                    crons: ['* * * * *'],
-                },
                 // @ts-expect-error Nitro's bundled Wrangler types do not include Workers Caching yet.
                 cache: {
                     enabled: true,
@@ -156,11 +176,7 @@ export default defineNuxtConfig({
         compressPublicAssets: true,
         experimental: {
             asyncContext: true,
-            tasks: true,
         },
-        // scheduledTasks: {
-        //     '* * * * *': ['posts:maintenance'],
-        // },
     },
 
     typescript: {

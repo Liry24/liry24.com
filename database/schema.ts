@@ -521,6 +521,11 @@ export const posts = table(
             .notNull(),
         scheduledAt: integer('scheduled_at', { mode: 'timestamp_ms' }),
         publishedAt: integer('published_at', { mode: 'timestamp_ms' }),
+        // These fields make a scheduled publication independently addressable while
+        // keeping the schema ready for a future scheduler migration.
+        scheduleRevision: text('schedule_revision'),
+        publishWorkflowInstanceId: text('publish_workflow_instance_id'),
+        publishWorkflowEngine: text('publish_workflow_engine'),
         authorUserId: text('author_user_id'),
     },
     (table): SQLiteTableExtraConfigValue[] => [
@@ -556,12 +561,16 @@ export const postReviews = table(
     {
         id: text().primaryKey(),
         postSlug: text('post_slug').notNull(),
+        jobId: text('job_id'),
         model: text().notNull(),
         status: text({ enum: ['completed', 'failed'] }).notNull(),
         issues: text({ mode: 'json' })
             .$type<Array<{ severity: 'low' | 'medium' | 'high'; message: string }>>()
             .notNull(),
         suggestedContent: text('suggested_content'),
+        sourceContent: text('source_content'),
+        summary: text(),
+        notes: text(),
         error: text(),
         createdAt: integer('created_at', { mode: 'timestamp_ms' })
             .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
@@ -569,6 +578,7 @@ export const postReviews = table(
     },
     (table): SQLiteTableExtraConfigValue[] => [
         index('post_reviews_postSlug_createdAt_idx').on(table.postSlug, table.createdAt),
+        index('post_reviews_jobId_idx').on(table.jobId),
         foreignKey({
             name: 'post_reviews_postSlug_fkey',
             columns: [table.postSlug],
@@ -582,6 +592,9 @@ export const postReviewJobs = table(
     {
         id: text().primaryKey(),
         postSlug: text('post_slug').notNull(),
+        input: text({ mode: 'json' })
+            .$type<{ title: string; excerpt: string; content: string }>()
+            .notNull(),
         status: text({ enum: ['pending', 'running', 'completed', 'failed'] })
             .default('pending')
             .notNull(),

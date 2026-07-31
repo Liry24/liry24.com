@@ -114,16 +114,20 @@ export const usePost = () => {
         }
     }
 
-    const reviewPost = async (slug: string) => {
+    const reviewPost = async (slug: string, state: Pick<Schema, 'title' | 'excerpt' | 'content'>) => {
         submitting.value = true
         try {
-            await $fetch(`/api/admin/posts/${slug}/review`, { method: 'POST' })
+            const result = await $fetch(`/api/admin/posts/${slug}/review`, {
+                method: 'POST',
+                body: state,
+            })
             toast.add({
                 icon: 'mingcute:ai-fill',
                 title: 'Review queued',
-                description: 'The editorial review will appear shortly.',
+                description: 'The editorial review is being prepared.',
                 color: 'success',
             })
+            return result.jobId
         } finally {
             submitting.value = false
         }

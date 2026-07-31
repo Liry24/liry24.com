@@ -1,4 +1,3 @@
-import { eq } from 'drizzle-orm'
 import z from 'zod'
 
 const request = {
@@ -7,13 +6,11 @@ const request = {
     }),
 }
 
-export default adminSessionEventHandler(async () => {
+export default adminSessionEventHandler(async ({ event }) => {
     const { slug } = await validateParams(request.params)
-
-    await db.batch([
-        db.delete(schema.postTags).where(eq(schema.postTags.postSlug, slug)),
-        db.delete(schema.posts).where(eq(schema.posts.slug, slug)),
-    ])
+    await deletePost(db, slug, {
+        publishWorkflow: event.context.cloudflare.env.POST_PUBLISH_WORKFLOW,
+    })
 
     return {
         success: true,

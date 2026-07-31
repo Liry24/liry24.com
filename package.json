@@ -14,6 +14,8 @@
         "fmt": "oxfmt",
         "fmt:check": "oxfmt --check",
         "cf:types": "bunx wrangler types .output/server/worker-configuration.d.ts --config .output/server/wrangler.json",
+        "post-publisher:types": "bunx wrangler types workers/post-publisher/worker-configuration.d.ts --config workers/post-publisher/wrangler.jsonc",
+        "post-publisher:deploy": "bunx wrangler deploy --config workers/post-publisher/wrangler.jsonc",
         "db:generate": "bunx drizzle-kit generate",
         "db:sync:local": "bun scripts/sync-d1-to-local.ts",
         "db:verify:local": "bun scripts/verify-local-d1.ts .data/wrangler/state/v3",

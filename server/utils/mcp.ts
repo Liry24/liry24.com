@@ -18,6 +18,7 @@ import {
     adminQueryInputSchema,
 } from './adminOperations'
 import type { Auth } from './auth'
+import type { PostAutomation } from './postService'
 
 const queryOutputSchema = z.object({
     resultType: z.literal('query'),
@@ -65,6 +66,7 @@ const requestContext = (authInfo: { clientId: string; extra?: Record<string, unk
     const r2 = authInfo.extra?.r2 as R2Bucket | undefined
     const imageBaseUrl = authInfo.extra?.imageBaseUrl
     const auth = authInfo.extra?.auth as Auth | undefined
+    const automation = authInfo.extra?.automation as PostAutomation | undefined
     if (
         typeof userId !== 'string' ||
         !(headers instanceof Headers) ||
@@ -80,13 +82,14 @@ const requestContext = (authInfo: { clientId: string; extra?: Record<string, unk
         r2,
         imageBaseUrl,
         auth,
+        automation,
     }
 }
 
 export const liry24McpHandler = createMcpHandler(
     ({ authInfo }) => {
         if (!authInfo) throw new Error('MCP authentication is required')
-        const { actor, database, r2, imageBaseUrl, auth } = requestContext(authInfo)
+        const { actor, database, r2, imageBaseUrl, auth, automation } = requestContext(authInfo)
         const server = new McpServer(
             {
                 name: 'liry24-admin',
@@ -166,7 +169,15 @@ export const liry24McpHandler = createMcpHandler(
             },
             async ({ planId }) => {
                 await enforceMcpRateLimit(database, actor, 'apply')
-                const result = await applyAdminPlan(database, actor, planId, r2, imageBaseUrl, auth)
+                const result = await applyAdminPlan(
+                    database,
+                    actor,
+                    planId,
+                    r2,
+                    imageBaseUrl,
+                    auth,
+                    automation,
+                )
                 const failed = result.operations.some((item) => item.status === 'failed')
                 return toolResult({
                     resultType: 'apply_result' as const,

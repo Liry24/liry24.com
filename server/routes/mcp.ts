@@ -63,7 +63,13 @@ const withCors = (response: Response, request: Request) => {
     })
 }
 
-const createProtectedMcp = (auth: Auth, database: Database, r2: R2Bucket, imageBaseUrl: string) =>
+const createProtectedMcp = (
+    auth: Auth,
+    database: Database,
+    r2: R2Bucket,
+    imageBaseUrl: string,
+    automation: import('../utils/postService').PostAutomation,
+) =>
     mcpHandler(
         {
             verifyOptions: {
@@ -126,6 +132,7 @@ const createProtectedMcp = (auth: Auth, database: Database, r2: R2Bucket, imageB
                     r2,
                     imageBaseUrl,
                     auth,
+                    automation,
                 },
             }
             return liry24McpHandler.fetch(request, { authInfo })
@@ -154,6 +161,9 @@ export default eventHandler(async (event) => {
     const auth = await getAuth()
     const r2 = event.context.cloudflare.env.R2
     const imageBaseUrl = useRuntimeConfig(event).public.imagesDomain
-    const protectedMcp = createProtectedMcp(auth, database, r2, imageBaseUrl)
+    const protectedMcp = createProtectedMcp(auth, database, r2, imageBaseUrl, {
+        reviewQueue: event.context.cloudflare.env.POST_REVIEW_QUEUE,
+        publishWorkflow: event.context.cloudflare.env.POST_PUBLISH_WORKFLOW,
+    })
     return withCors(await protectedMcp(request), request)
 })
