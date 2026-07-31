@@ -44,6 +44,40 @@ const normalizeAuthorizationQueryOrder = (request: Request) => {
     return url.toString()
 }
 
+const normalizeChatGptAuthorizationResponse = (response: Response, request: Request) => {
+    if (
+        request.method !== 'GET' ||
+        !new URL(request.url).pathname.endsWith('/oauth2/authorize') ||
+        response.status < 300 ||
+        response.status >= 400
+    )
+        return response
+
+    const location = response.headers.get('location')
+    if (!location) return response
+
+    const redirectURL = new URL(location, request.url)
+    const isSameOrigin = redirectURL.origin === new URL(request.url).origin
+    const isChatGptCallback =
+        isChatGptOrigin(redirectURL.origin) &&
+        redirectURL.pathname.startsWith('/connector/oauth/')
+    if (!isSameOrigin && !isChatGptCallback) return response
+
+    // Some connector webviews do not follow a relative Location returned by
+    // the OAuth login redirect. Make same-origin redirects absolute while
+    // preserving the original query and status.
+    const absoluteLocation = redirectURL.toString()
+    if (location === absoluteLocation) return response
+
+    const headers = new Headers(response.headers)
+    headers.set('location', absoluteLocation)
+    return new Response(response.body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers,
+    })
+}
+
 const withOAuthCors = (response: Response, request: Request) => {
     if (!isOAuthBrowserEndpoint(request) || !isChatGptOrigin(request.headers.get('origin')))
         return response
@@ -66,7 +100,9 @@ export default eventHandler(async (event) => {
     const request = toWebRequest(event)
 
     const normalizedAuthorizationURL = normalizeAuthorizationQueryOrder(request)
-    if (normalizedAuthorizationURL) return Response.redirect(normalizedAuthorizationURL, 307)
+    const authRequest = normalizedAuthorizationURL
+        ? new Request(normalizedAuthorizationURL, request)
+        : request
 
     if (
         request.method === 'OPTIONS' &&
@@ -78,7 +114,11 @@ export default eventHandler(async (event) => {
 
     try {
         const auth = await getAuth()
-        return withOAuthCors(await auth.handler(request), request)
+        const response = normalizeChatGptAuthorizationResponse(
+            await auth.handler(authRequest),
+            request,
+        )
+        return withOAuthCors(response, request)
     } catch (error) {
         console.error('Better Auth request failed', {
             path: new URL(request.url).pathname,
