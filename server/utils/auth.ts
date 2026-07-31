@@ -33,7 +33,23 @@ export const createAuth = (
             allowedHosts: ['localhost:3000', '127.0.0.1:3000', 'liry24.com', '*.workers.dev'],
             fallback: 'https://liry24.com',
         },
-        trustedOrigins: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+        trustedOrigins: async (request) => {
+            const origins = [
+                'http://localhost:3000',
+                'http://127.0.0.1:3000',
+                'https://liry24.com',
+            ]
+
+            // ChatGPT's DCR request can include credentials from the
+            // connector browser context. Allow its documented web origins
+            // only for the OAuth client-registration endpoint, keeping the
+            // rest of Better Auth's CSRF checks unchanged.
+            if (request && new URL(request.url).pathname.endsWith('/oauth2/register')) {
+                origins.push('https://chatgpt.com', 'https://*.chatgpt.com')
+            }
+
+            return origins
+        },
 
         database: drizzleAdapter(database, {
             provider: 'sqlite',
