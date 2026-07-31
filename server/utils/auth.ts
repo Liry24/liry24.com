@@ -45,7 +45,12 @@ export const createAuth = (
             // only for the OAuth client-registration endpoint, keeping the
             // rest of Better Auth's CSRF checks unchanged.
             if (request && new URL(request.url).pathname.endsWith('/oauth2/register')) {
-                origins.push('https://chatgpt.com', 'https://*.chatgpt.com')
+                origins.push(
+                    'https://chatgpt.com',
+                    'https://*.chatgpt.com',
+                    // Legacy ChatGPT web clients may still use this host.
+                    'https://chat.openai.com',
+                )
             }
 
             return origins
