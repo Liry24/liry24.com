@@ -3,7 +3,7 @@ import { drizzleAdapter } from '@better-auth/drizzle-adapter'
 import { mcp } from '@better-auth/mcp'
 import { passkey } from '@better-auth/passkey'
 import { betterAuth } from 'better-auth/minimal'
-import { admin, jwt, lastLoginMethod } from 'better-auth/plugins'
+import { admin, jwt, lastLoginMethod, oAuthProxy } from 'better-auth/plugins'
 
 import { schema, useDB, type Database } from '../../database'
 
@@ -12,6 +12,7 @@ const mcpResource = `${siteURL}/mcp`
 
 type AuthEnvironment = {
     BETTER_AUTH_SECRET?: string
+    OAUTH_PROXY_SECRET?: string
     GITHUB_CLIENT_ID?: string
     GITHUB_CLIENT_SECRET?: string
     VERCEL_CLIENT_ID?: string
@@ -29,9 +30,10 @@ export const createAuth = (
         secret: environment.BETTER_AUTH_SECRET,
 
         baseURL: {
-            allowedHosts: ['localhost:3000', 'liry24.com', '*.workers.dev'],
+            allowedHosts: ['localhost:3000', '127.0.0.1:3000', 'liry24.com', '*.workers.dev'],
             fallback: 'https://liry24.com',
         },
+        trustedOrigins: ['http://localhost:3000', 'http://127.0.0.1:3000'],
 
         database: drizzleAdapter(database, {
             provider: 'sqlite',
@@ -114,6 +116,11 @@ export const createAuth = (
             passkey(),
             lastLoginMethod(),
             admin(),
+            oAuthProxy({
+                productionURL: 'https://liry24.com',
+                secret: environment.OAUTH_PROXY_SECRET ?? environment.BETTER_AUTH_SECRET,
+                maxAge: 60,
+            }),
             jwt({
                 disableSettingJwtHeader: true,
                 jwks: {
@@ -191,6 +198,8 @@ export const getAuth = async () => {
         {
             BETTER_AUTH_SECRET:
                 workerEnvironment.BETTER_AUTH_SECRET ?? process.env.BETTER_AUTH_SECRET,
+            OAUTH_PROXY_SECRET:
+                workerEnvironment.OAUTH_PROXY_SECRET ?? process.env.OAUTH_PROXY_SECRET,
             GITHUB_CLIENT_ID: workerEnvironment.GITHUB_CLIENT_ID ?? process.env.GITHUB_CLIENT_ID,
             GITHUB_CLIENT_SECRET:
                 workerEnvironment.GITHUB_CLIENT_SECRET ?? process.env.GITHUB_CLIENT_SECRET,

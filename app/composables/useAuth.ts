@@ -42,9 +42,9 @@ export const _useAuth = () => {
 
     const signIn = {
         passkey: authClient.signIn.passkey,
-        github: (callbackURL = '/') =>
+        github: (callbackURL = '/admin') =>
             authClient.signIn.social({ provider: 'github', callbackURL }),
-        vercel: (callbackURL = '/') =>
+        vercel: (callbackURL = '/admin') =>
             authClient.signIn.social({ provider: 'vercel', callbackURL }),
     }
 
