@@ -29,7 +29,7 @@ const signInWithVercel = () => signIn.vercel(callbackURL.value)
 <template>
     <div class="grid grow items-center">
         <UAuthForm
-            title="Admin Login"
+            title="Admin Console"
             :providers="[
                 {
                     icon: 'mingcute:key-2-fill',
@@ -47,6 +47,7 @@ const signInWithVercel = () => signIn.vercel(callbackURL.value)
                     onClick: signInWithVercel,
                 },
             ]"
+            :ui="{ title: 'font-extralight text-4xl' }"
             class="mx-auto max-w-sm"
         />
     </div>

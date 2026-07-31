@@ -34,18 +34,22 @@ export default defineNuxtConfig({
 
     css: ['~/assets/css/main.css'],
 
+    experimental: {
+        crossOriginPrefetch: true,
+        extractAsyncDataHandlers: true,
+        inlineRouteRules: true,
+        sharedPrerenderData: true,
+        typescriptPlugin: true,
+        nitroAutoImports: true,
+        prefetchPreloadTags: true,
+    },
+
     runtimeConfig: {
         public: {
             siteURL: baseURL,
             imagesDomain,
         },
-        aiGateway: {
-            apiKey: process.env.AI_GATEWAY_API_KEY,
-        },
-        allowSignup: process.env.ALLOW_SIGNUP,
-        betterAuth: {
-            secret: process.env.BETTER_AUTH_SECRET,
-        },
+        allowSignup: process.env.ALLOW_SIGNUP === 'true',
         github: {
             clientId: process.env.GITHUB_CLIENT_ID,
             clientSecret: process.env.GITHUB_CLIENT_SECRET,
@@ -154,29 +158,19 @@ export default defineNuxtConfig({
             asyncContext: true,
             tasks: true,
         },
-        scheduledTasks: {
-            '* * * * *': ['posts:maintenance'],
-        },
+        // scheduledTasks: {
+        //     '* * * * *': ['posts:maintenance'],
+        // },
     },
 
     typescript: {
-        // typeCheck: true,
         tsConfig: {
-            include: ['../drizzle.config.*', '../database/*'],
+            include: ['../drizzle.config.*', '../database/*', '../scripts/*'],
             compilerOptions: {
                 noUncheckedIndexedAccess: true,
                 types: ['@cloudflare/workers-types'],
             },
         },
-    },
-
-    experimental: {
-        crossOriginPrefetch: true,
-        extractAsyncDataHandlers: true,
-        inlineRouteRules: true,
-        sharedPrerenderData: true,
-        typescriptPlugin: true,
-        nitroAutoImports: true,
     },
 
     app: {
@@ -188,28 +182,6 @@ export default defineNuxtConfig({
                 { charset: 'utf-8' },
                 { name: 'viewport', content: 'width=device-width, initial-scale=1' },
             ],
-        },
-    },
-
-    icon: {
-        clientBundle: {
-            icons: ['mingcute:sun-fill', 'mingcute:moon-fill'],
-            scan: true,
-            includeCustomCollections: true,
-        },
-        serverBundle: {
-            collections: [
-                {
-                    prefix: 'liria',
-                    fetchEndpoint: 'https://icons.liria.me/liria.json',
-                },
-            ],
-        },
-    },
-
-    ui: {
-        experimental: {
-            componentDetection: true,
         },
     },
 
@@ -230,16 +202,44 @@ export default defineNuxtConfig({
         },
     },
 
-    image: {
-        provider: 'cloudflare',
-        cloudflare: {
-            baseURL,
+    icon: {
+        clientBundle: {
+            icons: ['mingcute:sun-fill', 'mingcute:moon-fill'],
+            scan: true,
+            includeCustomCollections: true,
         },
-        domains: [parseURL(process.env.R2_DOMAIN).host!, 'avatars.githubusercontent.com'],
+        serverBundle: {
+            collections: [
+                {
+                    prefix: 'liria',
+                    fetchEndpoint: 'https://icons.liria.me/liria.json',
+                },
+            ],
+        },
+    },
+
+    motionV: {
+        directives: true,
     },
 
     sitemap: {
         sitemaps: true,
         sources: ['/api/__sitemap__/urls'],
+    },
+
+    ui: {
+        experimental: {
+            componentDetection: true,
+        },
+    },
+
+    $production: {
+        image: {
+            provider: 'cloudflare',
+            cloudflare: {
+                baseURL,
+            },
+            domains: [parseURL(process.env.R2_DOMAIN).host!, 'avatars.githubusercontent.com'],
+        },
     },
 })

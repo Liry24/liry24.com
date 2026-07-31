@@ -156,13 +156,6 @@ const sidebarCollapsed = ref(false)
                                 label: 'GitHub',
                             },
                             {
-                                to: app.turso,
-                                target: '_blank',
-                                external: true,
-                                icon: 'mingcute:coin-2-fill',
-                                label: 'Turso',
-                            },
-                            {
                                 to: '/',
                                 label: 'Back to site',
                                 icon: 'mingcute:arrow-left-line',
