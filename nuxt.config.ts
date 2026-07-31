@@ -218,13 +218,6 @@ export default defineNuxtConfig({
         },
     },
 
-    motionV: {
-        // motion-v's directive accesses the browser-only `Element` global while
-        // Nuxt renders directive SSR props. Register it from a `.client` plugin
-        // instead so the directive only ever runs in a browser.
-        directives: false,
-    },
-
     sitemap: {
         sitemaps: true,
         sources: ['/api/__sitemap__/urls'],
