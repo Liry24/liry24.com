@@ -68,6 +68,7 @@ defineShortcuts({
                                     v-if="work.image"
                                     :src="work.image"
                                     alt=""
+                                    :height="48"
                                     class="size-12 rounded-lg object-cover"
                                 />
 

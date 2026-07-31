@@ -173,6 +173,10 @@ export default defineNuxtConfig({
         },
     },
 
+    imports: {
+        presets: [{ from: 'cnfast', imports: ['cn'] }],
+    },
+
     app: {
         pageTransition: { name: 'page', mode: 'out-in' },
         head: {
