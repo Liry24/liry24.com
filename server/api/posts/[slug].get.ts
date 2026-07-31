@@ -12,6 +12,8 @@ export default eventHandler(async () => {
     const data = await db.query.posts.findFirst({
         where: {
             slug: { eq: slug },
+            status: { eq: 'published' },
+            publishedAt: { lte: new Date() },
         },
         with: {
             tags: {

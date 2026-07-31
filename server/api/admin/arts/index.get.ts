@@ -1,4 +1,4 @@
-export default eventHandler(async () => {
+export default adminSessionEventHandler(async () => {
     const data = await db.query.arts.findMany({
         orderBy: {
             sortIndex: 'asc',

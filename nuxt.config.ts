@@ -2,11 +2,12 @@ import { parseURL, withoutProtocol } from 'ufo'
 
 const baseURL = import.meta.env.NUXT_PUBLIC_SITE_URL || 'https://liry24.com'
 const imagesDomain = 'https://images.liry24.com'
+const productionGithubClientId = 'Ov23liCgRvti1lBwREzb'
 const title = 'Liry24'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-    compatibilityDate: '2026-05-21',
+    compatibilityDate: '2026-07-30',
 
     future: {
         compatibilityVersion: 5,
@@ -33,18 +34,22 @@ export default defineNuxtConfig({
 
     css: ['~/assets/css/main.css'],
 
+    experimental: {
+        crossOriginPrefetch: true,
+        extractAsyncDataHandlers: true,
+        inlineRouteRules: true,
+        sharedPrerenderData: true,
+        typescriptPlugin: true,
+        nitroAutoImports: true,
+        prefetchPreloadTags: true,
+    },
+
     runtimeConfig: {
         public: {
             siteURL: baseURL,
             imagesDomain,
         },
-        aiGateway: {
-            apiKey: process.env.AI_GATEWAY_API_KEY,
-        },
-        allowSignup: process.env.ALLOW_SIGNUP,
-        betterAuth: {
-            secret: process.env.BETTER_AUTH_SECRET,
-        },
+        allowSignup: process.env.ALLOW_SIGNUP === 'true',
         github: {
             clientId: process.env.GITHUB_CLIENT_ID,
             clientSecret: process.env.GITHUB_CLIENT_SECRET,
@@ -127,6 +132,7 @@ export default defineNuxtConfig({
                 },
                 vars: {
                     NUXT_PUBLIC_SITE_URL: baseURL,
+                    GITHUB_CLIENT_ID: productionGithubClientId,
                     D1_NAME: 'liry24-com',
                     R2_BUCKET: 'liry24-com',
                     R2_DOMAIN: imagesDomain,
@@ -136,6 +142,9 @@ export default defineNuxtConfig({
                         enabled: true,
                         invocation_logs: true,
                     },
+                },
+                triggers: {
+                    crons: ['* * * * *'],
                 },
                 // @ts-expect-error Nitro's bundled Wrangler types do not include Workers Caching yet.
                 cache: {
@@ -147,27 +156,21 @@ export default defineNuxtConfig({
         compressPublicAssets: true,
         experimental: {
             asyncContext: true,
+            tasks: true,
         },
+        // scheduledTasks: {
+        //     '* * * * *': ['posts:maintenance'],
+        // },
     },
 
     typescript: {
-        // typeCheck: true,
         tsConfig: {
-            include: ['../drizzle.config.*', '../database/*'],
+            include: ['../drizzle.config.*', '../database/*', '../scripts/*'],
             compilerOptions: {
                 noUncheckedIndexedAccess: true,
-                types: ['@cloudflare/workers-types'],
+                types: ['@cloudflare/workers-types', 'bun'],
             },
         },
-    },
-
-    experimental: {
-        crossOriginPrefetch: true,
-        extractAsyncDataHandlers: true,
-        inlineRouteRules: true,
-        sharedPrerenderData: true,
-        typescriptPlugin: true,
-        nitroAutoImports: true,
     },
 
     app: {
@@ -179,28 +182,6 @@ export default defineNuxtConfig({
                 { charset: 'utf-8' },
                 { name: 'viewport', content: 'width=device-width, initial-scale=1' },
             ],
-        },
-    },
-
-    icon: {
-        clientBundle: {
-            icons: ['mingcute:sun-fill', 'mingcute:moon-fill'],
-            scan: true,
-            includeCustomCollections: true,
-        },
-        serverBundle: {
-            collections: [
-                {
-                    prefix: 'liria',
-                    fetchEndpoint: 'https://icons.liria.me/liria.json',
-                },
-            ],
-        },
-    },
-
-    ui: {
-        experimental: {
-            componentDetection: true,
         },
     },
 
@@ -221,16 +202,47 @@ export default defineNuxtConfig({
         },
     },
 
-    image: {
-        provider: 'cloudflare',
-        cloudflare: {
-            baseURL,
+    icon: {
+        clientBundle: {
+            icons: ['mingcute:sun-fill', 'mingcute:moon-fill'],
+            scan: true,
+            includeCustomCollections: true,
         },
-        domains: [parseURL(process.env.R2_DOMAIN).host!, 'avatars.githubusercontent.com'],
+        serverBundle: {
+            collections: [
+                {
+                    prefix: 'liria',
+                    fetchEndpoint: 'https://icons.liria.me/liria.json',
+                },
+            ],
+        },
+    },
+
+    motionV: {
+        // motion-v's directive accesses the browser-only `Element` global while
+        // Nuxt renders directive SSR props. Register it from a `.client` plugin
+        // instead so the directive only ever runs in a browser.
+        directives: false,
     },
 
     sitemap: {
         sitemaps: true,
         sources: ['/api/__sitemap__/urls'],
+    },
+
+    ui: {
+        experimental: {
+            componentDetection: true,
+        },
+    },
+
+    $production: {
+        image: {
+            provider: 'cloudflare',
+            cloudflare: {
+                baseURL,
+            },
+            domains: [parseURL(process.env.R2_DOMAIN).host!, 'avatars.githubusercontent.com'],
+        },
     },
 })

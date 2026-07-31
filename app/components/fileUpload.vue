@@ -95,7 +95,7 @@ const handleUpload = async (file: File, options: { name: string }) => {
             key: string
         }>('/api/admin/upload', {
             method: 'POST',
-            body: { key: options.name, contentType: file.type },
+            body: { key: options.name, contentType: file.type, size: file.size },
         })
 
         await uploadWithProgress(uploadInfo, file)

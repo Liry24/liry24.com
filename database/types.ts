@@ -2,7 +2,18 @@ import { createInsertSchema, createSelectSchema, createUpdateSchema } from 'driz
 import type { ZodNumber, ZodString } from 'zod'
 import { z } from 'zod'
 
-import { artImages, arts, careers, posts, postTags, ranks, skills, socials, works } from './schema'
+import {
+    artImages,
+    arts,
+    careers,
+    postReviews,
+    posts,
+    postTags,
+    ranks,
+    skills,
+    socials,
+    works,
+} from './schema'
 
 export const socialsSelectSchema = createSelectSchema(socials, {
     id: z.coerce.number().int().positive(),
@@ -100,21 +111,42 @@ export const postTagsUpdateSchema = createUpdateSchema(postTags, {
 })
 export type PostTag = z.infer<typeof postTagsSelectSchema>
 
+export const postStatusSchema = z.enum(['draft', 'scheduled', 'published'])
+export const postReviewsSelectSchema = createSelectSchema(postReviews)
+export type PostReview = z.infer<typeof postReviewsSelectSchema>
+
 export const postsSelectSchema = createSelectSchema(posts).extend({
     tags: postTagsSelectSchema.omit({ postSlug: true }).array(),
+    latestReview: postReviewsSelectSchema.nullable().optional(),
 })
 export const postsInsertSchema = createInsertSchema(posts, {
     slug: (s: ZodString) => s.optional(),
     title: (s: ZodString) => s.min(1, { error: 'Title is required' }),
     content: (s: ZodString) => s.min(1, { error: 'Content is required' }),
-}).extend({
-    tags: z.string().array().optional(),
+    excerpt: (s: ZodString) => s.max(500).optional(),
 })
+    .omit({
+        authorUserId: true,
+        publishedAt: true,
+    })
+    .extend({
+        tags: z.string().min(1).array().optional(),
+        status: z.enum(['draft', 'scheduled']).default('draft'),
+        scheduledAt: z.coerce.date().nullable().optional(),
+    })
 export const postsUpdateSchema = createUpdateSchema(posts, {
     slug: (s: ZodString) => s.optional(),
     title: (s: ZodString) => s.min(1),
     content: (s: ZodString) => s.min(1),
-}).extend({
-    tags: z.string().array().min(1).optional(),
+    excerpt: (s: ZodString) => s.max(500).optional(),
 })
+    .omit({
+        authorUserId: true,
+        publishedAt: true,
+    })
+    .extend({
+        tags: z.string().min(1).array().optional(),
+        status: z.enum(['draft', 'scheduled']).optional(),
+        scheduledAt: z.coerce.date().nullable().optional(),
+    })
 export type Post = z.infer<typeof postsSelectSchema>

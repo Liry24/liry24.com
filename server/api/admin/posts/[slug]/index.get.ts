@@ -6,7 +6,7 @@ const request = {
     }),
 }
 
-export default eventHandler(async () => {
+export default adminSessionEventHandler(async () => {
     const { slug } = await validateParams(request.params)
 
     const data = await db.query.posts.findFirst({
@@ -18,6 +18,18 @@ export default eventHandler(async () => {
                 columns: {
                     tag: true,
                 },
+            },
+            reviews: {
+                orderBy: {
+                    createdAt: 'desc',
+                },
+                limit: 10,
+            },
+            reviewJobs: {
+                orderBy: {
+                    createdAt: 'desc',
+                },
+                limit: 5,
             },
         },
     })

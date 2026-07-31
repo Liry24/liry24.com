@@ -1,15 +1,10 @@
 <script setup lang="ts">
-import { motion } from 'motion-v'
-
-import { LazyStacksModal, NuxtImg, USeparator } from '#components'
+import { LazyStacksModal } from '#components'
 
 const { app } = useAppConfig()
 const overlay = useOverlay()
-const config = useRuntimeConfig()
 
 const modalStacks = overlay.create(LazyStacksModal)
-const MotionNuxtImg = motion.create(NuxtImg)
-const MotionUSeparator = motion.create(USeparator)
 
 const { data } = useFetch('/api/home')
 
@@ -43,36 +38,33 @@ defineSeo({
             :ui="{ content: 'gap-8 md:gap-12 lg:gap-16' }"
             class="my-8 [--duration:40s]"
         >
-            <MotionNuxtImg
+            <NuxtLink
                 v-for="(art, index) in rotateArray(data.arts, 1)"
                 :key="index"
-                :initial="{
-                    scale: 1.1,
-                    opacity: 0,
-                    filter: 'blur(20px)',
+                v-motion="{
+                    initial: { scale: 1.1, opacity: 0, filter: 'blur(20px)' },
+                    animate: { scale: 1, opacity: 1, filter: 'blur(0px)' },
+                    transition: { delay: 0.2 + index * 0.1 },
                 }"
-                :animate="{
-                    scale: 1,
-                    opacity: 1,
-                    filter: 'blur(0px)',
-                }"
-                :transition="{
-                    delay: 0.2 + index * 0.1,
-                }"
-                :src="art.images[0]?.src"
-                :alt="art.title"
-                :height="320"
-                format="webp"
-                class="aspect-square size-64 cursor-pointer rounded-xl object-cover md:size-72 lg:size-80"
-                @click="navigateTo(`/arts?open=${art.slug}`)"
-            />
+                :to="`/arts?open=${art.slug}`"
+            >
+                <NuxtImg
+                    :src="art.images[0]?.src"
+                    :alt="art.title"
+                    :height="320"
+                    format="webp"
+                    class="aspect-square size-64 cursor-pointer rounded-xl object-cover md:size-72 lg:size-80"
+                />
+            </NuxtLink>
         </UMarquee>
 
-        <motion.div
-            :initial="{ opacity: 0 }"
-            :animate="{ opacity: 1 }"
-            :transition="{
-                delay: 0.4,
+        <div
+            v-motion="{
+                initial: { opacity: 0 },
+                animate: { opacity: 1 },
+                transition: {
+                    delay: 0.4,
+                },
             }"
             class="mx-auto mb-16 flex max-w-xl flex-wrap items-center justify-center gap-2"
         >
@@ -86,13 +78,13 @@ defineSeo({
                 variant="ghost"
                 class="gap-2"
             />
-        </motion.div>
+        </div>
 
-        <motion.div
-            :initial="{ opacity: 0 }"
-            :animate="{ opacity: 1 }"
-            :transition="{
-                delay: 0.6,
+        <div
+            v-motion="{
+                initial: { opacity: 0 },
+                animate: { opacity: 1 },
+                transition: { delay: 0.6 },
             }"
             class="flex w-full flex-col items-center gap-2"
         >
@@ -170,33 +162,23 @@ defineSeo({
                     <p class="text-toned z-1 text-center">VR-SNS Avatar Setups Sharing Platform.</p>
                 </NuxtLink>
             </div>
-        </motion.div>
+        </div>
 
-        <MotionUSeparator
-            :initial="{
-                opacity: 0,
-            }"
-            :animate="{
-                opacity: 1,
-            }"
-            :transition="{
-                delay: 0.65,
+        <USeparator
+            v-motion="{
+                initial: { opacity: 0 },
+                animate: { opacity: 1 },
+                transition: { delay: 0.65 },
             }"
             class="mt-12 mb-20 max-w-sm self-center"
         />
 
         <div class="grid w-full max-w-6xl grid-cols-1 gap-x-16 gap-y-24 self-center lg:grid-cols-2">
-            <motion.div
-                :initial="{
-                    opacity: 0,
-                    filter: 'blur(20px)',
-                }"
-                :animate="{
-                    opacity: 1,
-                    filter: 'blur(0px)',
-                }"
-                :transition="{
-                    delay: 0.7,
+            <div
+                v-motion="{
+                    initial: { opacity: 0, filter: 'blur(20px)' },
+                    animate: { opacity: 1, filter: 'blur(0px)' },
+                    transition: { delay: 0.7 },
                 }"
                 class="grid gap-4"
             >
@@ -221,19 +203,13 @@ defineSeo({
                         <span class="text-toned">{{ career.company }}</span>
                     </p>
                 </div>
-            </motion.div>
+            </div>
 
-            <motion.div
-                :initial="{
-                    opacity: 0,
-                    filter: 'blur(20px)',
-                }"
-                :animate="{
-                    opacity: 1,
-                    filter: 'blur(0px)',
-                }"
-                :transition="{
-                    delay: 0.8,
+            <div
+                v-motion="{
+                    initial: { opacity: 0, filter: 'blur(20px)' },
+                    animate: { opacity: 1, filter: 'blur(0px)' },
+                    transition: { delay: 0.8 },
                 }"
                 class="grid gap-4"
             >
@@ -253,49 +229,13 @@ defineSeo({
                     </p>
                     <NuxtImg :src="rank.imageUrl" :alt="rank.rank" :width="40" :height="40" />
                 </div>
-            </motion.div>
+            </div>
 
-            <!-- <motion.div
-                :initial="{
-                    opacity: 0,
-                    filter: 'blur(20px)',
-                }"
-                :animate="{
-                    opacity: 1,
-                    filter: 'blur(0px)',
-                }"
-                :transition="{
-                    delay: 0.9,
-                }"
-                class="flex flex-col gap-4 lg:col-span-2"
-            >
-                <h2
-                    class="text-muted font-mono text-sm leading-none text-nowrap before:content-['//_']"
-                >
-                    Skills
-                </h2>
-
-                <div class="flex flex-wrap gap-2">
-                    <Icon
-                        v-for="skill in data.skills"
-                        :key="`skill-${skill.id}`"
-                        :name="skill.icon"
-                        size="20"
-                    />
-                </div>
-            </motion.div> -->
-
-            <motion.div
-                :initial="{
-                    opacity: 0,
-                    filter: 'blur(20px)',
-                }"
-                :animate="{
-                    opacity: 1,
-                    filter: 'blur(0px)',
-                }"
-                :transition="{
-                    delay: 1,
+            <div
+                v-motion="{
+                    initial: { opacity: 0, filter: 'blur(20px)' },
+                    animate: { opacity: 1, filter: 'blur(0px)' },
+                    transition: { delay: 1 },
                 }"
                 class="flex flex-col gap-4 lg:col-span-2"
             >
@@ -335,7 +275,7 @@ defineSeo({
                         </div>
                     </NuxtLink>
                 </div>
-            </motion.div>
+            </div>
         </div>
     </div>
 </template>

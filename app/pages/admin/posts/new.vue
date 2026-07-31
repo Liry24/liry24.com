@@ -6,14 +6,17 @@ const { savePost, submitting } = usePost()
 const state = reactive<Schema>({
     slug: '',
     title: '',
+    excerpt: '',
     tags: [],
     content: '',
+    status: 'draft',
+    scheduledAt: undefined,
 })
 
 const onSubmit = async () => {
     try {
         const slug = await savePost(state)
-        await navigateTo(`/posts/${slug}`)
+        await navigateTo(`/admin/posts/${slug}`)
     } catch {
         // Error handled in composable
     }
@@ -28,7 +31,7 @@ const onSubmit = async () => {
                     <template #right>
                         <UButton
                             icon="mingcute:upload-fill"
-                            label="Submit"
+                            label="Save draft"
                             color="neutral"
                             :loading="submitting"
                             @click="onSubmit"

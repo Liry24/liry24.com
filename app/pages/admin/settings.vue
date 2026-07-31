@@ -23,6 +23,10 @@ const { session } = useAuth()
                         <SettingsAccounts />
                     </section>
 
+                    <section id="passkeys">
+                        <SettingsPasskeys />
+                    </section>
+
                     <section id="sessions">
                         <UCard>
                             <template #header>

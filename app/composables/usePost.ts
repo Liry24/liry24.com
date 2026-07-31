@@ -98,10 +98,43 @@ export const usePost = () => {
         }
     }
 
+    const publishPost = async (slug: string) => {
+        submitting.value = true
+        try {
+            await $fetch(`/api/admin/posts/${slug}/publish`, { method: 'POST' })
+            await refreshNuxtData('posts')
+            toast.add({
+                icon: 'mingcute:send-fill',
+                title: 'Published',
+                description: 'The post is now public.',
+                color: 'success',
+            })
+        } finally {
+            submitting.value = false
+        }
+    }
+
+    const reviewPost = async (slug: string) => {
+        submitting.value = true
+        try {
+            await $fetch(`/api/admin/posts/${slug}/review`, { method: 'POST' })
+            toast.add({
+                icon: 'mingcute:ai-fill',
+                title: 'Review queued',
+                description: 'The editorial review will appear shortly.',
+                color: 'success',
+            })
+        } finally {
+            submitting.value = false
+        }
+    }
+
     return {
         savePost,
         updatePost,
         deletePost,
+        publishPost,
+        reviewPost,
         submitting,
     }
 }
