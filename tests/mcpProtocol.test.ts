@@ -3,10 +3,14 @@ import { afterEach, describe, expect, mock, test } from 'bun:test'
 import { Client, StreamableHTTPClientTransport, type FetchLike } from '@modelcontextprotocol/client'
 import type { AuthInfo } from '@modelcontextprotocol/server'
 
-mock.module('nitropack/runtime', () => ({
+await mock.module('nitropack/runtime', () => ({
     useEvent: () => {
         throw new Error('A request-scoped Nitro event was not expected in the protocol test')
     },
+}))
+
+await mock.module('files-sdk/r2', () => ({
+    r2: () => ({}),
 }))
 
 const { liry24McpHandler } = await import('../server/utils/mcp')

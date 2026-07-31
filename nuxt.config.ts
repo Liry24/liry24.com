@@ -168,7 +168,7 @@ export default defineNuxtConfig({
             include: ['../drizzle.config.*', '../database/*', '../scripts/*'],
             compilerOptions: {
                 noUncheckedIndexedAccess: true,
-                types: ['@cloudflare/workers-types'],
+                types: ['@cloudflare/workers-types', 'bun'],
             },
         },
     },
@@ -219,7 +219,10 @@ export default defineNuxtConfig({
     },
 
     motionV: {
-        directives: true,
+        // motion-v's directive accesses the browser-only `Element` global while
+        // Nuxt renders directive SSR props. Register it from a `.client` plugin
+        // instead so the directive only ever runs in a browser.
+        directives: false,
     },
 
     sitemap: {
