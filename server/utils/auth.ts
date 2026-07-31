@@ -64,7 +64,10 @@ export const createAuth = (
         }),
 
         account: {
-            storeStateStrategy: 'cookie',
+            // ChatGPT can retry OAuth in a second tab while the first flow is
+            // still open. Persist each state server-side so one flow cannot
+            // overwrite another flow's single state cookie.
+            storeStateStrategy: 'database',
             updateAccountOnSignIn: true,
             accountLinking: {
                 enabled: true,
