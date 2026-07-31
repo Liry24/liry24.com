@@ -1,12 +1,15 @@
+import type { D1Database } from '@cloudflare/workers-types'
 import { drizzle } from 'drizzle-orm/d1'
 import { useEvent } from 'nitropack/runtime'
 
 import { relations } from './relations'
 import * as schema from './schema'
 
+const createDB = (d1: D1Database) => drizzle(d1, { relations })
+
 const useDB = () => {
     const d1 = useEvent().context.cloudflare.env.DB
-    return drizzle(d1, { relations })
+    return createDB(d1)
 }
 
 type Database = ReturnType<typeof useDB>
@@ -24,4 +27,5 @@ const db = new Proxy({} as Database, {
     },
 })
 
-export { db, relations, schema, useDB }
+export { createDB, db, relations, schema, useDB }
+export type { Database }

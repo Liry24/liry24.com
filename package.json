@@ -6,6 +6,7 @@
         "build": "nuxt build",
         "dev": "bun run db:sync:local && nuxt dev",
         "preview": "nuxt preview",
+        "test": "bun test",
         "postinstall": "nuxt prepare",
         "typecheck": "nuxt typecheck",
         "lint": "oxlint --type-aware",
@@ -23,11 +24,14 @@
     },
     "dependencies": {
         "@ai-sdk/vue": "^4.0.42",
+        "@better-auth/cimd": "1.7.0-rc.2",
         "@better-auth/drizzle-adapter": "1.7.0-rc.2",
+        "@better-auth/mcp": "1.7.0-rc.2",
         "@better-auth/passkey": "1.7.0-rc.2",
         "@comark/nuxt": "0.5.1",
         "@iconify-json/mingcute": "^1.2.7",
         "@iconify-json/simple-icons": "^1.2.92",
+        "@modelcontextprotocol/server": "2.0.0",
         "@nuxt/image": "^2.1.0",
         "@nuxt/ui": "^4.10.0",
         "@nuxtjs/sitemap": "8.3.2",
@@ -52,8 +56,9 @@
         "zod": "^4.4.3"
     },
     "devDependencies": {
-        "@cloudflare/workers-types": "^4.20260426.1",
+        "@cloudflare/workers-types": "5.20260730.1",
         "@libsql/client": "^0.17.4",
+        "@modelcontextprotocol/client": "2.0.0",
         "@nuxt/a11y": "^1.0.0-alpha.1",
         "@nuxt/hints": "^1.1.4",
         "@types/node": "^26.1.2",

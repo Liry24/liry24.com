@@ -27,6 +27,10 @@ export default eventHandler(async () => {
         orderBy: {
             createdAt: 'desc',
         },
+        where: {
+            status: { eq: 'published' },
+            publishedAt: { lte: new Date() },
+        },
         limit,
         offset,
     })

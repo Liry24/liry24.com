@@ -2,11 +2,12 @@ import { parseURL, withoutProtocol } from 'ufo'
 
 const baseURL = import.meta.env.NUXT_PUBLIC_SITE_URL || 'https://liry24.com'
 const imagesDomain = 'https://images.liry24.com'
+const productionGithubClientId = 'Ov23liCgRvti1lBwREzb'
 const title = 'Liry24'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-    compatibilityDate: '2026-05-21',
+    compatibilityDate: '2026-07-30',
 
     future: {
         compatibilityVersion: 5,
@@ -127,6 +128,7 @@ export default defineNuxtConfig({
                 },
                 vars: {
                     NUXT_PUBLIC_SITE_URL: baseURL,
+                    GITHUB_CLIENT_ID: productionGithubClientId,
                     D1_NAME: 'liry24-com',
                     R2_BUCKET: 'liry24-com',
                     R2_DOMAIN: imagesDomain,
@@ -136,6 +138,9 @@ export default defineNuxtConfig({
                         enabled: true,
                         invocation_logs: true,
                     },
+                },
+                triggers: {
+                    crons: ['* * * * *'],
                 },
                 // @ts-expect-error Nitro's bundled Wrangler types do not include Workers Caching yet.
                 cache: {
@@ -147,6 +152,10 @@ export default defineNuxtConfig({
         compressPublicAssets: true,
         experimental: {
             asyncContext: true,
+            tasks: true,
+        },
+        scheduledTasks: {
+            '* * * * *': ['posts:maintenance'],
         },
     },
 

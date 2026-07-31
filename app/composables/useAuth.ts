@@ -1,10 +1,11 @@
+import { oauthProviderClient } from '@better-auth/oauth-provider/client'
 import { passkeyClient } from '@better-auth/passkey/client'
 import { adminClient, lastLoginMethodClient } from 'better-auth/client/plugins'
 import { createAuthClient } from 'better-auth/vue'
 import { withoutHost } from 'ufo'
 
 export const authClient = createAuthClient({
-    plugins: [passkeyClient(), adminClient(), lastLoginMethodClient()],
+    plugins: [passkeyClient(), adminClient(), lastLoginMethodClient(), oauthProviderClient()],
 })
 
 type Session = typeof authClient.$Infer.Session
@@ -41,8 +42,10 @@ export const _useAuth = () => {
 
     const signIn = {
         passkey: authClient.signIn.passkey,
-        github: () => authClient.signIn.social({ provider: 'github', callbackURL: '/' }),
-        vercel: () => authClient.signIn.social({ provider: 'vercel', callbackURL: '/' }),
+        github: (callbackURL = '/') =>
+            authClient.signIn.social({ provider: 'github', callbackURL }),
+        vercel: (callbackURL = '/') =>
+            authClient.signIn.social({ provider: 'vercel', callbackURL }),
     }
 
     const signOut = async () => {

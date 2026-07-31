@@ -4,6 +4,12 @@ definePageMeta({
 })
 
 const { signIn } = useAuth()
+const route = useRoute()
+const callbackURL = computed(() =>
+    typeof route.query.redirect === 'string' && route.query.redirect.startsWith('/')
+        ? route.query.redirect
+        : '/',
+)
 </script>
 
 <template>
@@ -19,14 +25,14 @@ const { signIn } = useAuth()
                     icon: 'mingcute:github-fill',
                     label: 'GitHub',
                     onClick: () => {
-                        signIn.github()
+                        signIn.github(callbackURL)
                     },
                 },
                 {
                     icon: 'mingcute:triangle-fill',
                     label: 'Vercel',
                     onClick: () => {
-                        signIn.vercel()
+                        signIn.vercel(callbackURL)
                     },
                 },
             ]"

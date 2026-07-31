@@ -14,6 +14,10 @@ export default defineSitemapEventHandler(async () => {
             title: true,
             slug: true,
         },
+        where: {
+            status: { eq: 'published' },
+            publishedAt: { lte: new Date() },
+        },
     })
 
     return [

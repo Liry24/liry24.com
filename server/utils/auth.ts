@@ -1,125 +1,204 @@
+import { cimd } from '@better-auth/cimd'
 import { drizzleAdapter } from '@better-auth/drizzle-adapter'
+import { mcp } from '@better-auth/mcp'
 import { passkey } from '@better-auth/passkey'
 import { betterAuth } from 'better-auth/minimal'
-import { admin, lastLoginMethod } from 'better-auth/plugins'
+import { admin, jwt, lastLoginMethod } from 'better-auth/plugins'
 
-import { schema } from '../../database'
+import { schema, useDB, type Database } from '../../database'
 
-export const auth = betterAuth({
-    appName: 'liry24',
-    secret: process.env.BETTER_AUTH_SECRET,
+const siteURL = (process.env.NUXT_PUBLIC_SITE_URL || 'https://liry24.com').replace(/\/$/u, '')
+const mcpResource = `${siteURL}/mcp`
 
-    baseURL: {
-        allowedHosts: ['localhost:3000', 'liry24.com', '*.workers.dev'],
-        fallback: 'https://liry24.com',
-    },
+type AuthEnvironment = {
+    BETTER_AUTH_SECRET?: string
+    GITHUB_CLIENT_ID?: string
+    GITHUB_CLIENT_SECRET?: string
+    VERCEL_CLIENT_ID?: string
+    VERCEL_CLIENT_SECRET?: string
+    ALLOW_SIGNUP?: string
+}
 
-    database: drizzleAdapter(db, {
-        provider: 'sqlite',
-        schema,
-        transaction: false,
-        usePlural: true,
-    }),
+export const createAuth = (
+    database: Database,
+    waitUntil: (promise: Promise<unknown>) => void,
+    environment: AuthEnvironment = process.env as AuthEnvironment,
+) =>
+    betterAuth({
+        appName: 'liry24',
+        secret: environment.BETTER_AUTH_SECRET,
 
-    account: {
-        storeStateStrategy: 'cookie',
-        updateAccountOnSignIn: true,
-        accountLinking: {
-            enabled: true,
-            trustedProviders: ['github'],
-            allowDifferentEmails: true,
+        baseURL: {
+            allowedHosts: ['localhost:3000', 'liry24.com', '*.workers.dev'],
+            fallback: 'https://liry24.com',
         },
-    },
 
-    session: {
-        expiresIn: 60 * 60 * 24 * 30,
-        updateAge: 60 * 60 * 24,
-        freshAge: 0,
-        cookieCache: {
-            enabled: true,
-            maxAge: 60 * 5,
-        },
-    },
+        database: drizzleAdapter(database, {
+            provider: 'sqlite',
+            schema,
+            transaction: false,
+            usePlural: true,
+        }),
 
-    rateLimit: {
-        enabled: true,
-        storage: 'database',
-        window: 60,
-        max: 100,
-        customRules: {
-            '/sign-in/social': {
-                window: 60,
-                max: 10,
-            },
-            '/get-session': {
-                window: 60,
-                max: 200,
+        account: {
+            storeStateStrategy: 'cookie',
+            updateAccountOnSignIn: true,
+            accountLinking: {
+                enabled: true,
+                trustedProviders: ['github'],
+                allowDifferentEmails: true,
             },
         },
-    },
 
-    emailAndPassword: {
-        enabled: false,
-    },
-
-    socialProviders: {
-        github: {
-            clientId: process.env.GITHUB_CLIENT_ID!,
-            clientSecret: process.env.GITHUB_CLIENT_SECRET,
-            mapProfileToUser: async (profile) => ({
-                email: profile.email,
-                username: profile.login,
-                displayUsername: profile.login,
-                name: profile.name,
-                image: profile.avatar_url,
-                emailVerified: true,
-            }),
-            disableSignUp: process.env.ALLOW_SIGNUP !== 'true',
+        session: {
+            expiresIn: 60 * 60 * 24 * 30,
+            updateAge: 60 * 60 * 24,
+            freshAge: 0,
+            cookieCache: {
+                enabled: true,
+                maxAge: 60 * 5,
+            },
         },
-        vercel: {
-            clientId: process.env.VERCEL_CLIENT_ID!,
-            clientSecret: process.env.VERCEL_CLIENT_SECRET,
-            mapProfileToUser: async (profile) => ({
-                email: profile.email,
-                username: profile.preferred_username,
-                displayUsername: profile.preferred_username,
-                name: profile.name,
-                image: profile.picture,
-                emailVerified: true,
-            }),
-            disableSignUp: process.env.ALLOW_SIGNUP !== 'true',
+
+        rateLimit: {
+            enabled: true,
+            storage: 'database',
+            window: 60,
+            max: 100,
+            customRules: {
+                '/sign-in/social': {
+                    window: 60,
+                    max: 10,
+                },
+                '/get-session': {
+                    window: 60,
+                    max: 200,
+                },
+            },
         },
-    },
 
-    plugins: [passkey(), lastLoginMethod(), admin()],
-
-    user: {
-        changeEmail: {
+        emailAndPassword: {
             enabled: false,
         },
-        deleteUser: {
-            enabled: false,
-        },
-    },
 
-    advanced: {
-        backgroundTasks: {
-            handler: (promise) => useEvent().context.cloudflare.context.waitUntil(promise),
+        socialProviders: {
+            github: {
+                clientId: environment.GITHUB_CLIENT_ID!,
+                clientSecret: environment.GITHUB_CLIENT_SECRET,
+                mapProfileToUser: async (profile) => ({
+                    email: profile.email,
+                    username: profile.login,
+                    displayUsername: profile.login,
+                    name: profile.name,
+                    image: profile.avatar_url,
+                    emailVerified: true,
+                }),
+                disableSignUp: environment.ALLOW_SIGNUP !== 'true',
+            },
+            vercel: {
+                clientId: environment.VERCEL_CLIENT_ID!,
+                clientSecret: environment.VERCEL_CLIENT_SECRET,
+                mapProfileToUser: async (profile) => ({
+                    email: profile.email,
+                    username: profile.preferred_username,
+                    displayUsername: profile.preferred_username,
+                    name: profile.name,
+                    image: profile.picture,
+                    emailVerified: true,
+                }),
+                disableSignUp: environment.ALLOW_SIGNUP !== 'true',
+            },
         },
-        ipAddress: {
-            ipAddressHeaders: ['x-forwarded-for', 'x-real-ip', 'cf-connecting-ip'],
-            disableIpTracking: false,
-        },
-        useSecureCookies: process.env.NODE_ENV === 'production',
-        disableCSRFCheck: false,
-        defaultCookieAttributes: {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-        },
-    },
-})
 
-export type Session = Awaited<ReturnType<typeof auth.api.getSession>>
+        plugins: [
+            passkey(),
+            lastLoginMethod(),
+            admin(),
+            jwt({
+                disableSettingJwtHeader: true,
+                jwks: {
+                    rotationInterval: 60 * 60 * 24 * 30,
+                    gracePeriod: 60 * 60 * 24 * 30,
+                },
+            }),
+            mcp({
+                loginPage: '/login',
+                consentPage: '/oauth/consent',
+                resource: mcpResource,
+                scopes: ['liry24:admin', 'offline_access'],
+                cachedResources: new Set([mcpResource]),
+                enforcePerClientResources: false,
+                accessTokenExpiresIn: 60 * 15,
+                refreshTokenExpiresIn: 60 * 60 * 24 * 30,
+                refreshTokenReuseInterval: 30,
+                grantTypes: ['authorization_code', 'refresh_token'],
+                allowDynamicClientRegistration: true,
+                allowUnauthenticatedClientRegistration: true,
+                clientRegistrationDefaultScopes: ['liry24:admin', 'offline_access'],
+                clientRegistrationAllowedScopes: ['liry24:admin', 'offline_access'],
+                advertisedMetadata: {
+                    scopes_supported: ['liry24:admin', 'offline_access'],
+                },
+                silenceWarnings: {
+                    oauthAuthServerConfig: true,
+                },
+            }),
+            cimd({
+                refreshRate: '60m',
+                allowLoopback: import.meta.dev,
+            }),
+        ],
 
-export const getAuth = async () => auth
+        user: {
+            changeEmail: {
+                enabled: false,
+            },
+            deleteUser: {
+                enabled: false,
+            },
+        },
+
+        advanced: {
+            backgroundTasks: {
+                handler: waitUntil,
+            },
+            ipAddress: {
+                ipAddressHeaders: ['x-forwarded-for', 'x-real-ip', 'cf-connecting-ip'],
+                disableIpTracking: false,
+            },
+            useSecureCookies: process.env.NODE_ENV === 'production',
+            disableCSRFCheck: false,
+            defaultCookieAttributes: {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'lax',
+            },
+        },
+    })
+
+export type Auth = ReturnType<typeof createAuth>
+type RequestAuthContext = { liry24Auth?: Auth }
+
+export type Session = Awaited<ReturnType<Auth['api']['getSession']>>
+
+export const getAuth = async () => {
+    const event = useEvent()
+    const context = event.context as typeof event.context & RequestAuthContext
+    const workerEnvironment = event.context.cloudflare.env as AuthEnvironment
+    context.liry24Auth ??= createAuth(
+        useDB(),
+        (promise) => event.context.cloudflare.context.waitUntil(promise),
+        {
+            BETTER_AUTH_SECRET:
+                workerEnvironment.BETTER_AUTH_SECRET ?? process.env.BETTER_AUTH_SECRET,
+            GITHUB_CLIENT_ID: workerEnvironment.GITHUB_CLIENT_ID ?? process.env.GITHUB_CLIENT_ID,
+            GITHUB_CLIENT_SECRET:
+                workerEnvironment.GITHUB_CLIENT_SECRET ?? process.env.GITHUB_CLIENT_SECRET,
+            VERCEL_CLIENT_ID: workerEnvironment.VERCEL_CLIENT_ID ?? process.env.VERCEL_CLIENT_ID,
+            VERCEL_CLIENT_SECRET:
+                workerEnvironment.VERCEL_CLIENT_SECRET ?? process.env.VERCEL_CLIENT_SECRET,
+            ALLOW_SIGNUP: workerEnvironment.ALLOW_SIGNUP ?? process.env.ALLOW_SIGNUP,
+        },
+    )
+    return context.liry24Auth
+}

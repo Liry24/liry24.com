@@ -148,6 +148,251 @@ export const rateLimits = table('rate_limits', {
     lastRequest: integer('last_request').notNull(),
 })
 
+export const jwks = table('jwks', {
+    id: text().primaryKey(),
+    publicKey: text('public_key').notNull(),
+    privateKey: text('private_key').notNull(),
+    createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+    expiresAt: integer('expires_at', { mode: 'timestamp_ms' }),
+    alg: text(),
+    crv: text(),
+})
+
+export const oauthClients = table(
+    'oauth_clients',
+    {
+        id: text().primaryKey(),
+        clientId: text('client_id').notNull().unique(),
+        clientSecret: text('client_secret'),
+        disabled: integer({ mode: 'boolean' }).default(false),
+        skipConsent: integer('skip_consent', { mode: 'boolean' }),
+        enableEndSession: integer('enable_end_session', { mode: 'boolean' }),
+        subjectType: text('subject_type'),
+        scopes: text({ mode: 'json' }).$type<string[]>(),
+        userId: text('user_id'),
+        createdAt: integer('created_at', { mode: 'timestamp_ms' }),
+        updatedAt: integer('updated_at', { mode: 'timestamp_ms' }),
+        name: text(),
+        uri: text(),
+        icon: text(),
+        contacts: text({ mode: 'json' }).$type<string[]>(),
+        tos: text(),
+        policy: text(),
+        softwareId: text('software_id'),
+        softwareVersion: text('software_version'),
+        softwareStatement: text('software_statement'),
+        redirectUris: text('redirect_uris', { mode: 'json' }).$type<string[]>().notNull(),
+        postLogoutRedirectUris: text('post_logout_redirect_uris', { mode: 'json' }).$type<
+            string[]
+        >(),
+        backchannelLogoutUri: text('backchannel_logout_uri'),
+        backchannelLogoutSessionRequired: integer('backchannel_logout_session_required', {
+            mode: 'boolean',
+        }),
+        tokenEndpointAuthMethod: text('token_endpoint_auth_method'),
+        clientJwks: text('jwks'),
+        jwksUri: text('jwks_uri'),
+        grantTypes: text('grant_types', { mode: 'json' }).$type<string[]>(),
+        responseTypes: text('response_types', { mode: 'json' }).$type<string[]>(),
+        public: integer({ mode: 'boolean' }),
+        type: text(),
+        requirePKCE: integer('require_pkce', { mode: 'boolean' }),
+        dpopBoundAccessTokens: integer('dpop_bound_access_tokens', { mode: 'boolean' }).default(
+            false,
+        ),
+        referenceId: text('reference_id'),
+        metadata: text({ mode: 'json' }).$type<Record<string, unknown>>(),
+    },
+    (table): SQLiteTableExtraConfigValue[] => [
+        index('oauth_clients_userId_idx').on(table.userId),
+        foreignKey({
+            name: 'oauth_clients_userId_fkey',
+            columns: [table.userId],
+            foreignColumns: [users.id],
+        }).onDelete('cascade'),
+    ],
+)
+
+export const oauthResources = table('oauth_resources', {
+    id: text().primaryKey(),
+    identifier: text().notNull().unique(),
+    name: text().notNull(),
+    accessTokenTtl: integer('access_token_ttl'),
+    refreshTokenTtl: integer('refresh_token_ttl'),
+    signingAlgorithm: text('signing_algorithm'),
+    signingKeyId: text('signing_key_id'),
+    allowedScopes: text('allowed_scopes', { mode: 'json' }).$type<string[]>(),
+    customClaims: text('custom_claims', { mode: 'json' }).$type<Record<string, unknown>>(),
+    dpopBoundAccessTokensRequired: integer('dpop_bound_access_tokens_required', {
+        mode: 'boolean',
+    }).default(false),
+    disabled: integer({ mode: 'boolean' }).default(false),
+    createdAt: integer('created_at', { mode: 'timestamp_ms' }),
+    updatedAt: integer('updated_at', { mode: 'timestamp_ms' }),
+    policyVersion: integer('policy_version').default(1),
+    metadata: text({ mode: 'json' }).$type<Record<string, unknown>>(),
+})
+
+export const oauthClientResources = table(
+    'oauth_client_resources',
+    {
+        id: text().primaryKey(),
+        clientId: text('client_id').notNull(),
+        resourceId: text('resource_id').notNull(),
+        metadata: text({ mode: 'json' }).$type<Record<string, unknown>>(),
+        createdAt: integer('created_at', { mode: 'timestamp_ms' }),
+    },
+    (table): SQLiteTableExtraConfigValue[] => [
+        index('oauth_client_resources_clientId_idx').on(table.clientId),
+        index('oauth_client_resources_resourceId_idx').on(table.resourceId),
+        foreignKey({
+            name: 'oauth_client_resources_clientId_fkey',
+            columns: [table.clientId],
+            foreignColumns: [oauthClients.clientId],
+        }).onDelete('cascade'),
+        foreignKey({
+            name: 'oauth_client_resources_resourceId_fkey',
+            columns: [table.resourceId],
+            foreignColumns: [oauthResources.identifier],
+        }).onDelete('cascade'),
+    ],
+)
+
+export const oauthRefreshTokens = table(
+    'oauth_refresh_tokens',
+    {
+        id: text().primaryKey(),
+        token: text().notNull().unique(),
+        clientId: text('client_id').notNull(),
+        sessionId: text('session_id'),
+        userId: text('user_id').notNull(),
+        referenceId: text('reference_id'),
+        authorizationCodeId: text('authorization_code_id'),
+        resources: text({ mode: 'json' }).$type<string[]>(),
+        requestedUserInfoClaims: text('requested_user_info_claims', { mode: 'json' }).$type<
+            Record<string, unknown>
+        >(),
+        expiresAt: integer('expires_at', { mode: 'timestamp_ms' }).notNull(),
+        createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+        revoked: integer({ mode: 'timestamp_ms' }),
+        rotatedAt: integer('rotated_at', { mode: 'timestamp_ms' }),
+        rotationReplayResponse: text('rotation_replay_response'),
+        rotationReplayExpiresAt: integer('rotation_replay_expires_at', {
+            mode: 'timestamp_ms',
+        }),
+        authTime: integer('auth_time', { mode: 'timestamp_ms' }),
+        confirmation: text({ mode: 'json' }).$type<Record<string, unknown>>(),
+        scopes: text({ mode: 'json' }).$type<string[]>().notNull(),
+    },
+    (table): SQLiteTableExtraConfigValue[] => [
+        index('oauth_refresh_tokens_clientId_idx').on(table.clientId),
+        index('oauth_refresh_tokens_sessionId_idx').on(table.sessionId),
+        index('oauth_refresh_tokens_userId_idx').on(table.userId),
+        index('oauth_refresh_tokens_authorizationCodeId_idx').on(table.authorizationCodeId),
+        foreignKey({
+            name: 'oauth_refresh_tokens_clientId_fkey',
+            columns: [table.clientId],
+            foreignColumns: [oauthClients.clientId],
+        }).onDelete('cascade'),
+        foreignKey({
+            name: 'oauth_refresh_tokens_sessionId_fkey',
+            columns: [table.sessionId],
+            foreignColumns: [sessions.id],
+        }).onDelete('set null'),
+        foreignKey({
+            name: 'oauth_refresh_tokens_userId_fkey',
+            columns: [table.userId],
+            foreignColumns: [users.id],
+        }).onDelete('cascade'),
+    ],
+)
+
+export const oauthAccessTokens = table(
+    'oauth_access_tokens',
+    {
+        id: text().primaryKey(),
+        token: text().notNull().unique(),
+        clientId: text('client_id').notNull(),
+        sessionId: text('session_id'),
+        userId: text('user_id'),
+        referenceId: text('reference_id'),
+        authorizationCodeId: text('authorization_code_id'),
+        resources: text({ mode: 'json' }).$type<string[]>(),
+        requestedUserInfoClaims: text('requested_user_info_claims', { mode: 'json' }).$type<
+            Record<string, unknown>
+        >(),
+        refreshId: text('refresh_id'),
+        expiresAt: integer('expires_at', { mode: 'timestamp_ms' }).notNull(),
+        createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+        revoked: integer({ mode: 'timestamp_ms' }),
+        confirmation: text({ mode: 'json' }).$type<Record<string, unknown>>(),
+        scopes: text({ mode: 'json' }).$type<string[]>().notNull(),
+    },
+    (table): SQLiteTableExtraConfigValue[] => [
+        index('oauth_access_tokens_clientId_idx').on(table.clientId),
+        index('oauth_access_tokens_sessionId_idx').on(table.sessionId),
+        index('oauth_access_tokens_userId_idx').on(table.userId),
+        index('oauth_access_tokens_authorizationCodeId_idx').on(table.authorizationCodeId),
+        index('oauth_access_tokens_refreshId_idx').on(table.refreshId),
+        foreignKey({
+            name: 'oauth_access_tokens_clientId_fkey',
+            columns: [table.clientId],
+            foreignColumns: [oauthClients.clientId],
+        }).onDelete('cascade'),
+        foreignKey({
+            name: 'oauth_access_tokens_sessionId_fkey',
+            columns: [table.sessionId],
+            foreignColumns: [sessions.id],
+        }).onDelete('set null'),
+        foreignKey({
+            name: 'oauth_access_tokens_userId_fkey',
+            columns: [table.userId],
+            foreignColumns: [users.id],
+        }).onDelete('cascade'),
+        foreignKey({
+            name: 'oauth_access_tokens_refreshId_fkey',
+            columns: [table.refreshId],
+            foreignColumns: [oauthRefreshTokens.id],
+        }).onDelete('cascade'),
+    ],
+)
+
+export const oauthConsents = table(
+    'oauth_consents',
+    {
+        id: text().primaryKey(),
+        clientId: text('client_id').notNull(),
+        userId: text('user_id'),
+        referenceId: text('reference_id'),
+        resources: text({ mode: 'json' }).$type<string[]>(),
+        requestedUserInfoClaims: text('requested_user_info_claims', { mode: 'json' }).$type<
+            Record<string, unknown>
+        >(),
+        scopes: text({ mode: 'json' }).$type<string[]>().notNull(),
+        createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+        updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull(),
+    },
+    (table): SQLiteTableExtraConfigValue[] => [
+        index('oauth_consents_clientId_idx').on(table.clientId),
+        index('oauth_consents_userId_idx').on(table.userId),
+        foreignKey({
+            name: 'oauth_consents_clientId_fkey',
+            columns: [table.clientId],
+            foreignColumns: [oauthClients.clientId],
+        }).onDelete('cascade'),
+        foreignKey({
+            name: 'oauth_consents_userId_fkey',
+            columns: [table.userId],
+            foreignColumns: [users.id],
+        }).onDelete('cascade'),
+    ],
+)
+
+export const oauthClientAssertions = table('oauth_client_assertions', {
+    id: text().primaryKey(),
+    expiresAt: integer('expires_at', { mode: 'timestamp_ms' }).notNull(),
+})
+
 export const socials = table(
     'socials',
     {
@@ -269,9 +514,25 @@ export const posts = table(
             .$onUpdate(() => /* @__PURE__ */ new Date())
             .notNull(),
         title: text().notNull(),
+        excerpt: text().default('').notNull(),
         content: text().notNull(),
+        status: text({ enum: ['draft', 'scheduled', 'published'] })
+            .default('published')
+            .notNull(),
+        scheduledAt: integer('scheduled_at', { mode: 'timestamp_ms' }),
+        publishedAt: integer('published_at', { mode: 'timestamp_ms' }),
+        authorUserId: text('author_user_id'),
     },
-    (table): SQLiteTableExtraConfigValue[] => [index('posts_createdAt_idx').on(table.createdAt)],
+    (table): SQLiteTableExtraConfigValue[] => [
+        index('posts_createdAt_idx').on(table.createdAt),
+        index('posts_status_publishedAt_idx').on(table.status, table.publishedAt),
+        index('posts_status_scheduledAt_idx').on(table.status, table.scheduledAt),
+        foreignKey({
+            name: 'posts_authorUserId_fkey',
+            columns: [table.authorUserId],
+            foreignColumns: [users.id],
+        }).onDelete('set null'),
+    ],
 )
 
 export const postTags = table(
@@ -286,6 +547,137 @@ export const postTags = table(
             name: 'post_tags_postSlug_fkey',
             columns: [table.postSlug],
             foreignColumns: [posts.slug],
+        }).onDelete('cascade'),
+    ],
+)
+
+export const postReviews = table(
+    'post_reviews',
+    {
+        id: text().primaryKey(),
+        postSlug: text('post_slug').notNull(),
+        model: text().notNull(),
+        status: text({ enum: ['completed', 'failed'] }).notNull(),
+        issues: text({ mode: 'json' })
+            .$type<Array<{ severity: 'low' | 'medium' | 'high'; message: string }>>()
+            .notNull(),
+        suggestedContent: text('suggested_content'),
+        error: text(),
+        createdAt: integer('created_at', { mode: 'timestamp_ms' })
+            .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+            .notNull(),
+    },
+    (table): SQLiteTableExtraConfigValue[] => [
+        index('post_reviews_postSlug_createdAt_idx').on(table.postSlug, table.createdAt),
+        foreignKey({
+            name: 'post_reviews_postSlug_fkey',
+            columns: [table.postSlug],
+            foreignColumns: [posts.slug],
+        }).onDelete('cascade'),
+    ],
+)
+
+export const postReviewJobs = table(
+    'post_review_jobs',
+    {
+        id: text().primaryKey(),
+        postSlug: text('post_slug').notNull(),
+        status: text({ enum: ['pending', 'running', 'completed', 'failed'] })
+            .default('pending')
+            .notNull(),
+        attempts: integer().default(0).notNull(),
+        availableAt: integer('available_at', { mode: 'timestamp_ms' }).notNull(),
+        lockedAt: integer('locked_at', { mode: 'timestamp_ms' }),
+        lastError: text('last_error'),
+        createdAt: integer('created_at', { mode: 'timestamp_ms' })
+            .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+            .notNull(),
+        updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
+            .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+            .$onUpdate(() => /* @__PURE__ */ new Date())
+            .notNull(),
+    },
+    (table): SQLiteTableExtraConfigValue[] => [
+        index('post_review_jobs_status_availableAt_idx').on(table.status, table.availableAt),
+        index('post_review_jobs_postSlug_createdAt_idx').on(table.postSlug, table.createdAt),
+        foreignKey({
+            name: 'post_review_jobs_postSlug_fkey',
+            columns: [table.postSlug],
+            foreignColumns: [posts.slug],
+        }).onDelete('cascade'),
+    ],
+)
+
+export const adminActionPlans = table(
+    'admin_action_plans',
+    {
+        id: text().primaryKey(),
+        actorUserId: text('actor_user_id').notNull(),
+        clientId: text('client_id').notNull(),
+        operations: text({ mode: 'json' }).$type<unknown[]>().notNull(),
+        snapshot: text({ mode: 'json' }).$type<unknown[]>().notNull(),
+        snapshotHash: text('snapshot_hash').notNull(),
+        status: text({
+            enum: ['pending', 'applying', 'applied', 'partially_failed', 'expired'],
+        })
+            .default('pending')
+            .notNull(),
+        result: text({ mode: 'json' }).$type<Record<string, unknown>>(),
+        expiresAt: integer('expires_at', { mode: 'timestamp_ms' }).notNull(),
+        retryExpiresAt: integer('retry_expires_at', { mode: 'timestamp_ms' }),
+        createdAt: integer('created_at', { mode: 'timestamp_ms' })
+            .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+            .notNull(),
+        appliedAt: integer('applied_at', { mode: 'timestamp_ms' }),
+    },
+    (table): SQLiteTableExtraConfigValue[] => [
+        index('admin_action_plans_actorUserId_createdAt_idx').on(
+            table.actorUserId,
+            table.createdAt,
+        ),
+        index('admin_action_plans_status_expiresAt_idx').on(table.status, table.expiresAt),
+        foreignKey({
+            name: 'admin_action_plans_actorUserId_fkey',
+            columns: [table.actorUserId],
+            foreignColumns: [users.id],
+        }).onDelete('cascade'),
+    ],
+)
+
+export const adminAuditEvents = table(
+    'admin_audit_events',
+    {
+        id: text().primaryKey(),
+        planId: text('plan_id'),
+        actorUserId: text('actor_user_id').notNull(),
+        clientId: text('client_id').notNull(),
+        source: text({ enum: ['mcp', 'admin'] }).notNull(),
+        action: text().notNull(),
+        resource: text().notNull(),
+        resourceId: text('resource_id'),
+        before: text({ mode: 'json' }).$type<unknown>(),
+        after: text({ mode: 'json' }).$type<unknown>(),
+        outcome: text({ enum: ['succeeded', 'failed', 'skipped'] }).notNull(),
+        error: text(),
+        createdAt: integer('created_at', { mode: 'timestamp_ms' })
+            .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+            .notNull(),
+    },
+    (table): SQLiteTableExtraConfigValue[] => [
+        index('admin_audit_events_planId_idx').on(table.planId),
+        index('admin_audit_events_actorUserId_createdAt_idx').on(
+            table.actorUserId,
+            table.createdAt,
+        ),
+        foreignKey({
+            name: 'admin_audit_events_planId_fkey',
+            columns: [table.planId],
+            foreignColumns: [adminActionPlans.id],
+        }).onDelete('set null'),
+        foreignKey({
+            name: 'admin_audit_events_actorUserId_fkey',
+            columns: [table.actorUserId],
+            foreignColumns: [users.id],
         }).onDelete('cascade'),
     ],
 )

@@ -7,7 +7,7 @@ const request = {
     }),
 }
 
-export default eventHandler(async () => {
+export default adminSessionEventHandler(async () => {
     const { limit, offset } = await validateQuery(request.query)
 
     const data = await db.query.posts.findMany({
@@ -16,6 +16,10 @@ export default eventHandler(async () => {
             createdAt: true,
             updatedAt: true,
             title: true,
+            excerpt: true,
+            status: true,
+            scheduledAt: true,
+            publishedAt: true,
         },
         with: {
             tags: {
@@ -23,11 +27,17 @@ export default eventHandler(async () => {
                     tag: true,
                 },
             },
+            reviews: {
+                orderBy: {
+                    createdAt: 'desc',
+                },
+                limit: 1,
+            },
         },
         orderBy: {
             createdAt: 'desc',
         },
-        limit,
+        limit: Math.min(limit, 50),
         offset,
     })
 

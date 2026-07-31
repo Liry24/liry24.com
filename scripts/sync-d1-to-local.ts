@@ -19,6 +19,14 @@ const dataImportOrder = [
     'verifications',
     'rate_limits',
     'passkeys',
+    'jwks',
+    'oauth_clients',
+    'oauth_resources',
+    'oauth_client_resources',
+    'oauth_refresh_tokens',
+    'oauth_access_tokens',
+    'oauth_consents',
+    'oauth_client_assertions',
     'socials',
     'careers',
     'works',
@@ -28,6 +36,10 @@ const dataImportOrder = [
     'ranks',
     'posts',
     'post_tags',
+    'post_reviews',
+    'post_review_jobs',
+    'admin_action_plans',
+    'admin_audit_events',
 ] as const
 
 interface LocalWranglerConfigOptions {
