@@ -6,6 +6,7 @@ import { betterAuth } from 'better-auth/minimal'
 import { admin, jwt, lastLoginMethod, oAuthProxy } from 'better-auth/plugins'
 
 import { schema, useDB, type Database } from '../../database'
+import { chatGptCimdClientDiscovery } from './chatGptCimd'
 
 const siteURL = (process.env.NUXT_PUBLIC_SITE_URL || 'https://liry24.com').replace(/\/$/u, '')
 const mcpResource = `${siteURL}/mcp`
@@ -34,11 +35,7 @@ export const createAuth = (
             fallback: 'https://liry24.com',
         },
         trustedOrigins: async (request) => {
-            const origins = [
-                'http://localhost:3000',
-                'http://127.0.0.1:3000',
-                'https://liry24.com',
-            ]
+            const origins = ['http://localhost:3000', 'http://127.0.0.1:3000', 'https://liry24.com']
 
             // ChatGPT's DCR request can include credentials from the
             // connector browser context. Allow its documented web origins
@@ -165,6 +162,11 @@ export const createAuth = (
                 grantTypes: ['authorization_code', 'refresh_token'],
                 allowDynamicClientRegistration: true,
                 allowUnauthenticatedClientRegistration: true,
+                extensions: [
+                    {
+                        clientDiscovery: chatGptCimdClientDiscovery,
+                    },
+                ],
                 clientRegistrationDefaultScopes: ['liry24:admin', 'offline_access'],
                 clientRegistrationAllowedScopes: ['liry24:admin', 'offline_access'],
                 advertisedMetadata: {

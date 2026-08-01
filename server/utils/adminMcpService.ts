@@ -29,11 +29,8 @@ import {
     normalizeAdminUploadKey,
 } from './adminUpload'
 import type { Auth } from './auth'
-import {
-    createPublishWorkflow,
-    type PostAutomation,
-} from './postService'
-import { storage } from './storage'
+import { createPublishWorkflow, type PostAutomation } from './postService'
+import { getStorage } from './storage'
 
 const PLAN_TTL_MS = 10 * 60_000
 const RETRY_TTL_MS = 24 * 60 * 60_000
@@ -1285,7 +1282,13 @@ export const applyAdminPlan = async (
                         operationAutomation = { schedule }
                     }
                 }
-                pushContentStatements(database, statements, operation, actor.userId, operationAutomation)
+                pushContentStatements(
+                    database,
+                    statements,
+                    operation,
+                    actor.userId,
+                    operationAutomation,
+                )
                 const auditId = crypto.randomUUID()
                 statements.push(
                     auditStatement(database, {
@@ -1446,6 +1449,7 @@ export const issueAdminUploadUrl = async (
 ) => {
     const validated = adminUploadRequestSchema.parse(input)
     const key = normalizeAdminUploadKey(validated.key)
+    const storage = getStorage()
     const [uploadInfo, publicUrl] = await Promise.all([
         storage.signedUploadUrl(key, {
             contentType: validated.contentType,

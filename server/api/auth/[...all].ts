@@ -59,14 +59,21 @@ const normalizeChatGptAuthorizationResponse = (response: Response, request: Requ
     const redirectURL = new URL(location, request.url)
     const isSameOrigin = redirectURL.origin === new URL(request.url).origin
     const isChatGptCallback =
-        isChatGptOrigin(redirectURL.origin) &&
-        redirectURL.pathname.startsWith('/connector/oauth/')
+        isChatGptOrigin(redirectURL.origin) && redirectURL.pathname.startsWith('/connector/oauth/')
     if (!isSameOrigin && !isChatGptCallback) return response
+
+    // ChatGPT's callback relay currently rejects the optional RFC 9207
+    // issuer parameter before it reaches the token endpoint. Discovery
+    // advertises this extension as optional, so omit it only for ChatGPT;
+    // state, exact redirect URI, and PKCE remain enforced by Better Auth.
+    const compatibleRedirectURL = isChatGptCallback
+        ? withoutOAuthResponseIssuer(redirectURL)
+        : redirectURL
 
     // Some connector webviews do not follow a relative Location returned by
     // the OAuth login redirect. Make same-origin redirects absolute while
     // preserving the original query and status.
-    const absoluteLocation = redirectURL.toString()
+    const absoluteLocation = compatibleRedirectURL.toString()
     if (location === absoluteLocation) return response
 
     const headers = new Headers(response.headers)
@@ -114,8 +121,8 @@ export default eventHandler(async (event) => {
 
     try {
         const auth = await getAuth()
-        const response = normalizeChatGptAuthorizationResponse(
-            await auth.handler(authRequest),
+        const response = await withOAuthIssuerCompatibility(
+            normalizeChatGptAuthorizationResponse(await auth.handler(authRequest), request),
             request,
         )
         return withOAuthCors(response, request)

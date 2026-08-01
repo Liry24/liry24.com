@@ -9,10 +9,6 @@ await mock.module('nitropack/runtime', () => ({
     },
 }))
 
-await mock.module('files-sdk/r2', () => ({
-    r2: () => ({}),
-}))
-
 const { liry24McpHandler } = await import('../server/utils/mcp')
 
 const connected: Client[] = []

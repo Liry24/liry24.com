@@ -1,6 +1,9 @@
+import { getStorage } from '../../utils/storage'
+
 export default adminSessionEventHandler(async () => {
     const input = await validateBody(adminUploadRequestSchema)
     const key = normalizeAdminUploadKey(input.key)
+    const storage = getStorage()
 
     const [uploadInfo, publicUrl] = await Promise.all([
         storage.signedUploadUrl(key, {
