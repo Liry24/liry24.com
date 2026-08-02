@@ -23,17 +23,17 @@
         "db:migrate:remote": "bunx wrangler d1 migrations apply liry24-com --remote --config .output/server/wrangler.json"
     },
     "dependencies": {
-        "@ai-sdk/vue": "^4.0.43",
-        "@aws-sdk/client-s3": "^3.1099.0",
-        "@aws-sdk/lib-storage": "^3.1100.0",
-        "@aws-sdk/s3-presigned-post": "^3.1099.0",
-        "@aws-sdk/s3-request-presigner": "^3.1099.0",
+        "@ai-sdk/vue": "^4.0.48",
+        "@aws-sdk/client-s3": "^3.1101.0",
+        "@aws-sdk/lib-storage": "^3.1101.0",
+        "@aws-sdk/s3-presigned-post": "^3.1101.0",
+        "@aws-sdk/s3-request-presigner": "^3.1101.0",
         "@better-auth/cimd": "1.7.0-rc.2",
         "@better-auth/drizzle-adapter": "1.7.0-rc.2",
         "@better-auth/mcp": "1.7.0-rc.2",
         "@better-auth/passkey": "1.7.0-rc.2",
         "@comark/nuxt": "0.5.1",
-        "@iconify-json/mingcute": "^1.2.7",
+        "@iconify-json/mingcute": "^1.2.8",
         "@iconify-json/simple-icons": "^1.2.92",
         "@modelcontextprotocol/server": "2.0.0",
         "@nuxt/image": "^2.1.0",
@@ -43,7 +43,6 @@
         "@takumi-rs/wasm": "2.5.4",
         "@vueuse/nuxt": "^14.3.0",
         "@yeger/vue-masonry-wall": "^6.1.4",
-        "aws4fetch": "^1.0.20",
         "better-auth": "1.7.0-rc.2",
         "cnfast": "^0.1.0",
         "drizzle-orm": "1.0.0-rc.4",
@@ -60,7 +59,7 @@
         "zod": "^4.4.3"
     },
     "devDependencies": {
-        "@cloudflare/workers-types": "^5.20260730.1",
+        "@cloudflare/workers-types": "^5.20260801.1",
         "@libsql/client": "^0.17.4",
         "@modelcontextprotocol/client": "2.0.0",
         "@nuxt/a11y": "^1.0.0-alpha.1",
@@ -74,8 +73,8 @@
         "oxlint-tsgolint": "^7.0.2001",
         "taze": "^19.16.0",
         "typescript": "^6.0.3",
-        "vue-tsc": "^3.3.8",
-        "wrangler": "^4.115.0"
+        "vue-tsc": "^3.3.9",
+        "wrangler": "^4.118.0"
     },
     "overrides": {
         "vue": "latest"

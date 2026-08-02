@@ -26,7 +26,6 @@ export const getStorage = () => {
             secretAccessKey: config.secretAccessKey!,
             bucket: config.bucket!,
             publicBaseUrl: config.publicBaseUrl!,
-            client: 'fetch',
         }),
     })
     return storage
