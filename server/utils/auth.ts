@@ -6,8 +6,6 @@ import { betterAuth } from 'better-auth/minimal'
 import { admin, jwt, lastLoginMethod, oAuthProxy } from 'better-auth/plugins'
 
 import { schema, useDB, type Database } from '../../database'
-import { chatGptCimdClientDiscovery } from './chatGptCimd'
-
 const siteURL = (process.env.NUXT_PUBLIC_SITE_URL || 'https://liry24.com').replace(/\/$/u, '')
 const mcpResource = `${siteURL}/mcp`
 
@@ -34,24 +32,7 @@ export const createAuth = (
             allowedHosts: ['localhost:3000', '127.0.0.1:3000', 'liry24.com', '*.workers.dev'],
             fallback: 'https://liry24.com',
         },
-        trustedOrigins: async (request) => {
-            const origins = ['http://localhost:3000', 'http://127.0.0.1:3000', 'https://liry24.com']
-
-            // ChatGPT's DCR request can include credentials from the
-            // connector browser context. Allow its documented web origins
-            // only for the OAuth client-registration endpoint, keeping the
-            // rest of Better Auth's CSRF checks unchanged.
-            if (request && new URL(request.url).pathname.endsWith('/oauth2/register')) {
-                origins.push(
-                    'https://chatgpt.com',
-                    'https://*.chatgpt.com',
-                    // Legacy ChatGPT web clients may still use this host.
-                    'https://chat.openai.com',
-                )
-            }
-
-            return origins
-        },
+        trustedOrigins: ['http://localhost:3000', 'http://127.0.0.1:3000', 'https://liry24.com'],
 
         database: drizzleAdapter(database, {
             provider: 'sqlite',
@@ -61,9 +42,8 @@ export const createAuth = (
         }),
 
         account: {
-            // ChatGPT can retry OAuth in a second tab while the first flow is
-            // still open. Persist each state server-side so one flow cannot
-            // overwrite another flow's single state cookie.
+            // Persist concurrent OAuth states server-side so one browser tab
+            // cannot overwrite another tab's state cookie.
             storeStateStrategy: 'database',
             updateAccountOnSignIn: true,
             accountLinking: {
@@ -162,11 +142,6 @@ export const createAuth = (
                 grantTypes: ['authorization_code', 'refresh_token'],
                 allowDynamicClientRegistration: true,
                 allowUnauthenticatedClientRegistration: true,
-                extensions: [
-                    {
-                        clientDiscovery: chatGptCimdClientDiscovery,
-                    },
-                ],
                 clientRegistrationDefaultScopes: ['liry24:admin', 'offline_access'],
                 clientRegistrationAllowedScopes: ['liry24:admin', 'offline_access'],
                 advertisedMetadata: {

@@ -2,7 +2,7 @@
 
 ## Value Proposition
 
-Liry24 の既存管理者が、ChatGPT または Codex との会話からサイトコンテンツと
+Liry24 の既存管理者が、MCP 対応クライアントとの会話からサイトコンテンツと
 安全なユーザー管理操作をまとめて実行できるようにする。
 
 現在は `/admin` の各画面を個別に開いて操作する必要があり、複数リソースにまたがる
@@ -28,7 +28,7 @@ Liry24 の既存管理者が、ChatGPT または Codex との会話からサイ�
 
 ## Interaction Overview
 
-専用 UI は作らず、ChatGPT と Codex の標準ツール表示を使う。
+専用 UI は作らず、MCP 対応クライアントの標準ツール表示を使う。
 
 1. `liry24_admin_query` で対象を確認する。
 2. `liry24_admin_prepare` が最大 50 操作を検証し、変更前後の差分と `planId` を返す。
@@ -43,7 +43,7 @@ Liry24 の既存管理者が、ChatGPT または Codex との会話からサイ�
 - **Auth**: Better Auth `1.7.0-rc.2`;既存の `role === "admin"` のみ許可
 - **MCP endpoint**: `https://liry24.com/mcp`
 - **Protocol**: MCP `2026-07-28` primary、legacy stateless fallback
-- **Clients**: 個人用 ChatGPT remote MCP と個人用 Codex plugin
+- **Clients**: OAuth と MCP に対応したクライアント
 - **No custom view**: Skybridge view、公開ディレクトリ申請、impersonation は対象外
 
 ## MCP Contract
