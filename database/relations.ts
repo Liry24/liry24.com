@@ -169,6 +169,28 @@ export const relations = defineRelations(schema, (r) => ({
             optional: false,
         }),
     },
+    persons: {
+        works: r.many.workPersons({
+            from: r.persons.id,
+            to: r.workPersons.personId,
+        }),
+        links: r.many.personLinks({
+            from: r.persons.id,
+            to: r.personLinks.personId,
+        }),
+    },
+    personLinks: {
+        person: r.one.persons({
+            from: r.personLinks.personId,
+            to: r.persons.id,
+        }),
+    },
+    works: {
+        persons: r.many.workPersons({
+            from: r.works.slug,
+            to: r.workPersons.workSlug,
+        }),
+    },
     posts: {
         author: r.one.users({
             from: r.posts.authorUserId,

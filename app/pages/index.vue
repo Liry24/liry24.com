@@ -77,15 +77,11 @@ defineSeo({
 
         <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ delay: 0.6 }">
             <div class="flex w-full flex-col items-center gap-2">
-                <div class="flex items-center gap-2">
-                    <Icon name="liria:liria" size="32" aria-hidden="true" />
-                    <h2
-                        class="text-toned ml-1 pt-0.5 text-3xl leading-none font-extrabold text-nowrap"
-                    >
-                        Liria
-                    </h2>
+                <div class="flex items-center gap-3 leading-none text-nowrap">
+                    <Icon name="liria:liria" size="42" aria-hidden="true" class="text-toned" />
+                    <h2 class="ml-1 pt-0.5 text-5xl font-extrabold">Liria</h2>
                     <p
-                        class="text-muted pt-0.5 text-3xl leading-none font-thin tracking-tight text-nowrap before:content-['//_']"
+                        class="text-muted pt-0.5 text-5xl font-thin tracking-tighter before:content-['//']"
                     >
                         Creation Circle
                     </p>
@@ -162,7 +158,7 @@ defineSeo({
             :initial="{ opacity: 0 }"
             :animate="{ opacity: 1 }"
             :transition="{ delay: 0.65 }"
-            class="mt-12 mb-20 max-w-sm self-center"
+            class="my-12 max-w-sm self-center"
         />
 
         <div class="grid w-full max-w-6xl grid-cols-1 gap-x-16 gap-y-24 self-center lg:grid-cols-2">
@@ -184,8 +180,9 @@ defineSeo({
                     class="text-muted mx-2 flex flex-col items-start gap-1 tracking-wide"
                 >
                     <p class="font-mono text-sm text-nowrap">{{ career.period }}</p>
-                    <p class="text-toned grow font-medium">
-                        {{ career.position }} at
+                    <p class="text-toned font-medium">
+                        {{ career.position }}
+                        <span class="text-muted font-light">at </span>
                         <span class="text-highlighted">{{ career.company }}</span>
                     </p>
                 </div>
@@ -223,7 +220,16 @@ defineSeo({
                     <NuxtImg :src="rank.imageUrl" :alt="rank.rank" :width="40" :height="40" />
                 </NuxtLink>
             </Motion>
+        </div>
 
+        <MotionUSeparator
+            :initial="{ opacity: 0 }"
+            :animate="{ opacity: 1 }"
+            :transition="{ delay: 0.9 }"
+            class="my-12 max-w-sm self-center"
+        />
+
+        <div class="grid w-full max-w-6xl grid-cols-1 gap-x-16 gap-y-24 self-center lg:grid-cols-2">
             <Motion
                 as="div"
                 :initial="{ opacity: 0, filter: 'blur(20px)' }"
@@ -244,9 +250,7 @@ defineSeo({
                         :to="`/posts/${post.slug}`"
                         class="hover:bg-muted flex h-fit flex-col gap-3 rounded-xl p-6 transition-colors"
                     >
-                        <h2
-                            class="before:text-dimmed line-clamp-2 text-2xl font-bold before:font-mono before:-tracking-widest before:content-['//_']"
-                        >
+                        <h2 class="line-clamp-2 text-2xl font-bold">
                             {{ post.title }}
                         </h2>
 

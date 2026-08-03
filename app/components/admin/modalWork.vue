@@ -40,6 +40,8 @@ const state = reactive<Schema>({
     },
     icon: props.data?.icon || '',
     href: props.data?.href || '',
+    price: props.data?.price || '',
+    style: props.data?.style || 'small',
 })
 
 const onSubmit = async () => {
@@ -94,6 +96,15 @@ const onSubmit = async () => {
                     />
                 </UFormField>
 
+                <UFormField label="Image">
+                    <FileUpload
+                        v-model="state.image"
+                        prefix="work"
+                        accept="image/*"
+                        label="Upload Image"
+                    />
+                </UFormField>
+
                 <UFormField label="Description" name="description">
                     <UTextarea
                         v-model="state.description"
@@ -128,19 +139,19 @@ const onSubmit = async () => {
                     </div>
                 </UFormField>
 
-                <UFormField v-if="props.fields.slug" label="Slug" name="slug">
+                <UFormField label="URL" name="href">
                     <UInput
-                        v-model="state.slug"
-                        placeholder="work-slug"
+                        v-model="state.href"
+                        placeholder="https://example.com"
                         variant="soft"
                         class="w-full"
                     />
                 </UFormField>
 
-                <UFormField label="URL" name="href">
+                <UFormField label="Price" name="price">
                     <UInput
-                        v-model="state.href"
-                        placeholder="https://example.com"
+                        v-model="state.price"
+                        placeholder="1,000 JPY"
                         variant="soft"
                         class="w-full"
                     />
@@ -159,12 +170,24 @@ const onSubmit = async () => {
                     </UInput>
                 </UFormField>
 
-                <UFormField label="Image">
-                    <FileUpload
-                        v-model="state.image"
-                        prefix="work"
-                        accept="image/*"
-                        label="Upload Image"
+                <UFormField v-if="props.fields.slug" label="Slug" name="slug">
+                    <UInput
+                        v-model="state.slug"
+                        placeholder="work-slug"
+                        variant="soft"
+                        class="w-full"
+                    />
+                </UFormField>
+
+                <UFormField label="Style" name="style">
+                    <USelect
+                        v-model="state.style"
+                        :items="[
+                            { label: 'Large', value: 'large' },
+                            { label: 'Small', value: 'small' },
+                        ]"
+                        variant="soft"
+                        class="w-full"
                     />
                 </UFormField>
             </UForm>

@@ -8,6 +8,7 @@ import {
     type SQLiteTableExtraConfigValue,
     uniqueIndex,
 } from 'drizzle-orm/sqlite-core'
+import { nanoid } from 'nanoid'
 
 export const users = table('users', {
     id: text().primaryKey(),
@@ -393,6 +394,35 @@ export const oauthClientAssertions = table('oauth_client_assertions', {
     expiresAt: integer('expires_at', { mode: 'timestamp_ms' }).notNull(),
 })
 
+export const persons = table('persons', {
+    id: text()
+        .primaryKey()
+        .$default(() => nanoid()),
+    name: text().notNull(),
+    description: text(),
+    image: text(),
+})
+
+export const personLinks = table(
+    'person_links',
+    {
+        id: text()
+            .primaryKey()
+            .$default(() => nanoid()),
+        personId: text('person_id').notNull(),
+        href: text().notNull(),
+        label: text().notNull(),
+    },
+    (table): SQLiteTableExtraConfigValue[] => [
+        index('person_links_personId_idx').on(table.personId),
+        foreignKey({
+            name: 'person_links_personId_fkey',
+            columns: [table.personId],
+            foreignColumns: [persons.id],
+        }).onDelete('cascade'),
+    ],
+)
+
 export const socials = table(
     'socials',
     {
@@ -434,10 +464,38 @@ export const works = table(
         image: text(),
         icon: text(),
         href: text(),
+        price: text(),
+        style: text({ enum: ['large', 'small'] })
+            .default('small')
+            .notNull(),
         sortIndex: integer('sort_index', { mode: 'number' }).notNull().default(0),
     },
     (table): SQLiteTableExtraConfigValue[] => [
         index('works_sortIndex_createdAt_idx').on(table.sortIndex, table.createdAt),
+    ],
+)
+
+export const workPersons = table(
+    'work_persons',
+    {
+        id: text()
+            .primaryKey()
+            .$default(() => nanoid()),
+        workSlug: text('work_slug').notNull(),
+        personId: text('person_id').notNull(),
+    },
+    (table): SQLiteTableExtraConfigValue[] => [
+        index('work_persons_workSlug_idx').on(table.workSlug),
+        foreignKey({
+            name: 'work_persons_workSlug_fkey',
+            columns: [table.workSlug],
+            foreignColumns: [works.slug],
+        }).onDelete('cascade'),
+        foreignKey({
+            name: 'work_persons_personId_fkey',
+            columns: [table.personId],
+            foreignColumns: [persons.id],
+        }).onDelete('cascade'),
     ],
 )
 
