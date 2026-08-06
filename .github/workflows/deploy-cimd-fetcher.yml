@@ -1,23 +1,28 @@
-name: Deploy production
+name: Deploy CIMD fetcher
 
 on:
   push:
     branches:
       - main
+    paths:
+      - .github/workflows/deploy-cimd-fetcher.yml
+      - bun.lock
+      - package.json
+      - workers/cimd-fetcher/**
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: liry24-production-deploy
+  group: liry24-cimd-fetcher-deploy
   cancel-in-progress: false
 
 jobs:
   deploy:
-    name: Deploy Workers and CIMD container
+    name: Build and deploy CIMD fetcher
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 30
     environment: production
     env:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -40,20 +45,8 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - name: Verify application
-        run: |
-          bun run lint
-          bun run typecheck
-          bun run cimd-fetcher:typecheck
-          bun test
-          bun run db:generate
-          git diff --exit-code -- drizzle
-
-      - name: Build Worker
-        run: bun run build
+      - name: Type check CIMD fetcher
+        run: bun run cimd-fetcher:typecheck
 
       - name: Deploy CIMD container Worker
         run: bunx wrangler deploy --config workers/cimd-fetcher/wrangler.jsonc --keep-vars
-
-      - name: Deploy application Worker
-        run: bunx wrangler deploy --config .output/server/wrangler.json --keep-vars
