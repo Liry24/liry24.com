@@ -1,4 +1,4 @@
-import { mcpHandler } from '@better-auth/mcp'
+import { requireMcpAuth } from '@better-auth/mcp'
 import type { R2Bucket } from '@cloudflare/workers-types'
 import {
     localhostAllowedOrigins,
@@ -35,6 +35,7 @@ const corsHeaders = (request: Request) => {
     const allowHeaders = new Set([
         'authorization',
         'content-type',
+        'dpop',
         'mcp-protocol-version',
         'mcp-session-id',
     ])
@@ -45,7 +46,7 @@ const corsHeaders = (request: Request) => {
 
     return {
         ...(origin ? { 'access-control-allow-origin': origin } : {}),
-        'access-control-allow-methods': 'GET, POST, DELETE, OPTIONS',
+        'access-control-allow-methods': 'POST, OPTIONS',
         'access-control-allow-headers': [...allowHeaders].join(', '),
         'access-control-expose-headers': 'MCP-Protocol-Version, MCP-Session-Id, WWW-Authenticate',
         'access-control-max-age': '600',
@@ -70,14 +71,8 @@ const createProtectedMcp = (
     imageBaseUrl: string,
     automation: import('../utils/postService').PostAutomation,
 ) =>
-    mcpHandler(
-        {
-            verifyOptions: {
-                issuer,
-                audience: resource,
-            },
-            jwksUrl: `${issuer}/jwks`,
-        },
+    requireMcpAuth(
+        auth,
         async (request: Request, jwt: JWTPayload) => {
             const userId = typeof jwt.sub === 'string' ? jwt.sub : null
             const clientId =
@@ -94,7 +89,7 @@ const createProtectedMcp = (
                       ? jwt.scope.filter((scope): scope is string => typeof scope === 'string')
                       : []
 
-            if (!userId || !clientId || !sessionId || !scopes.includes(requiredScope))
+            if (!userId || !clientId || !sessionId)
                 return jsonRpcError(403, 'The access token is missing required MCP claims')
 
             const [user, session] = await Promise.all([
@@ -138,9 +133,10 @@ const createProtectedMcp = (
             return liry24McpHandler.fetch(request, { authInfo })
         },
         {
-            resourceMetadataMappings: {
-                [resource]: `${siteURL}/.well-known/oauth-protected-resource/mcp`,
-            },
+            resource,
+            issuer,
+            jwksUrl: `${issuer}/jwks`,
+            requiredScopes: [requiredScope],
         },
     )
 

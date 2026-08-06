@@ -216,7 +216,7 @@ export const liry24McpHandler = createMcpHandler(
         return server
     },
     {
-        legacy: 'stateless',
+        legacy: 'reject',
         responseMode: 'json',
         onerror: (error) => {
             console.error(

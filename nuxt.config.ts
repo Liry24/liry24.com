@@ -153,6 +153,13 @@ export default defineNuxtConfig({
                         script_name: 'liry24-post-publisher',
                     },
                 ],
+                services: [
+                    {
+                        binding: 'CIMD_FETCHER',
+                        service: 'liry24-cimd-fetcher',
+                        experimental_remote: true,
+                    },
+                ],
                 vars: {
                     NUXT_PUBLIC_SITE_URL: baseURL,
                     GITHUB_CLIENT_ID: productionGithubClientId,
