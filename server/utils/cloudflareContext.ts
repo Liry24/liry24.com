@@ -16,6 +16,17 @@ type CloudflarePlatform = {
 const getCloudflarePlatform = (event: H3Event) =>
     event.context._platform as CloudflarePlatform | undefined
 
+const getEventCloudflareContext = (event: H3Event) =>
+    event.context.cloudflare as CloudflareRequestContext | undefined
+
+export const getCloudflareEnvironment = <Environment>(event: H3Event) => {
+    const cloudflare = getEventCloudflareContext(event) ?? getCloudflarePlatform(event)?.cloudflare
+
+    // The module-worker entry exposes bindings through `process.env`. Prefer the
+    // request context when it is available so local development stays compatible.
+    return (cloudflare?.env ?? process.env) as unknown as Environment
+}
+
 export const attachCloudflareContext = (event: H3Event) => {
     const platform = getCloudflarePlatform(event)
     const cloudflare = platform?.cloudflare

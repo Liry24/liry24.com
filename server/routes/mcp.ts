@@ -9,7 +9,9 @@ import type { JWTPayload } from 'jose'
 
 import { useDB, type Database } from '../../database'
 import { getAuth, type Auth } from '../utils/auth'
+import { getCloudflareEnvironment } from '../utils/cloudflareContext'
 import { liry24McpHandler } from '../utils/mcp'
+import type { PostAutomation } from '../utils/postService'
 
 const siteURL = (process.env.NUXT_PUBLIC_SITE_URL || 'https://liry24.com').replace(/\/$/u, '')
 const resource = `${siteURL}/mcp`
@@ -153,13 +155,16 @@ export default eventHandler(async (event) => {
             headers: corsHeaders(request),
         })
 
+    const environment = getCloudflareEnvironment<
+        { R2: R2Bucket } & Required<Pick<PostAutomation, 'reviewQueue' | 'publishWorkflow'>>
+    >(event)
     const database = useDB()
     const auth = await getAuth()
-    const r2 = event.context.cloudflare.env.R2
+    const r2 = environment.R2
     const imageBaseUrl = useRuntimeConfig(event).public.imagesDomain
     const protectedMcp = createProtectedMcp(auth, database, r2, imageBaseUrl, {
-        reviewQueue: event.context.cloudflare.env.POST_REVIEW_QUEUE,
-        publishWorkflow: event.context.cloudflare.env.POST_PUBLISH_WORKFLOW,
+        reviewQueue: environment.reviewQueue,
+        publishWorkflow: environment.publishWorkflow,
     })
     return withCors(await protectedMcp(request), request)
 })

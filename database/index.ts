@@ -2,13 +2,14 @@ import type { D1Database } from '@cloudflare/workers-types'
 import { drizzle } from 'drizzle-orm/d1'
 import { useEvent } from 'nitropack/runtime'
 
+import { getCloudflareEnvironment } from '../server/utils/cloudflareContext'
 import { relations } from './relations'
 import * as schema from './schema'
 
 const createDB = (d1: D1Database) => drizzle(d1, { relations })
 
 const useDB = () => {
-    const d1 = useEvent().context.cloudflare.env.DB
+    const d1 = getCloudflareEnvironment<{ DB: D1Database }>(useEvent()).DB
     return createDB(d1)
 }
 

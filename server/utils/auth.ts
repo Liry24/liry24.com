@@ -7,6 +7,7 @@ import { admin, jwt, lastLoginMethod, oAuthProxy } from 'better-auth/plugins'
 
 import { schema, useDB, type Database } from '../../database'
 import { createCimdMetadataResourceFetch, type CimdMetadataFetcher } from './cimdFetch'
+import { getCloudflareEnvironment } from './cloudflareContext'
 const siteURL = (process.env.NUXT_PUBLIC_SITE_URL || 'https://liry24.com').replace(/\/$/u, '')
 const mcpResource = `${siteURL}/mcp`
 
@@ -195,12 +196,12 @@ export type Session = Awaited<ReturnType<Auth['api']['getSession']>>
 export const getAuth = async () => {
     const event = useEvent()
     const context = event.context as typeof event.context & RequestAuthContext
-    const workerEnvironment = event.context.cloudflare.env as AuthEnvironment & {
-        CIMD_FETCHER?: CimdMetadataFetcher
-    }
+    const workerEnvironment = getCloudflareEnvironment<
+        AuthEnvironment & { CIMD_FETCHER?: CimdMetadataFetcher }
+    >(event)
     context.liry24Auth ??= createAuth(
         useDB(),
-        (promise) => event.context.cloudflare.context.waitUntil(promise),
+        (promise) => event.waitUntil(promise),
         {
             BETTER_AUTH_SECRET:
                 workerEnvironment.BETTER_AUTH_SECRET ?? process.env.BETTER_AUTH_SECRET,
