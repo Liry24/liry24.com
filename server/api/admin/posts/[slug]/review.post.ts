@@ -4,21 +4,21 @@ const request = {
     params: z.object({
         slug: z.string().min(1),
     }),
+    body: z.object({
+        title: z.string().min(1).max(500),
+        excerpt: z.string().max(500),
+        content: z.string().min(1).max(100_000),
+    }),
 }
 
 export default adminSessionEventHandler(async ({ event }) => {
     const { slug } = await validateParams(request.params)
-    const jobId = await enqueuePostReview(db, slug)
-    event.context.cloudflare.context.waitUntil(
-        processPostReviewJobs(db, event.context.cloudflare.env.AI).catch((error) => {
-            console.error(
-                JSON.stringify({
-                    message: 'post review background processing failed',
-                    jobId,
-                    error: error instanceof Error ? error.message : String(error),
-                }),
-            )
-        }),
+    const input = await validateBody(request.body)
+    const jobId = await enqueuePostReview(
+        db,
+        slug,
+        input,
+        event.context.cloudflare.env.POST_REVIEW_QUEUE,
     )
     return { accepted: true, jobId }
 })

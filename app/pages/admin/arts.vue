@@ -65,6 +65,7 @@ defineShortcuts({
                                     <NuxtImg
                                         :src="art.images[0]?.src"
                                         :alt="art.images[0]?.alt"
+                                        :height="48"
                                         class="size-12 rounded-lg object-cover"
                                     />
                                 </template>

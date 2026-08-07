@@ -153,36 +153,35 @@ onMounted(() => {
 </script>
 
 <template>
-    <UCard>
+    <UCard :ui="{ header: 'flex' }">
         <template #header>
             <h2 class="my-2 text-xl leading-none font-semibold text-nowrap">Passkeys</h2>
-        </template>
-
-        <div class="flex flex-col gap-6">
-            <UPageCard
-                title="Add a passkey"
-                description="Use your device's biometrics, PIN, or a security key to sign in."
-                orientation="horizontal"
-                variant="naked"
-            >
-                <div class="flex w-full flex-col gap-2 sm:w-auto sm:min-w-80 sm:flex-row">
+            <UModal>
+                <UButton
+                    label="Create passkey"
+                    icon="mingcute:add-line"
+                    color="neutral"
+                    class="ml-auto"
+                />
+                <template #body>
                     <UInput
                         v-model="newPasskeyName"
                         placeholder="Name this passkey (optional)"
                         autocomplete="off"
                     />
                     <UButton
-                        label="Add passkey"
-                        icon="mingcute:plus-line"
-                        variant="subtle"
+                        label="Create"
                         color="neutral"
+                        size="lg"
+                        block
                         :loading="addingPasskey"
-                        class="justify-center"
                         @click="addPasskey"
                     />
-                </div>
-            </UPageCard>
+                </template>
+            </UModal>
+        </template>
 
+        <div class="flex flex-col gap-6">
             <div
                 v-if="passkeys.length"
                 class="divide-default border-default flex flex-col divide-y rounded-lg border"

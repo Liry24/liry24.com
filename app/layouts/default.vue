@@ -12,10 +12,10 @@ const tabs = [
         label: 'arts',
         to: '/arts',
     },
-    // {
-    //     label: 'works',
-    //     to: '/works',
-    // },
+    {
+        label: 'works',
+        to: '/works',
+    },
     {
         label: 'posts',
         to: '/posts',

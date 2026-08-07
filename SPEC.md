@@ -2,7 +2,7 @@
 
 ## Value Proposition
 
-Liry24 の既存管理者が、ChatGPT または Codex との会話からサイトコンテンツと
+Liry24 の既存管理者が、MCP 対応クライアントとの会話からサイトコンテンツと
 安全なユーザー管理操作をまとめて実行できるようにする。
 
 現在は `/admin` の各画面を個別に開いて操作する必要があり、複数リソースにまたがる
@@ -28,7 +28,7 @@ Liry24 の既存管理者が、ChatGPT または Codex との会話からサイ�
 
 ## Interaction Overview
 
-専用 UI は作らず、ChatGPT と Codex の標準ツール表示を使う。
+専用 UI は作らず、MCP 対応クライアントの標準ツール表示を使う。
 
 1. `liry24_admin_query` で対象を確認する。
 2. `liry24_admin_prepare` が最大 50 操作を検証し、変更前後の差分と `planId` を返す。
@@ -40,10 +40,10 @@ Liry24 の既存管理者が、ChatGPT または Codex との会話からサイ�
 
 - **Runtime**: Nuxt 4 / Nitro / Cloudflare Workers
 - **Storage**: Cloudflare D1 and R2
-- **Auth**: Better Auth `1.7.0-rc.2`;既存の `role === "admin"` のみ許可
+- **Auth**: Better Auth `1.7.0-rc.4`;既存の `role === "admin"` のみ許可
 - **MCP endpoint**: `https://liry24.com/mcp`
-- **Protocol**: MCP `2026-07-28` primary、legacy stateless fallback
-- **Clients**: 個人用 ChatGPT remote MCP と個人用 Codex plugin
+- **Protocol**: MCP `2026-07-28` の Streamable HTTP のみ。legacy stateless transport は拒否する
+- **Clients**: OAuth と MCP に対応したクライアント
 - **No custom view**: Skybridge view、公開ディレクトリ申請、impersonation は対象外
 
 ## MCP Contract
@@ -73,10 +73,14 @@ Liry24 の既存管理者が、ChatGPT または Codex との会話からサイ�
 - resource は `/mcp`、scope は `liry24:admin offline_access`。
 - access token 15 分、refresh token 30 日、reuse window 30 秒。
 - CIMD を優先し、CIMD 未対応 client 向けに DCR fallback を残す。
+- CIMD の外部 HTTPS 取得は、非公開の `liry24-cimd-fetcher` service binding 経由で
+  Node Container に委譲する。公式 `@better-auth/cimd/node` transport が DNS を一度だけ解決し、
+  public-routable address に固定して接続し、redirect を追従しない。
+- Container は Lite 1 instance、30 秒 idle sleep とし、CIMD のメタデータ本文や永続 cache は持たない。
 - consent はログイン済み admin のみ許可する。
-- MCP request ごとに JWT の `sub`、`client_id`、`scope`、`aud` と、現在の
-  user role、ban、session を検証する。
-- Origin、MCP protocol headers、header/body method-name 整合性を検証する。
+- `requireMcpAuth` が JWT の署名、issuer、audience、expiry、scope、DPoP/replay を検証し、
+  アプリ側は現在の user role、ban、session だけを追加で検証する。
+- Origin と MCP protocol headers、header/body method-name 整合性を検証する。
 
 ## Consistency and Safety
 
@@ -107,7 +111,7 @@ Liry24 の既存管理者が、ChatGPT または Codex との会話からサイ�
 
 ## Validation
 
-- MCP 2026 client と legacy client の両方で接続・tool call を検証する。
+- MCP 2026 client の接続・tool call と legacy transport の拒否を検証する。
 - OAuth discovery、CIMD、DCR fallback、admin/ban/scope/audience/session 拒否を検証する。
 - prepare/apply の期限、actor、競合、rollback、retry、self-lockout 防止を検証する。
 - posts migration、公開条件、予約公開、AI review の成功・失敗を検証する。

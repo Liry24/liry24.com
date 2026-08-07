@@ -1,6 +1,15 @@
 <script setup lang="ts">
 const { works, changed, fetchWorks, reorderWorks, deleteWork, modalWork } = useWork()
 
+const visibleAdditionalFields = ref<{ name: keyof Work }[]>([
+    { name: 'slug' },
+    { name: 'category' },
+    { name: 'description' },
+    { name: 'price' },
+    { name: 'href' },
+    { name: 'style' },
+])
+
 defineShortcuts({
     n: () => {
         modalWork.open()
@@ -60,19 +69,36 @@ defineShortcuts({
                     <ReorderGroup v-model:values="works" axis="y" class="grid gap-2">
                         <ReorderItem v-for="work in works" :key="work.slug" :value="work">
                             <div
-                                class="bg-muted/50 ring-muted flex cursor-grab items-center gap-3 rounded-lg p-4 ring select-none"
+                                class="bg-muted/70 ring-muted/50 flex cursor-grab items-center gap-2 rounded-xl px-3 py-4 ring select-none"
                             >
-                                <Icon name="mingcute:dot-grid-fill" size="20" />
+                                <Icon name="mingcute:dots-line" size="20" />
 
                                 <NuxtImg
                                     v-if="work.image"
                                     :src="work.image"
                                     alt=""
-                                    class="size-12 rounded-lg object-cover"
+                                    :height="48"
+                                    class="mr-2 size-12 rounded-lg object-cover"
                                 />
 
-                                <span class="text-sm leading-none">{{ work.title }}</span>
-                                <span class="text-muted text-sm leading-none">{{ work.slug }}</span>
+                                <div class="flex flex-col gap-3">
+                                    <span class="text-sm leading-none">{{ work.title }}</span>
+
+                                    <div class="flex flex-wrap gap-2">
+                                        <div
+                                            v-for="field in visibleAdditionalFields.filter(
+                                                (f) => work[f.name],
+                                            )"
+                                            :key="field.name"
+                                            class="bg-default text-muted flex gap-1 rounded-lg p-3 text-xs leading-none"
+                                        >
+                                            {{ field.name }}:
+                                            <span class="text-default font-mono">
+                                                {{ work[field.name] }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
 
                                 <div class="ml-auto flex items-center">
                                     <UButton

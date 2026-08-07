@@ -15,6 +15,7 @@ const { isSupported: isCopySupported, copy, copied } = useClipboard()
 defineSeo({
     title: data.value?.title,
     titleTemplate: '%s | Liry24',
+    description: data.value?.excerpt,
 })
 </script>
 
@@ -66,7 +67,7 @@ defineSeo({
             <div class="flex max-w-4xl flex-col gap-6">
                 <USeparator decorative class="my-4" />
 
-                <Comark :markdown="data.content" class="sentence px-1 *:first:mt-0 *:last:mb-0" />
+                <Markdown :value="data.content" class="sentence px-1 *:first:mt-0 *:last:mb-0" />
             </div>
         </UContainer>
     </UPage>

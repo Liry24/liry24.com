@@ -29,7 +29,8 @@ import {
     normalizeAdminUploadKey,
 } from './adminUpload'
 import type { Auth } from './auth'
-import { storage } from './storage'
+import { createPublishWorkflow, type PostAutomation } from './postService'
+import { getStorage } from './storage'
 
 const PLAN_TTL_MS = 10 * 60_000
 const RETRY_TTL_MS = 24 * 60 * 60_000
@@ -734,6 +735,10 @@ const pushContentStatements = (
     statements: BatchItem<'sqlite'>[],
     operation: AdminOperation,
     actorUserId: string,
+    postAutomation?: {
+        schedule?: { revision: string; instanceId: string }
+        reviewJob?: { id: string; input: { title: string; excerpt: string; content: string } }
+    },
 ) => {
     if (operation.action === 'create') {
         const data = operation.data
@@ -748,6 +753,9 @@ const pushContentStatements = (
                         content: String(data.content),
                         status,
                         scheduledAt: status === 'scheduled' ? toDate(data.scheduledAt) : null,
+                        scheduleRevision: postAutomation?.schedule?.revision ?? null,
+                        publishWorkflowInstanceId: postAutomation?.schedule?.instanceId ?? null,
+                        publishWorkflowEngine: postAutomation?.schedule ? 'workflow-v1' : null,
                         publishedAt: null,
                         authorUserId: actorUserId,
                     }),
@@ -1042,7 +1050,13 @@ const pushContentStatements = (
             statements.push(
                 database
                     .update(schema.posts)
-                    .set({ status: 'scheduled', scheduledAt: new Date(operation.scheduledAt) })
+                    .set({
+                        status: 'scheduled',
+                        scheduledAt: new Date(operation.scheduledAt),
+                        scheduleRevision: postAutomation?.schedule?.revision ?? null,
+                        publishWorkflowInstanceId: postAutomation?.schedule?.instanceId ?? null,
+                        publishWorkflowEngine: postAutomation?.schedule ? 'workflow-v1' : null,
+                    })
                     .where(eq(schema.posts.slug, operation.id)),
             )
             break
@@ -1050,15 +1064,27 @@ const pushContentStatements = (
             statements.push(
                 database
                     .update(schema.posts)
-                    .set({ status: 'published', publishedAt: new Date(), scheduledAt: null })
+                    .set({
+                        status: 'published',
+                        publishedAt: new Date(),
+                        scheduledAt: null,
+                        scheduleRevision: null,
+                        publishWorkflowInstanceId: null,
+                        publishWorkflowEngine: null,
+                    })
                     .where(eq(schema.posts.slug, operation.id)),
             )
             break
         case 'request_post_review':
             statements.push(
                 database.insert(schema.postReviewJobs).values({
-                    id: crypto.randomUUID(),
+                    id: postAutomation?.reviewJob?.id ?? crypto.randomUUID(),
                     postSlug: operation.id,
+                    input: postAutomation?.reviewJob?.input ?? {
+                        title: '',
+                        excerpt: '',
+                        content: '',
+                    },
                     status: 'pending',
                     attempts: 0,
                     availableAt: new Date(),
@@ -1154,6 +1180,7 @@ export const applyAdminPlan = async (
     r2: R2Bucket,
     imageBaseUrl: string,
     auth: Auth,
+    automation?: PostAutomation,
 ) => {
     const plan = await database.query.adminActionPlans.findFirst({
         where: { id: { eq: planId } },
@@ -1214,7 +1241,54 @@ export const applyAdminPlan = async (
             const d1Results: OperationResult[] = []
             for (const [index, operation] of operations.entries()) {
                 if (EXTERNAL_ACTIONS.has(operation.action)) continue
-                pushContentStatements(database, statements, operation, actor.userId)
+                const snapshot = snapshots[index] as Record<string, unknown> | null
+                let operationAutomation:
+                    | {
+                          schedule?: { revision: string; instanceId: string }
+                          reviewJob?: {
+                              id: string
+                              input: { title: string; excerpt: string; content: string }
+                          }
+                      }
+                    | undefined
+                if (operation.action === 'request_post_review') {
+                    const input = {
+                        title: typeof snapshot?.title === 'string' ? snapshot.title : '',
+                        excerpt: typeof snapshot?.excerpt === 'string' ? snapshot.excerpt : '',
+                        content: typeof snapshot?.content === 'string' ? snapshot.content : '',
+                    }
+                    if (!automation?.reviewQueue)
+                        throw new Error('Post review queue binding is not configured')
+                    const id = crypto.randomUUID()
+                    await automation.reviewQueue.send({ jobId: id })
+                    operationAutomation = { reviewJob: { id, input } }
+                }
+                if (operation.action === 'schedule_post') {
+                    const schedule = await createPublishWorkflow(
+                        automation,
+                        operation.id,
+                        new Date(operation.scheduledAt),
+                    )
+                    operationAutomation = { schedule }
+                }
+                if (operation.action === 'create' && operation.resource === 'posts') {
+                    const scheduledAt = toDate(operation.data.scheduledAt)
+                    if (operation.data.status === 'scheduled' && scheduledAt) {
+                        const schedule = await createPublishWorkflow(
+                            automation,
+                            String(operation.data.slug),
+                            scheduledAt,
+                        )
+                        operationAutomation = { schedule }
+                    }
+                }
+                pushContentStatements(
+                    database,
+                    statements,
+                    operation,
+                    actor.userId,
+                    operationAutomation,
+                )
                 const auditId = crypto.randomUUID()
                 statements.push(
                     auditStatement(database, {
@@ -1375,6 +1449,7 @@ export const issueAdminUploadUrl = async (
 ) => {
     const validated = adminUploadRequestSchema.parse(input)
     const key = normalizeAdminUploadKey(validated.key)
+    const storage = getStorage()
     const [uploadInfo, publicUrl] = await Promise.all([
         storage.signedUploadUrl(key, {
             contentType: validated.contentType,

@@ -128,6 +128,9 @@ export const postsInsertSchema = createInsertSchema(posts, {
     .omit({
         authorUserId: true,
         publishedAt: true,
+        scheduleRevision: true,
+        publishWorkflowInstanceId: true,
+        publishWorkflowEngine: true,
     })
     .extend({
         tags: z.string().min(1).array().optional(),
@@ -143,6 +146,9 @@ export const postsUpdateSchema = createUpdateSchema(posts, {
     .omit({
         authorUserId: true,
         publishedAt: true,
+        scheduleRevision: true,
+        publishWorkflowInstanceId: true,
+        publishWorkflowEngine: true,
     })
     .extend({
         tags: z.string().min(1).array().optional(),

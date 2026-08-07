@@ -8,6 +8,7 @@ import {
     type SQLiteTableExtraConfigValue,
     uniqueIndex,
 } from 'drizzle-orm/sqlite-core'
+import { nanoid } from 'nanoid'
 
 export const users = table('users', {
     id: text().primaryKey(),
@@ -393,6 +394,35 @@ export const oauthClientAssertions = table('oauth_client_assertions', {
     expiresAt: integer('expires_at', { mode: 'timestamp_ms' }).notNull(),
 })
 
+export const persons = table('persons', {
+    id: text()
+        .primaryKey()
+        .$default(() => nanoid()),
+    name: text().notNull(),
+    description: text(),
+    image: text(),
+})
+
+export const personLinks = table(
+    'person_links',
+    {
+        id: text()
+            .primaryKey()
+            .$default(() => nanoid()),
+        personId: text('person_id').notNull(),
+        href: text().notNull(),
+        label: text().notNull(),
+    },
+    (table): SQLiteTableExtraConfigValue[] => [
+        index('person_links_personId_idx').on(table.personId),
+        foreignKey({
+            name: 'person_links_personId_fkey',
+            columns: [table.personId],
+            foreignColumns: [persons.id],
+        }).onDelete('cascade'),
+    ],
+)
+
 export const socials = table(
     'socials',
     {
@@ -434,10 +464,38 @@ export const works = table(
         image: text(),
         icon: text(),
         href: text(),
+        price: text(),
+        style: text({ enum: ['large', 'small'] })
+            .default('small')
+            .notNull(),
         sortIndex: integer('sort_index', { mode: 'number' }).notNull().default(0),
     },
     (table): SQLiteTableExtraConfigValue[] => [
         index('works_sortIndex_createdAt_idx').on(table.sortIndex, table.createdAt),
+    ],
+)
+
+export const workPersons = table(
+    'work_persons',
+    {
+        id: text()
+            .primaryKey()
+            .$default(() => nanoid()),
+        workSlug: text('work_slug').notNull(),
+        personId: text('person_id').notNull(),
+    },
+    (table): SQLiteTableExtraConfigValue[] => [
+        index('work_persons_workSlug_idx').on(table.workSlug),
+        foreignKey({
+            name: 'work_persons_workSlug_fkey',
+            columns: [table.workSlug],
+            foreignColumns: [works.slug],
+        }).onDelete('cascade'),
+        foreignKey({
+            name: 'work_persons_personId_fkey',
+            columns: [table.personId],
+            foreignColumns: [persons.id],
+        }).onDelete('cascade'),
     ],
 )
 
@@ -521,6 +579,11 @@ export const posts = table(
             .notNull(),
         scheduledAt: integer('scheduled_at', { mode: 'timestamp_ms' }),
         publishedAt: integer('published_at', { mode: 'timestamp_ms' }),
+        // These fields make a scheduled publication independently addressable while
+        // keeping the schema ready for a future scheduler migration.
+        scheduleRevision: text('schedule_revision'),
+        publishWorkflowInstanceId: text('publish_workflow_instance_id'),
+        publishWorkflowEngine: text('publish_workflow_engine'),
         authorUserId: text('author_user_id'),
     },
     (table): SQLiteTableExtraConfigValue[] => [
@@ -556,12 +619,16 @@ export const postReviews = table(
     {
         id: text().primaryKey(),
         postSlug: text('post_slug').notNull(),
+        jobId: text('job_id'),
         model: text().notNull(),
         status: text({ enum: ['completed', 'failed'] }).notNull(),
         issues: text({ mode: 'json' })
             .$type<Array<{ severity: 'low' | 'medium' | 'high'; message: string }>>()
             .notNull(),
         suggestedContent: text('suggested_content'),
+        sourceContent: text('source_content'),
+        summary: text(),
+        notes: text(),
         error: text(),
         createdAt: integer('created_at', { mode: 'timestamp_ms' })
             .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
@@ -569,6 +636,7 @@ export const postReviews = table(
     },
     (table): SQLiteTableExtraConfigValue[] => [
         index('post_reviews_postSlug_createdAt_idx').on(table.postSlug, table.createdAt),
+        index('post_reviews_jobId_idx').on(table.jobId),
         foreignKey({
             name: 'post_reviews_postSlug_fkey',
             columns: [table.postSlug],
@@ -582,6 +650,9 @@ export const postReviewJobs = table(
     {
         id: text().primaryKey(),
         postSlug: text('post_slug').notNull(),
+        input: text({ mode: 'json' })
+            .$type<{ title: string; excerpt: string; content: string }>()
+            .notNull(),
         status: text({ enum: ['pending', 'running', 'completed', 'failed'] })
             .default('pending')
             .notNull(),

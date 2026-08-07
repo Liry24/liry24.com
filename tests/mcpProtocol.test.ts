@@ -9,10 +9,6 @@ await mock.module('nitropack/runtime', () => ({
     },
 }))
 
-await mock.module('files-sdk/r2', () => ({
-    r2: () => ({}),
-}))
-
 const { liry24McpHandler } = await import('../server/utils/mcp')
 
 const connected: Client[] = []
@@ -42,10 +38,10 @@ const localFetch: FetchLike = async (input, init) => {
     return liry24McpHandler.fetch(request, { authInfo })
 }
 
-const connect = async (mode: 'legacy' | 'auto') => {
+const connect = async () => {
     const client = new Client(
-        { name: `liry24-${mode}-test`, version: '1.0.0' },
-        { versionNegotiation: { mode } },
+        { name: 'liry24-auto-test', version: '1.0.0' },
+        { versionNegotiation: { mode: 'auto' } },
     )
     const transport = new StreamableHTTPClientTransport(new URL('https://liry24.test/mcp'), {
         fetch: localFetch,
@@ -57,7 +53,7 @@ const connect = async (mode: 'legacy' | 'auto') => {
 
 describe('MCP protocol compatibility', () => {
     test('serves the 2026-07-28 negotiated transport', async () => {
-        const client = await connect('auto')
+        const client = await connect()
         const { tools } = await client.listTools()
         expect(tools.map((tool) => tool.name)).toEqual([
             'liry24_admin_query',
@@ -67,9 +63,20 @@ describe('MCP protocol compatibility', () => {
         ])
     })
 
-    test('falls back to the legacy stateless transport', async () => {
-        const client = await connect('legacy')
-        const { tools } = await client.listTools()
-        expect(tools).toHaveLength(4)
+    test('rejects the legacy stateless transport', async () => {
+        const client = new Client(
+            { name: 'liry24-legacy-test', version: '1.0.0' },
+            { versionNegotiation: { mode: 'legacy' } },
+        )
+        const transport = new StreamableHTTPClientTransport(new URL('https://liry24.test/mcp'), {
+            fetch: localFetch,
+        })
+        let failure: unknown
+        try {
+            await client.connect(transport)
+        } catch (error) {
+            failure = error
+        }
+        expect(failure).toBeInstanceOf(Error)
     })
 })

@@ -2,6 +2,8 @@
 import type { Schema } from '~/components/admin/postForm.vue'
 
 const { savePost, submitting } = usePost()
+const toast = useToast()
+const generatingMetadata = ref(false)
 
 const state = reactive<Schema>({
     slug: '',
@@ -21,6 +23,33 @@ const onSubmit = async () => {
         // Error handled in composable
     }
 }
+
+const generateMetadata = async () => {
+    if (!state.content.trim()) {
+        toast.add({ title: 'Content is required', description: 'Write the post body before generating metadata.', color: 'warning' })
+        return
+    }
+    generatingMetadata.value = true
+    try {
+        const metadata = await $fetch('/api/admin/posts/metadata', {
+            method: 'POST',
+            body: { content: state.content },
+        })
+        state.slug = metadata.slug
+        state.excerpt = metadata.excerpt
+        toast.add({
+            icon: 'mingcute:ai-fill',
+            title: 'Metadata generated',
+            description: 'Slug and OGP excerpt were filled from the current content.',
+            color: 'success',
+        })
+    } catch (error) {
+        console.error(error)
+        toast.add({ title: 'Could not generate metadata', color: 'error' })
+    } finally {
+        generatingMetadata.value = false
+    }
+}
 </script>
 
 <template>
@@ -29,6 +58,15 @@ const onSubmit = async () => {
             <template #header>
                 <UDashboardNavbar title="New Post" icon="mingcute:edit-3-fill">
                     <template #right>
+                        <UButton
+                            icon="mingcute:ai-fill"
+                            label="Generate metadata"
+                            variant="outline"
+                            color="neutral"
+                            :loading="generatingMetadata"
+                            :disabled="!state.content.trim()"
+                            @click="generateMetadata"
+                        />
                         <UButton
                             icon="mingcute:upload-fill"
                             label="Save draft"

@@ -1,15 +1,14 @@
 import { eq } from 'drizzle-orm'
 
 const request = {
-    params: worksSelectSchema.required({ slug: true }),
+    params: worksSelectSchema.pick({ slug: true }).required({ slug: true }),
     body: worksUpdateSchema,
 }
 
 export default adminSessionEventHandler(async () => {
     const { slug: workSlug } = await validateParams(request.params)
-    const { slug, href, title, description, category, image, icon, sortIndex } = await validateBody(
-        request.body,
-    )
+    const { slug, href, title, description, category, image, icon, price, style, sortIndex } =
+        await validateBody(request.body)
 
     await db
         .update(schema.works)
@@ -21,6 +20,8 @@ export default adminSessionEventHandler(async () => {
             category,
             image,
             icon,
+            price,
+            style,
             sortIndex,
         })
         .where(eq(schema.works.slug, workSlug))

@@ -19,12 +19,12 @@ const { session } = useAuth()
                         <SettingsEmail :session />
                     </section>
 
-                    <section id="social" class="empty:hidden">
-                        <SettingsAccounts />
-                    </section>
-
                     <section id="passkeys">
                         <SettingsPasskeys />
+                    </section>
+
+                    <section id="social" class="empty:hidden">
+                        <SettingsAccounts />
                     </section>
 
                     <section id="sessions">

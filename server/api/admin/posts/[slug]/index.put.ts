@@ -7,10 +7,12 @@ const request = {
     body: postsUpdateSchema.omit({ slug: true }),
 }
 
-export default adminSessionEventHandler(async () => {
+export default adminSessionEventHandler(async ({ event }) => {
     const { slug } = await validateParams(request.params)
     const input = await validateBody(request.body)
-    await updateUnpublishedPost(db, slug, input)
+    await updateUnpublishedPost(db, slug, input, {
+        publishWorkflow: event.context.cloudflare.env.POST_PUBLISH_WORKFLOW,
+    })
 
     return {
         success: true,

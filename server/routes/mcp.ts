@@ -1,4 +1,4 @@
-import { mcpHandler } from '@better-auth/mcp'
+import { requireMcpAuth } from '@better-auth/mcp'
 import type { R2Bucket } from '@cloudflare/workers-types'
 import {
     localhostAllowedOrigins,
@@ -35,6 +35,7 @@ const corsHeaders = (request: Request) => {
     const allowHeaders = new Set([
         'authorization',
         'content-type',
+        'dpop',
         'mcp-protocol-version',
         'mcp-session-id',
     ])
@@ -45,7 +46,7 @@ const corsHeaders = (request: Request) => {
 
     return {
         ...(origin ? { 'access-control-allow-origin': origin } : {}),
-        'access-control-allow-methods': 'GET, POST, DELETE, OPTIONS',
+        'access-control-allow-methods': 'POST, OPTIONS',
         'access-control-allow-headers': [...allowHeaders].join(', '),
         'access-control-expose-headers': 'MCP-Protocol-Version, MCP-Session-Id, WWW-Authenticate',
         'access-control-max-age': '600',
@@ -63,15 +64,15 @@ const withCors = (response: Response, request: Request) => {
     })
 }
 
-const createProtectedMcp = (auth: Auth, database: Database, r2: R2Bucket, imageBaseUrl: string) =>
-    mcpHandler(
-        {
-            verifyOptions: {
-                issuer,
-                audience: resource,
-            },
-            jwksUrl: `${issuer}/jwks`,
-        },
+const createProtectedMcp = (
+    auth: Auth,
+    database: Database,
+    r2: R2Bucket,
+    imageBaseUrl: string,
+    automation: import('../utils/postService').PostAutomation,
+) =>
+    requireMcpAuth(
+        auth,
         async (request: Request, jwt: JWTPayload) => {
             const userId = typeof jwt.sub === 'string' ? jwt.sub : null
             const clientId =
@@ -88,7 +89,7 @@ const createProtectedMcp = (auth: Auth, database: Database, r2: R2Bucket, imageB
                       ? jwt.scope.filter((scope): scope is string => typeof scope === 'string')
                       : []
 
-            if (!userId || !clientId || !sessionId || !scopes.includes(requiredScope))
+            if (!userId || !clientId || !sessionId)
                 return jsonRpcError(403, 'The access token is missing required MCP claims')
 
             const [user, session] = await Promise.all([
@@ -126,14 +127,16 @@ const createProtectedMcp = (auth: Auth, database: Database, r2: R2Bucket, imageB
                     r2,
                     imageBaseUrl,
                     auth,
+                    automation,
                 },
             }
             return liry24McpHandler.fetch(request, { authInfo })
         },
         {
-            resourceMetadataMappings: {
-                [resource]: `${siteURL}/.well-known/oauth-protected-resource/mcp`,
-            },
+            resource,
+            issuer,
+            jwksUrl: `${issuer}/jwks`,
+            requiredScopes: [requiredScope],
         },
     )
 
@@ -154,6 +157,9 @@ export default eventHandler(async (event) => {
     const auth = await getAuth()
     const r2 = event.context.cloudflare.env.R2
     const imageBaseUrl = useRuntimeConfig(event).public.imagesDomain
-    const protectedMcp = createProtectedMcp(auth, database, r2, imageBaseUrl)
+    const protectedMcp = createProtectedMcp(auth, database, r2, imageBaseUrl, {
+        reviewQueue: event.context.cloudflare.env.POST_REVIEW_QUEUE,
+        publishWorkflow: event.context.cloudflare.env.POST_PUBLISH_WORKFLOW,
+    })
     return withCors(await protectedMcp(request), request)
 })

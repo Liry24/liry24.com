@@ -17,10 +17,10 @@ export default adminSessionEventHandler(async ({ event }) => {
     })
     return {
         client: {
-            clientId: client.clientId,
-            name: client.name,
-            uri: client.uri,
-            icon: client.icon,
+            clientId: client.client_id,
+            name: client.client_name,
+            uri: client.client_uri,
+            icon: client.logo_uri,
         },
     }
 })

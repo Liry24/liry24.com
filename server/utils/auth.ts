@@ -6,7 +6,7 @@ import { betterAuth } from 'better-auth/minimal'
 import { admin, jwt, lastLoginMethod, oAuthProxy } from 'better-auth/plugins'
 
 import { schema, useDB, type Database } from '../../database'
-
+import { createCimdMetadataResourceFetch, type CimdMetadataFetcher } from './cimdFetch'
 const siteURL = (process.env.NUXT_PUBLIC_SITE_URL || 'https://liry24.com').replace(/\/$/u, '')
 const mcpResource = `${siteURL}/mcp`
 
@@ -24,6 +24,7 @@ export const createAuth = (
     database: Database,
     waitUntil: (promise: Promise<unknown>) => void,
     environment: AuthEnvironment = process.env as AuthEnvironment,
+    cimdMetadataFetcher?: CimdMetadataFetcher,
 ) =>
     betterAuth({
         appName: 'liry24',
@@ -33,7 +34,7 @@ export const createAuth = (
             allowedHosts: ['localhost:3000', '127.0.0.1:3000', 'liry24.com', '*.workers.dev'],
             fallback: 'https://liry24.com',
         },
-        trustedOrigins: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+        trustedOrigins: ['http://localhost:3000', 'http://127.0.0.1:3000', 'https://liry24.com'],
 
         database: drizzleAdapter(database, {
             provider: 'sqlite',
@@ -43,7 +44,9 @@ export const createAuth = (
         }),
 
         account: {
-            storeStateStrategy: 'cookie',
+            // Persist concurrent OAuth states server-side so one browser tab
+            // cannot overwrite another tab's state cookie.
+            storeStateStrategy: 'database',
             updateAccountOnSignIn: true,
             accountLinking: {
                 enabled: true,
@@ -151,8 +154,9 @@ export const createAuth = (
                 },
             }),
             cimd({
-                refreshRate: '60m',
-                allowLoopback: import.meta.dev,
+                fetchClientMetadataResource: createCimdMetadataResourceFetch(cimdMetadataFetcher),
+                metadataProfile: 'mcp-2026-07-28',
+                metadataRevalidationInterval: '60m',
             }),
         ],
 
@@ -191,7 +195,9 @@ export type Session = Awaited<ReturnType<Auth['api']['getSession']>>
 export const getAuth = async () => {
     const event = useEvent()
     const context = event.context as typeof event.context & RequestAuthContext
-    const workerEnvironment = event.context.cloudflare.env as AuthEnvironment
+    const workerEnvironment = event.context.cloudflare.env as AuthEnvironment & {
+        CIMD_FETCHER?: CimdMetadataFetcher
+    }
     context.liry24Auth ??= createAuth(
         useDB(),
         (promise) => event.context.cloudflare.context.waitUntil(promise),
@@ -208,6 +214,7 @@ export const getAuth = async () => {
                 workerEnvironment.VERCEL_CLIENT_SECRET ?? process.env.VERCEL_CLIENT_SECRET,
             ALLOW_SIGNUP: workerEnvironment.ALLOW_SIGNUP ?? process.env.ALLOW_SIGNUP,
         },
+        workerEnvironment.CIMD_FETCHER,
     )
     return context.liry24Auth
 }

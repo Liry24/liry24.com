@@ -124,21 +124,7 @@ const statusItems = [
             :ui="{ container: 'grow flex flex-col' }"
             class="flex grow flex-col"
         >
-            <template #hint>
-                <span>0</span>
-            </template>
-
-            <TextEditor
-                v-model="model.content"
-                content-type="markdown"
-                :ui="{}"
-                class="grow"
-                :disabled="props.disabled"
-            >
-                <template #top="{ editor }">
-                    <TextEditorFixedToolbar :editor />
-                </template>
-            </TextEditor>
+            <UTextarea v-model="model.content" autoresize :rows="6" variant="soft" />
         </UFormField>
     </UForm>
 </template>

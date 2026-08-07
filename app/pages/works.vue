@@ -34,20 +34,52 @@ defineSeo({
                             'max-w-full h-[calc(100dvh-4rem)] w-[calc(100dvw-4rem)] rounded-4xl',
                     }"
                 >
-                    <UCard
-                        variant="soft"
-                        :ui="{ body: 'flex flex-col gap-3 p-2 sm:p-2' }"
-                        class="rounded-3xl shadow-xl"
+                    <div
+                        v-if="item.style === 'small'"
+                        class="flex flex-col items-start gap-2 rounded-3xl p-2"
                     >
+                        <UBadge
+                            v-if="item.category"
+                            :label="item.category"
+                            icon="mingcute:hashtag-line"
+                            variant="soft"
+                        />
+
+                        <div class="flex gap-3">
+                            <NuxtImg
+                                v-if="item.image"
+                                :src="item.image"
+                                :alt="item.title"
+                                class="size-32 rounded-lg"
+                            />
+
+                            <div>
+                                <h2 class="font-mono text-xl">{{ item.title }}</h2>
+                                <p>{{ item.description }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        v-else-if="item.style === 'large'"
+                        class="flex flex-col items-start gap-2 rounded-3xl p-2"
+                    >
+                        <UBadge
+                            v-if="item.category"
+                            :label="item.category"
+                            icon="mingcute:hashtag-line"
+                            variant="soft"
+                        />
+
                         <NuxtImg
                             v-if="item.image"
                             :src="item.image"
                             :alt="item.title"
-                            class="rounded-xl"
+                            class="rounded-lg"
                         />
 
-                        <h2 class="mx-2 mb-1 font-medium">{{ item.title }}</h2>
-                    </UCard>
+                        <h2 class="text-toned mx-1 font-mono text-sm">{{ item.title }}</h2>
+                    </div>
 
                     <template #content> </template>
                 </UModal>
