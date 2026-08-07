@@ -2,7 +2,8 @@ import { describe, expect, test } from 'bun:test'
 
 import type { H3Event } from 'h3'
 
-const { attachCloudflareContext } = await import('../server/utils/cloudflareContext')
+const { attachCloudflareContext, getCloudflareEnvironment } =
+    await import('../server/utils/cloudflareContext')
 
 describe('Cloudflare module-worker request context', () => {
     test('exposes Nitro module-worker bindings at the development-compatible path', () => {
@@ -26,6 +27,7 @@ describe('Cloudflare module-worker request context', () => {
         expect(event.context.cloudflare).toBe(cloudflare)
         expect(event.context.cf).toEqual({ colo: 'NRT' })
         expect(event.context.waitUntil).toBeFunction()
+        expect(getCloudflareEnvironment<{ DB: unknown }>(event).DB).toBe(cloudflare.env.DB)
     })
 
     test('does not overwrite the context created by the development preset', () => {

@@ -1,5 +1,8 @@
 import z from 'zod'
 
+import { getCloudflareEnvironment } from '../../../../utils/cloudflareContext'
+import type { PostReviewQueue } from '../../../../utils/postService'
+
 const request = {
     params: z.object({
         slug: z.string().min(1),
@@ -18,7 +21,7 @@ export default adminSessionEventHandler(async ({ event }) => {
         db,
         slug,
         input,
-        event.context.cloudflare.env.POST_REVIEW_QUEUE,
+        getCloudflareEnvironment<{ POST_REVIEW_QUEUE: PostReviewQueue }>(event).POST_REVIEW_QUEUE,
     )
     return { accepted: true, jobId }
 })

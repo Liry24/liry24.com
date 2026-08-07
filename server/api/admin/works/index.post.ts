@@ -1,12 +1,16 @@
 import { generateText } from 'ai'
 import { sql } from 'drizzle-orm'
-import { createWorkersAI } from 'workers-ai-provider'
+import { createWorkersAI, type WorkersAISettings } from 'workers-ai-provider'
+
+import { getCloudflareEnvironment } from '../../../utils/cloudflareContext'
+
+type WorkersAIBinding = Extract<WorkersAISettings, { binding: unknown }>['binding']
 
 const request = {
     body: worksInsertSchema,
 }
 
-export default adminSessionEventHandler(async () => {
+export default adminSessionEventHandler(async ({ event }) => {
     const { slug, title, description, category, image, icon, href, sortIndex } = await validateBody(
         request.body,
     )
@@ -28,7 +32,9 @@ export default adminSessionEventHandler(async () => {
                 content: `The short slug must not overlap with any of the existing slugs: ${exists.map((b) => b.slug).join(', ')}`,
             })
 
-        const workersai = createWorkersAI({ binding: useEvent().context.cloudflare.env.AI })
+        const workersai = createWorkersAI({
+            binding: getCloudflareEnvironment<{ AI: WorkersAIBinding }>(event).AI,
+        })
         const result = await generateText({
             model: workersai('@cf/google/gemini-3.1-flash-lite'),
             messages: [
