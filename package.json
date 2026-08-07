@@ -15,7 +15,7 @@
         "fmt:check": "oxfmt --check",
         "cf:types": "bunx wrangler types .output/server/worker-configuration.d.ts --config .output/server/wrangler.json",
         "cimd-fetcher:types": "bunx wrangler types workers/cimd-fetcher/worker-configuration.d.ts --config workers/cimd-fetcher/wrangler.jsonc",
-        "cimd-fetcher:typecheck": "bunx tsc --project workers/cimd-fetcher/tsconfig.json",
+        "cimd-fetcher:typecheck": "bun run cimd-fetcher:types && bunx tsc --project workers/cimd-fetcher/tsconfig.json",
         "cimd-fetcher:deploy": "bunx wrangler deploy --config workers/cimd-fetcher/wrangler.jsonc",
         "post-publisher:types": "bunx wrangler types workers/post-publisher/worker-configuration.d.ts --config workers/post-publisher/wrangler.jsonc",
         "post-publisher:deploy": "bunx wrangler deploy --config workers/post-publisher/wrangler.jsonc",
