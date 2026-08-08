@@ -36,6 +36,9 @@ export default defineNuxtConfig({
             },
             wrangler: {
                 name: 'liry24-com',
+                assets: {
+                    not_found_handling: '404-page',
+                },
                 routes: [{ pattern: withoutProtocol(baseURL), custom_domain: true }],
                 vars: {
                     NUXT_PUBLIC_SITE_URL: baseURL,
