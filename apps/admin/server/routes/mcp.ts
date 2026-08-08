@@ -1,4 +1,3 @@
-import { requireMcpAuth } from '@better-auth/mcp'
 import type { R2Bucket } from '@cloudflare/workers-types'
 import {
     localhostAllowedOrigins,
@@ -6,14 +5,14 @@ import {
     type AuthInfo,
 } from '@modelcontextprotocol/server'
 import type { Database } from '@repo/database'
+import { createDpopReplayStore } from 'better-auth/oauth2'
 import type { JWTPayload } from 'jose'
 
 import { useDB } from '../utils/database'
+import { liry24McpResource, protectLiry24Mcp } from '../utils/mcpAuth'
+import type { PostAutomation, PostPublishWorkflow, PostReviewQueue } from '../utils/postService'
 
 const siteURL = (process.env.NUXT_PUBLIC_SITE_URL || 'https://admin.liry24.com').replace(/\/$/u, '')
-const resource = `${siteURL}/mcp`
-const issuer = `${siteURL}/api/auth`
-const requiredScope = 'liry24:admin'
 
 const jsonRpcError = (status: number, message: string) =>
     new Response(
@@ -68,76 +67,72 @@ const createProtectedMcp = (
     database: Database,
     r2: R2Bucket,
     imageBaseUrl: string,
-    automation: import('../utils/postService').PostAutomation,
-) =>
-    requireMcpAuth(
-        auth,
-        async (request: Request, jwt: JWTPayload) => {
-            const userId = typeof jwt.sub === 'string' ? jwt.sub : null
-            const clientId =
-                typeof jwt.client_id === 'string'
-                    ? jwt.client_id
-                    : typeof jwt.azp === 'string'
-                      ? jwt.azp
-                      : null
-            const sessionId = typeof jwt.sid === 'string' ? jwt.sid : null
-            const scopes =
-                typeof jwt.scope === 'string'
-                    ? jwt.scope.split(/\s+/u).filter(Boolean)
-                    : Array.isArray(jwt.scope)
-                      ? jwt.scope.filter((scope): scope is string => typeof scope === 'string')
-                      : []
+    automation: PostAutomation,
+) => {
+    const handler = async (request: Request, jwt: JWTPayload) => {
+        const userId = typeof jwt.sub === 'string' ? jwt.sub : null
+        const clientId =
+            typeof jwt.client_id === 'string'
+                ? jwt.client_id
+                : typeof jwt.azp === 'string'
+                  ? jwt.azp
+                  : null
+        const sessionId = typeof jwt.sid === 'string' ? jwt.sid : null
+        const scopes =
+            typeof jwt.scope === 'string'
+                ? jwt.scope.split(/\s+/u).filter(Boolean)
+                : Array.isArray(jwt.scope)
+                  ? jwt.scope.filter((scope): scope is string => typeof scope === 'string')
+                  : []
 
-            if (!userId || !clientId || !sessionId)
-                return jsonRpcError(403, 'The access token is missing required MCP claims')
+        if (!userId || !clientId || !sessionId)
+            return jsonRpcError(403, 'The access token is missing required MCP claims')
 
-            const [user, session] = await Promise.all([
-                database.query.users.findFirst({
-                    columns: { id: true, role: true, banned: true, banExpires: true },
-                    where: { id: { eq: userId } },
-                }),
-                database.query.sessions.findFirst({
-                    columns: { id: true, userId: true, expiresAt: true },
-                    where: { id: { eq: sessionId } },
-                }),
-            ])
+        const [user, session] = await Promise.all([
+            database.query.users.findFirst({
+                columns: { id: true, role: true, banned: true, banExpires: true },
+                where: { id: { eq: userId } },
+            }),
+            database.query.sessions.findFirst({
+                columns: { id: true, userId: true, expiresAt: true },
+                where: { id: { eq: sessionId } },
+            }),
+        ])
 
-            if (
-                !user ||
-                user.role !== 'admin' ||
-                (user.banned && (!user.banExpires || user.banExpires > new Date()))
-            )
-                return jsonRpcError(403, 'An active administrator account is required')
-            if (!session || session.userId !== userId || session.expiresAt <= new Date())
-                return jsonRpcError(401, 'The Better Auth session is no longer active')
+        if (
+            !user ||
+            user.role !== 'admin' ||
+            (user.banned && (!user.banExpires || user.banExpires > new Date()))
+        )
+            return jsonRpcError(403, 'An active administrator account is required')
+        if (!session || session.userId !== userId || session.expiresAt <= new Date())
+            return jsonRpcError(401, 'The Better Auth session is no longer active')
 
-            const authorization = request.headers.get('authorization') ?? ''
-            const authInfo: AuthInfo = {
-                token: authorization.replace(/^Bearer\s+/iu, ''),
-                clientId,
-                scopes,
-                expiresAt: typeof jwt.exp === 'number' ? jwt.exp : undefined,
-                resource: new URL(resource),
-                extra: {
-                    userId,
-                    sessionId,
-                    headers: request.headers,
-                    database,
-                    r2,
-                    imageBaseUrl,
-                    auth,
-                    automation,
-                },
-            }
-            return liry24McpHandler.fetch(request, { authInfo })
-        },
-        {
-            resource,
-            issuer,
-            jwksUrl: `${issuer}/jwks`,
-            requiredScopes: [requiredScope],
-        },
+        const authorization = request.headers.get('authorization') ?? ''
+        const authInfo: AuthInfo = {
+            token: authorization.replace(/^Bearer\s+/iu, ''),
+            clientId,
+            scopes,
+            expiresAt: typeof jwt.exp === 'number' ? jwt.exp : undefined,
+            resource: new URL(liry24McpResource),
+            extra: {
+                userId,
+                sessionId,
+                headers: request.headers,
+                database,
+                r2,
+                imageBaseUrl,
+                auth,
+                automation,
+            },
+        }
+        return liry24McpHandler.fetch(request, { authInfo })
+    }
+
+    return auth.$context.then(({ internalAdapter }) =>
+        protectLiry24Mcp(handler, createDpopReplayStore(internalAdapter)),
     )
+}
 
 export default eventHandler(async (event) => {
     const request = toWebRequest(event)
@@ -151,17 +146,24 @@ export default eventHandler(async (event) => {
             status: 204,
             headers: corsHeaders(request),
         })
+    if (request.method !== 'POST')
+        return new Response(null, {
+            status: 405,
+            headers: { ...corsHeaders(request), allow: 'POST, OPTIONS' },
+        })
 
-    const environment = getCloudflareEnvironment<
-        { R2: R2Bucket } & Required<Pick<PostAutomation, 'reviewQueue' | 'publishWorkflow'>>
-    >(event)
+    const environment = getCloudflareEnvironment<{
+        R2: R2Bucket
+        POST_REVIEW_QUEUE?: PostReviewQueue
+        POST_PUBLISH_WORKFLOW?: PostPublishWorkflow
+    }>(event)
     const database = useDB()
     const auth = await getAuth()
     const r2 = environment.R2
     const imageBaseUrl = useRuntimeConfig(event).public.imagesDomain
-    const protectedMcp = createProtectedMcp(auth, database, r2, imageBaseUrl, {
-        reviewQueue: environment.reviewQueue,
-        publishWorkflow: environment.publishWorkflow,
+    const protectedMcp = await createProtectedMcp(auth, database, r2, imageBaseUrl, {
+        reviewQueue: environment.POST_REVIEW_QUEUE,
+        publishWorkflow: environment.POST_PUBLISH_WORKFLOW,
     })
     return withCors(await protectedMcp(request), request)
 })
