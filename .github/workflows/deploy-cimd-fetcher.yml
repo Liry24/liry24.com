@@ -46,7 +46,7 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Type check CIMD fetcher
-        run: bun run cimd-fetcher:typecheck
+        run: bun run --filter admin cimd-fetcher:typecheck
 
       - name: Deploy CIMD container Worker
         run: bunx wrangler deploy --config workers/cimd-fetcher/wrangler.jsonc --keep-vars

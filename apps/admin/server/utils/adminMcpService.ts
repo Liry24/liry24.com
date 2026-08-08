@@ -20,6 +20,8 @@ import { and, asc, desc, eq, inArray, like, or, sql } from 'drizzle-orm'
 import type { BatchItem } from 'drizzle-orm/batch'
 import type { ZodType } from 'zod'
 
+import { normalizePostSlug } from './postService'
+
 const PLAN_TTL_MS = 10 * 60_000
 const RETRY_TTL_MS = 24 * 60 * 60_000
 const EXTERNAL_ACTIONS = new Set([
@@ -57,15 +59,6 @@ const safeError = (error: unknown) =>
         .replace(/https?:\/\/\S+/giu, '[url]')
         .replace(/bearer\s+\S+/giu, 'Bearer [redacted]')
         .slice(0, 1_000)
-
-const normalizeSlug = (value: string) =>
-    value
-        .normalize('NFKD')
-        .toLowerCase()
-        .trim()
-        .replace(/[^a-z0-9]+/gu, '-')
-        .replace(/^-+|-+$/gu, '')
-        .slice(0, 80)
 
 const jsonClone = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T
 
@@ -509,7 +502,7 @@ const uniqueSlug = async (
     reserved: Set<string>,
 ) => {
     const base =
-        normalizeSlug(
+        normalizePostSlug(
             typeof requested === 'string' ? requested : typeof title === 'string' ? title : '',
         ) || `${resource.slice(0, -1)}-${crypto.randomUUID().slice(0, 8)}`
     for (let suffix = 1; suffix <= 100; suffix += 1) {

@@ -1,6 +1,8 @@
 <script setup lang="ts">
-const { skills, changed, categories, fetchSkills, reorderSkills, deleteSkill, modalSkill } =
-    useSkill()
+import { LazyAdminModalSkill } from '#components'
+
+const { skills, changed, categories, fetchSkills, reorderSkills, deleteSkill } = useSkill()
+const modalSkill = useOverlay().create(LazyAdminModalSkill)
 
 defineShortcuts({
     n: () => {

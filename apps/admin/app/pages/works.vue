@@ -1,5 +1,8 @@
 <script setup lang="ts">
-const { works, changed, fetchWorks, reorderWorks, deleteWork, modalWork } = useWork()
+import { LazyAdminModalWork } from '#components'
+
+const { works, changed, fetchWorks, reorderWorks, deleteWork } = useWork()
+const modalWork = useOverlay().create(LazyAdminModalWork)
 
 const visibleAdditionalFields = ref<{ name: keyof Work }[]>([
     { name: 'slug' },

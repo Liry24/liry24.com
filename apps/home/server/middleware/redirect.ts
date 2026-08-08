@@ -10,7 +10,11 @@ export default defineEventHandler(async (event) => {
     if (path.includes('.')) return
     if (['arts', 'posts', 'works'].includes(path)) return
 
-    const database = getCloudflareEnvironment<{ DB?: D1Database }>(event)?.DB
+    const context = event.context as typeof event.context & {
+        cloudflare?: { env: { DB?: D1Database } }
+        _platform?: { cloudflare?: { env: { DB?: D1Database } } }
+    }
+    const database = context.cloudflare?.env.DB ?? context._platform?.cloudflare?.env.DB
     if (!database) return
 
     const social = await database

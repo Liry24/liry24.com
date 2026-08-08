@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
               ? query.s
               : undefined
     const size = parseAvatarSize(rawSize)
-    if (!size) throw serverError.badRequest()
+    if (!size) throw createError({ status: 400, statusText: 'Bad Request' })
 
     const params = new URLSearchParams({
         url: `${config.public.imagesDomain}/avatar.png`,

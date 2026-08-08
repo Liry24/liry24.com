@@ -16,7 +16,7 @@ export default adminSessionEventHandler(async ({ db }) => {
         where: { clientId: { eq: clientId } },
     })
 
-    if (!client) throw serverError.notFound()
+    if (!client) throw createError({ status: 404, statusText: 'Not Found' })
 
     return { client }
 })

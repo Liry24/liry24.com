@@ -1,5 +1,8 @@
 <script setup lang="ts">
-const { socials, changed, fetchSocials, reorderSocials, deleteSocial, modalSocial } = useSocial()
+import { LazyAdminModalSocial } from '#components'
+
+const { socials, changed, fetchSocials, reorderSocials, deleteSocial } = useSocial()
+const modalSocial = useOverlay().create(LazyAdminModalSocial)
 
 defineShortcuts({
     n: () => {

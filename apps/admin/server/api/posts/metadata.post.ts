@@ -8,14 +8,6 @@ const request = {
     body: z.object({ content: z.string().min(1).max(100_000) }),
 }
 
-const normalizeSlug = (value: string) =>
-    value
-        .toLowerCase()
-        .trim()
-        .replace(/[^a-z0-9]+/gu, '-')
-        .replace(/^-+|-+$/gu, '')
-        .slice(0, 80)
-
 export default adminSessionEventHandler(async ({ event, db }) => {
     const { content } = await validateBody(request.body)
     const workersai = createWorkersAI({
@@ -35,7 +27,7 @@ export default adminSessionEventHandler(async ({ event, db }) => {
             statusText: 'Metadata generation returned an invalid response',
         })
     const metadata = parsed as Record<string, unknown>
-    const slug = typeof metadata.slug === 'string' ? normalizeSlug(metadata.slug) : ''
+    const slug = typeof metadata.slug === 'string' ? normalizePostSlug(metadata.slug) : ''
     const excerpt =
         typeof metadata.excerpt === 'string' ? metadata.excerpt.trim().slice(0, 160) : ''
     if (!slug || !excerpt)

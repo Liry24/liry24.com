@@ -1,17 +1,28 @@
+import { eq } from 'drizzle-orm'
 import z from 'zod'
+
+import { reorderRecords } from '../../utils/sortOrder'
 
 const request = {
     body: z.object({
-        ranks: ranksInsertSchema.array(),
+        order: ranksSelectSchema.shape.id.array(),
     }),
 }
 
 export default adminSessionEventHandler(async ({ db }) => {
-    const { ranks } = await validateBody(request.body)
+    const { order } = await validateBody(request.body)
+    const current = await db.select({ id: schema.ranks.id }).from(schema.ranks)
 
-    if (ranks.length)
-        await db.batch([db.delete(schema.ranks), db.insert(schema.ranks).values(ranks)])
-    else await db.delete(schema.ranks)
+    await reorderRecords({
+        order,
+        current: current.map(({ id }) => id),
+        update: async (items) => {
+            const statements = items.map(({ id, sortIndex }) =>
+                db.update(schema.ranks).set({ sortIndex }).where(eq(schema.ranks.id, id)),
+            )
+            if (statements[0]) await db.batch([statements[0], ...statements.slice(1)])
+        },
+    })
 
     return {
         success: true,

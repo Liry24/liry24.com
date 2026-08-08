@@ -1,5 +1,8 @@
 <script setup lang="ts">
-const { ranks, changed, fetchRanks, reorderRanks, deleteRank, modalRank } = useRank()
+import { LazyAdminModalRank } from '#components'
+
+const { ranks, changed, fetchRanks, reorderRanks, deleteRank } = useRank()
+const modalRank = useOverlay().create(LazyAdminModalRank)
 
 defineShortcuts({
     n: () => {

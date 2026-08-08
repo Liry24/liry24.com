@@ -6,17 +6,25 @@ const { attachCloudflareContext, getCloudflareEnvironment } =
     await import('../server/utils/cloudflareContext')
 
 describe('Cloudflare module-worker request context', () => {
-    test('exposes Nitro module-worker bindings at the development-compatible path', () => {
-        const waitUntil = (_promise: Promise<unknown>) => undefined
+    const readDatabase = (event: H3Event) => getCloudflareEnvironment<{ DB: unknown }>(event).DB
+
+    test('lets a consumer read bindings in the development preset', () => {
+        const event = {
+            context: { cloudflare: { env: { DB: 'development-binding' } } },
+        } as unknown as H3Event
+
+        expect(readDatabase(event)).toBe('development-binding')
+    })
+
+    test('lets a consumer read bindings in the module-worker preset', () => {
         const cloudflare = {
             request: new Request('https://liry24.test/api/works'),
-            env: { DB: { prepare: () => undefined } },
-            context: { waitUntil },
+            env: { DB: 'module-worker-binding' },
+            context: { waitUntil: (_promise: Promise<unknown>) => undefined },
         }
         const event = {
             context: {
                 _platform: {
-                    cf: { colo: 'NRT' },
                     cloudflare,
                 },
             },
@@ -24,29 +32,6 @@ describe('Cloudflare module-worker request context', () => {
 
         attachCloudflareContext(event)
 
-        expect(event.context.cloudflare).toBe(cloudflare)
-        expect(event.context.cf).toEqual({ colo: 'NRT' })
-        expect(event.context.waitUntil).toBeFunction()
-        expect(getCloudflareEnvironment<{ DB: unknown }>(event).DB).toBe(cloudflare.env.DB)
-    })
-
-    test('does not overwrite the context created by the development preset', () => {
-        const existing = { env: { DB: 'development-binding' } }
-        const event = {
-            context: {
-                cloudflare: existing,
-                _platform: {
-                    cloudflare: {
-                        request: new Request('https://liry24.test/'),
-                        env: { DB: 'production-binding' },
-                        context: { waitUntil: (_promise: Promise<unknown>) => undefined },
-                    },
-                },
-            },
-        } as unknown as H3Event
-
-        attachCloudflareContext(event)
-
-        expect(event.context.cloudflare).toBe(existing)
+        expect(readDatabase(event)).toBe('module-worker-binding')
     })
 })

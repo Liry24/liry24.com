@@ -36,7 +36,7 @@ export type PostAutomation = {
     publishWorkflow?: PostPublishWorkflow
 }
 
-const normalizeSlug = (value: string) =>
+export const normalizePostSlug = (value: string) =>
     value
         .normalize('NFKD')
         .toLowerCase()
@@ -50,7 +50,7 @@ export const createPostSlug = async (
     requested: string | undefined,
     title: string,
 ) => {
-    const base = normalizeSlug(requested || title) || `post-${crypto.randomUUID().slice(0, 8)}`
+    const base = normalizePostSlug(requested || title) || `post-${crypto.randomUUID().slice(0, 8)}`
     const existing = await database.query.posts.findMany({
         columns: { slug: true },
         where: { slug: { like: `${base}%` } },

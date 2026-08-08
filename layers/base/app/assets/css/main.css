@@ -6,6 +6,7 @@
     --font-mono: 'Geist Mono', monospace;
 }
 
+
 @keyframes fadeIn {
     0% {
         opacity: 0;

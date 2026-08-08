@@ -1,4 +1,3 @@
-import { destr } from 'destr'
 import type { z } from 'zod'
 
 const throwIfFailed = <T>(
@@ -6,31 +5,16 @@ const throwIfFailed = <T>(
     result: z.ZodSafeParseSuccess<T> | z.ZodSafeParseError<unknown>,
 ): T => {
     if (!result.success) {
-        if (import.meta.dev) logger(tag).error(result.error)
-        throw serverError.badRequest({ responseMessage: 'Validation Error' })
+        if (import.meta.dev) console.error(tag, result.error)
+        throw createError({ status: 400, statusText: 'Bad Request', message: 'Validation Error' })
     }
     return result.data
 }
 
-export const validateBody = async <T extends z.ZodTypeAny>(
-    s: T,
-    o?: { sanitize?: boolean },
-): Promise<z.infer<T>> =>
+export const validateBody = async <T extends z.ZodTypeAny>(s: T): Promise<z.infer<T>> =>
     throwIfFailed(
         'validateBody',
-        await readValidatedBody(useEvent(), (b) =>
-            s.safeParse(o?.sanitize ? sanitizeObject(b) : b),
-        ),
-    )
-
-export const validateFormData = async <T extends z.ZodTypeAny>(s: T): Promise<z.infer<T>> =>
-    throwIfFailed(
-        'validateFormData',
-        s.safeParse(
-            Object.fromEntries(
-                [...(await readFormData(useEvent())).entries()].map(([k, v]) => [k, destr(v)]),
-            ),
-        ),
+        await readValidatedBody(useEvent(), (body) => s.safeParse(body)),
     )
 
 export const validateParams = async <T extends z.ZodTypeAny>(s: T): Promise<z.infer<T>> =>

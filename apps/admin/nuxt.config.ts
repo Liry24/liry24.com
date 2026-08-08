@@ -4,35 +4,8 @@ const baseURL = import.meta.env.NUXT_PUBLIC_SITE_URL || 'https://admin.liry24.co
 const imagesDomain = 'https://images.liry24.com'
 const title = 'Liry24 Admin'
 
-// https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-    compatibilityDate: '2026-07-30',
-
-    future: { compatibilityVersion: 5 },
-
-    devtools: { enabled: true, timeline: { enabled: true } },
-
-    modules: [
-        '@comark/nuxt',
-        '@nuxt/ui',
-        '@nuxt/image',
-        '@vueuse/nuxt',
-        'motion-v/nuxt',
-        '@nuxt/hints',
-        '@nuxt/a11y',
-    ],
-
-    css: ['~/assets/css/main.css'],
-
-    experimental: {
-        crossOriginPrefetch: true,
-        extractAsyncDataHandlers: true,
-        inlineRouteRules: true,
-        sharedPrerenderData: true,
-        typescriptPlugin: true,
-        nitroAutoImports: true,
-        prefetchPreloadTags: true,
-    },
+    extends: ['../../layers/base'],
 
     runtimeConfig: {
         public: {
@@ -62,11 +35,6 @@ export default defineNuxtConfig({
     },
 
     vite: {
-        vue: {
-            features: {
-                optionsAPI: false,
-            },
-        },
         optimizeDeps: {
             include: [
                 '@nuxt/ui > prosemirror-state',
@@ -79,26 +47,15 @@ export default defineNuxtConfig({
     },
 
     nitro: {
-        preset: 'cloudflare_module',
-        plugins: [
-            '~~/server/plugins/00.reflect-metadata',
-            '~~/server/plugins/01.cloudflare-context',
-        ],
+        plugins: ['~~/server/plugins/00.reflect-metadata', '~~/server/plugins/01.cloudflare-context'],
         cloudflare: {
-            deployConfig: true,
-            nodeCompat: true,
             dev: {
                 configPath: './.data/wrangler.dev.jsonc',
                 persistDir: './.data/wrangler/state/v3',
             },
             wrangler: {
                 name: 'liry24-com-admin',
-                routes: [
-                    {
-                        pattern: 'admin.liry24.com',
-                        custom_domain: true,
-                    },
-                ],
+                routes: [{ pattern: 'admin.liry24.com', custom_domain: true }],
                 d1_databases: [
                     {
                         binding: 'DB',
@@ -114,29 +71,11 @@ export default defineNuxtConfig({
                         migrations_pattern: string
                     },
                 ],
-                r2_buckets: [
-                    {
-                        binding: 'R2',
-                        bucket_name: process.env.R2_BUCKET!,
-                    },
-                ],
-                ai: {
-                    binding: 'AI',
-                },
+                r2_buckets: [{ binding: 'R2', bucket_name: process.env.R2_BUCKET! }],
+                ai: { binding: 'AI' },
                 queues: {
-                    producers: [
-                        {
-                            binding: 'POST_REVIEW_QUEUE',
-                            queue: 'liry24-post-reviews',
-                        },
-                    ],
-                    consumers: [
-                        {
-                            queue: 'liry24-post-reviews',
-                            max_batch_size: 1,
-                            max_retries: 4,
-                        },
-                    ],
+                    producers: [{ binding: 'POST_REVIEW_QUEUE', queue: 'liry24-post-reviews' }],
+                    consumers: [{ queue: 'liry24-post-reviews', max_batch_size: 1, max_retries: 4 }],
                 },
                 workflows: [
                     {
@@ -170,76 +109,22 @@ export default defineNuxtConfig({
                 },
             },
         },
-        compressPublicAssets: true,
-        experimental: {
-            asyncContext: true,
-        },
     },
 
     typescript: {
         tsConfig: {
             include: ['../auth.config.ts'],
-            compilerOptions: {
-                noUncheckedIndexedAccess: true,
-                types: ['@cloudflare/workers-types', 'bun'],
-            },
         },
-    },
-
-    imports: {
-        presets: [{ from: 'cnfast', imports: ['cn'] }],
     },
 
     app: {
-        pageTransition: { name: 'page', mode: 'out-in' },
-        head: {
-            title,
-            htmlAttrs: { lang: 'ja', prefix: 'og: https://ogp.me/ns#' },
-            meta: [
-                { charset: 'utf-8' },
-                { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-            ],
-        },
-    },
-
-    fonts: {
-        families: [
-            { name: 'Geist', provider: 'google', preload: true },
-            { name: 'Geist Mono', provider: 'google', preload: true },
-        ],
-        defaults: {
-            weights: [100, 200, 300, 400, 500, 600, 700, 800, 900],
-        },
-    },
-
-    icon: {
-        clientBundle: {
-            icons: ['mingcute:sun-fill', 'mingcute:moon-fill'],
-            scan: true,
-            includeCustomCollections: true,
-        },
-        serverBundle: {
-            collections: [
-                {
-                    prefix: 'liria',
-                    fetchEndpoint: 'https://icons.liria.me/liria.json',
-                },
-            ],
-        },
-    },
-
-    ui: {
-        experimental: {
-            componentDetection: true,
-        },
+        head: { title },
     },
 
     $production: {
         image: {
             provider: 'cloudflare',
-            cloudflare: {
-                baseURL,
-            },
+            cloudflare: { baseURL },
             domains: [parseURL(process.env.R2_DOMAIN).host!, 'avatars.githubusercontent.com'],
         },
     },

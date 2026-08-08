@@ -1,5 +1,8 @@
 <script setup lang="ts">
-const { careers, changed, fetchCareers, reorderCareers, deleteCareer, modalCareer } = useCareer()
+import { LazyAdminModalCareer } from '#components'
+
+const { careers, changed, fetchCareers, reorderCareers, deleteCareer } = useCareer()
+const modalCareer = useOverlay().create(LazyAdminModalCareer)
 
 defineShortcuts({
     n: () => {

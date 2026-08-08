@@ -3,6 +3,8 @@ import { describe, expect, test } from 'bun:test'
 import { adminOperationSchema, adminPrepareInputSchema } from '../server/utils/adminOperations'
 import {
     assertSafeImportUrl,
+    adminUploadRequestSchema,
+    fetchSafeImage,
     MAX_ADMIN_UPLOAD_BYTES,
     normalizeAdminUploadKey,
 } from '../server/utils/adminUpload'
@@ -57,7 +59,78 @@ describe('admin upload safety', () => {
         expect(() => assertSafeImportUrl('https://[::1]/image.png')).toThrow()
     })
 
-    test('keeps the documented import limit at 10 MiB', () => {
-        expect(MAX_ADMIN_UPLOAD_BYTES).toBe(10 * 1024 * 1024)
+    test('accepts an upload at the limit and rejects one byte more', () => {
+        expect(
+            adminUploadRequestSchema.safeParse({
+                key: 'posts/cover.webp',
+                contentType: 'image/webp',
+                size: MAX_ADMIN_UPLOAD_BYTES,
+            }).success,
+        ).toBe(true)
+        expect(
+            adminUploadRequestSchema.safeParse({
+                key: 'posts/cover.webp',
+                contentType: 'image/webp',
+                size: MAX_ADMIN_UPLOAD_BYTES + 1,
+            }).success,
+        ).toBe(false)
+    })
+
+    test('rejects a private redirect before fetching it', async () => {
+        const originalFetch = globalThis.fetch
+        globalThis.fetch = async () =>
+            new Response(null, {
+                status: 302,
+                headers: { location: 'https://127.0.0.1/private-image.png' },
+            })
+
+        try {
+            await expect(fetchSafeImage('https://images.example/cover.png')).rejects.toThrow(
+                'Import URL host is not allowed',
+            )
+        } finally {
+            globalThis.fetch = originalFetch
+        }
+    })
+
+    test('rejects unsupported MIME types', async () => {
+        const originalFetch = globalThis.fetch
+        globalThis.fetch = async () =>
+            new Response('<svg />', {
+                status: 200,
+                headers: { 'content-type': 'image/svg+xml' },
+            })
+
+        try {
+            await expect(fetchSafeImage('https://images.example/cover.svg')).rejects.toThrow(
+                'Import response is not an allowed raster image',
+            )
+        } finally {
+            globalThis.fetch = originalFetch
+        }
+    })
+
+    test('rejects a response that exceeds the limit while streaming', async () => {
+        const originalFetch = globalThis.fetch
+        globalThis.fetch = async () =>
+            new Response(
+                new ReadableStream({
+                    start(controller) {
+                        controller.enqueue(new Uint8Array(MAX_ADMIN_UPLOAD_BYTES))
+                        controller.enqueue(new Uint8Array(1))
+                        controller.close()
+                    },
+                }),
+                { status: 200, headers: { 'content-type': 'image/png' } },
+            )
+
+        try {
+            const image = await fetchSafeImage('https://images.example/cover.png')
+            await expect(new Response(image.body).arrayBuffer()).rejects.toThrow(
+                'Import response exceeds 10 MiB',
+            )
+        } finally {
+            globalThis.fetch = originalFetch
+        }
     })
 })

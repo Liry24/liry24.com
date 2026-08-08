@@ -1,5 +1,8 @@
 <script setup lang="ts">
-const { arts, changed, fetchArts, reorderArts, deleteArt, modalArt } = useArt()
+import { LazyAdminModalArt } from '#components'
+
+const { arts, changed, fetchArts, reorderArts, deleteArt } = useArt()
+const modalArt = useOverlay().create(LazyAdminModalArt)
 
 defineShortcuts({
     n: () => {

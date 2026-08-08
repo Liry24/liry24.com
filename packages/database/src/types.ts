@@ -6,9 +6,7 @@ import {
     artImages,
     arts,
     careers,
-    postReviews,
     posts,
-    postTags,
     ranks,
     skills,
     socials,
@@ -102,23 +100,6 @@ export const ranksInsertSchema = createInsertSchema(ranks).omit({ id: true })
 export const ranksUpdateSchema = createUpdateSchema(ranks)
 export type Rank = z.infer<typeof ranksSelectSchema>
 
-export const postTagsSelectSchema = createSelectSchema(postTags)
-export const postTagsInsertSchema = createInsertSchema(postTags, {
-    tag: (s: ZodString) => s.min(1),
-})
-export const postTagsUpdateSchema = createUpdateSchema(postTags, {
-    tag: (s: ZodString) => s.min(1),
-})
-export type PostTag = z.infer<typeof postTagsSelectSchema>
-
-export const postStatusSchema = z.enum(['draft', 'scheduled', 'published'])
-export const postReviewsSelectSchema = createSelectSchema(postReviews)
-export type PostReview = z.infer<typeof postReviewsSelectSchema>
-
-export const postsSelectSchema = createSelectSchema(posts).extend({
-    tags: postTagsSelectSchema.omit({ postSlug: true }).array(),
-    latestReview: postReviewsSelectSchema.nullable().optional(),
-})
 export const postsInsertSchema = createInsertSchema(posts, {
     slug: (s: ZodString) => s.optional(),
     title: (s: ZodString) => s.min(1, { error: 'Title is required' }),
@@ -155,8 +136,6 @@ export const postsUpdateSchema = createUpdateSchema(posts, {
         status: z.enum(['draft', 'scheduled']).optional(),
         scheduledAt: z.coerce.date().nullable().optional(),
     })
-export type Post = z.infer<typeof postsSelectSchema>
-
 export interface PublicSiteSnapshot {
     arts: Array<{
         slug: string
