@@ -10,6 +10,7 @@ await mock.module('nitropack/runtime', () => ({
 }))
 
 const { liry24McpHandler } = await import('../server/utils/mcp')
+const { liry24McpResource, protectLiry24Mcp } = await import('../server/utils/mcpAuth')
 
 const connected: Client[] = []
 
@@ -52,6 +53,36 @@ const connect = async () => {
 }
 
 describe('MCP protocol compatibility', () => {
+    test('returns an OAuth challenge before initializing the MCP handler', async () => {
+        const protectedHandler = protectLiry24Mcp(async () => {
+            throw new Error('The MCP handler must not run without an access token')
+        })
+        const response = await protectedHandler(
+            new Request(liry24McpResource, {
+                method: 'POST',
+                headers: { 'content-type': 'application/json' },
+                body: JSON.stringify({
+                    jsonrpc: '2.0',
+                    id: 1,
+                    method: 'initialize',
+                    params: {
+                        protocolVersion: '2026-07-28',
+                        capabilities: {},
+                        clientInfo: { name: 'liry24-auth-test', version: '1.0.0' },
+                    },
+                }),
+            }),
+        )
+
+        expect(response.status).toBe(401)
+        expect(response.headers.get('www-authenticate')).toContain('resource_metadata=')
+        expect(await response.json()).toMatchObject({
+            jsonrpc: '2.0',
+            id: null,
+            error: { code: -32000, message: 'missing authorization header' },
+        })
+    })
+
     test('serves the 2026-07-28 negotiated transport', async () => {
         const client = await connect()
         const { tools } = await client.listTools()
