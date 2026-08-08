@@ -104,8 +104,8 @@ export default defineNuxtConfig({
                         binding: 'DB',
                         database_name: process.env.D1_NAME!,
                         database_id: process.env.D1_ID!,
-                        migrations_dir: '../../drizzle',
-                        migrations_pattern: '../../drizzle/*/migration.sql',
+                        migrations_dir: '../../../../drizzle',
+                        migrations_pattern: '../../../../drizzle/*/migration.sql',
                     } as {
                         binding: string
                         database_name: string
@@ -168,11 +168,6 @@ export default defineNuxtConfig({
                         invocation_logs: true,
                     },
                 },
-                // @ts-expect-error Nitro's bundled Wrangler types do not include Workers Caching yet.
-                cache: {
-                    enabled: true,
-                    cross_version_cache: false,
-                },
             },
         },
         compressPublicAssets: true,
@@ -183,7 +178,7 @@ export default defineNuxtConfig({
 
     typescript: {
         tsConfig: {
-            include: ['../drizzle.config.*', '../database/*', '../auth.config.ts'],
+            include: ['../auth.config.ts'],
             compilerOptions: {
                 noUncheckedIndexedAccess: true,
                 types: ['@cloudflare/workers-types', 'bun'],

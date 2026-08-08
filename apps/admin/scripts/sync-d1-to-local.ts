@@ -2,8 +2,9 @@ import { access, mkdir, readFile, rename, rm, stat, writeFile } from 'node:fs/pr
 import { dirname, relative, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-const workspaceRoot = fileURLToPath(new URL('..', import.meta.url))
-const dataRoot = resolve(workspaceRoot, '.data')
+const appRoot = fileURLToPath(new URL('..', import.meta.url))
+const repositoryRoot = fileURLToPath(new URL('../../..', import.meta.url))
+const dataRoot = resolve(appRoot, '.data')
 const defaultConfigPath = resolve(dataRoot, 'wrangler.dev.jsonc')
 const activePersistPath = resolve(dataRoot, 'wrangler/state')
 const activeStatePath = resolve(activePersistPath, 'v3')
@@ -66,10 +67,10 @@ export const writeLocalWranglerConfig = async ({
     const config = {
         $schema: toConfigPath(
             absoluteConfigPath,
-            resolve(workspaceRoot, 'node_modules/wrangler/config-schema.json'),
+            resolve(repositoryRoot, 'node_modules/wrangler/config-schema.json'),
         ),
         name: workerName,
-        main: toConfigPath(absoluteConfigPath, resolve(workspaceRoot, '.output/server/index.mjs')),
+        main: toConfigPath(absoluteConfigPath, resolve(appRoot, '.output/server/index.mjs')),
         compatibility_date: '2026-05-21',
         compatibility_flags: ['nodejs_compat'],
         d1_databases: [
@@ -77,10 +78,13 @@ export const writeLocalWranglerConfig = async ({
                 binding: 'DB',
                 database_name: databaseName,
                 database_id: databaseId,
-                migrations_dir: toConfigPath(absoluteConfigPath, resolve(workspaceRoot, 'drizzle')),
+                migrations_dir: toConfigPath(
+                    absoluteConfigPath,
+                    resolve(repositoryRoot, 'drizzle'),
+                ),
                 migrations_pattern: toConfigPath(
                     absoluteConfigPath,
-                    resolve(workspaceRoot, 'drizzle/*/migration.sql'),
+                    resolve(repositoryRoot, 'drizzle/*/migration.sql'),
                 ),
             },
         ],
@@ -110,7 +114,7 @@ const assertDataPath = (path: string) => {
 
 const runWrangler = async (args: string[], label: string) => {
     const child = Bun.spawn(['bun', 'x', 'wrangler', ...args], {
-        cwd: workspaceRoot,
+        cwd: repositoryRoot,
         env: process.env,
         stdout: 'pipe',
         stderr: 'pipe',
@@ -229,7 +233,7 @@ const prepareDataImport = async () => {
 
 const verifyStagedD1 = async () => {
     const child = Bun.spawn(['bun', 'scripts/verify-local-d1.ts', stagingStatePath], {
-        cwd: workspaceRoot,
+        cwd: appRoot,
         env: process.env,
         stdout: 'pipe',
         stderr: 'pipe',

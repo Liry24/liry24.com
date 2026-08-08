@@ -1,8 +1,8 @@
 import type { R2Bucket } from '@cloudflare/workers-types'
 import { createMcpHandler, McpServer } from '@modelcontextprotocol/server'
+import type { Database } from '@repo/database'
 import { z } from 'zod'
 
-import type { Database } from '../../database'
 import {
     applyAdminPlan,
     enforceMcpRateLimit,

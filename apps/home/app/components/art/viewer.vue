@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import type { PublicSiteSnapshot } from '@repo/database/types'
+
 const open = defineModel<boolean>('open', { default: false })
 
 const { item } = defineProps<{
-    item: Serialized<Art>
+    item: PublicSiteSnapshot['arts'][number]
 }>()
 
 const historyStateAdded = ref(false)

@@ -1,6 +1,5 @@
-import { createDB } from '../../database'
 import type { D1Database, Message } from '@cloudflare/workers-types'
-import { processPostReviewJob, type AiBinding } from '../utils/postService'
+import { createDB } from '@repo/database'
 
 type ReviewMessage = { jobId?: unknown }
 

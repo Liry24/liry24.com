@@ -1,6 +1,6 @@
 import type { H3Event } from 'h3'
 
-import { useDB } from '../../database'
+import { useDB } from './database'
 
 export const promiseEventHandler = <T = unknown>(
     handler: ({ event, db }: { event: H3Event; db: ReturnType<typeof useDB> }) => Promise<T> | T,
@@ -59,12 +59,5 @@ export const adminSessionEventHandler = <T = unknown>(
     sessionEventHandler(async ({ event, session, db }) => {
         if (!session || session.user.role !== 'admin') throw serverError.forbidden()
 
-        const result = await handler({ event, session, db })
-
-        if (event.method !== 'GET' && event.method !== 'HEAD') {
-            const tags = getAdminMutationCacheTags(getRequestURL(event).pathname)
-            event.context.cloudflare.context.waitUntil(purgePublicCache(tags))
-        }
-
-        return result
+        return await handler({ event, session, db })
     })

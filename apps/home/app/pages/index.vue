@@ -1,12 +1,7 @@
 <script setup lang="ts">
 import { motion } from 'motion-v'
-import type { Serialize, Simplify } from 'nitropack/types'
 
 import { LazyStacksModal, USeparator } from '#components'
-
-type SnapshotData = Simplify<
-    Serialize<Awaited<ReturnType<typeof import('../../../admin/server/api/snapshot.get').default>>>
->
 
 const { app } = useAppConfig()
 const overlay = useOverlay()
@@ -14,7 +9,11 @@ const overlay = useOverlay()
 const modalStacks = overlay.create(LazyStacksModal)
 const MotionUSeparator = motion.create(USeparator)
 
-const { data } = useFetch<SnapshotData>('https://admin.liry24.com/api/snapshot')
+const { data } = await useSiteSnapshot()
+
+if (!data.value) throw createError({ statusCode: 404, statusMessage: 'Page not found' })
+
+if (import.meta.server) prerenderRoutes(data.value.posts.map((post) => `/posts/${post.slug}`))
 
 const rotateArray = <T>(arr: T[], n: number): T[] => {
     const len = arr.length
@@ -250,7 +249,7 @@ defineSeo({
 
                 <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                     <NuxtLink
-                        v-for="post in data.posts"
+                        v-for="post in data.posts.slice(0, 10)"
                         :key="post.slug"
                         :to="`/posts/${post.slug}`"
                         class="hover:bg-muted flex h-fit flex-col gap-3 rounded-xl p-6 transition-colors"

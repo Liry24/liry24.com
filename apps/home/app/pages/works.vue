@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { MasonryWall } from '@yeger/vue-masonry-wall'
 
-const { data } = useFetch('/api/works')
+const { data: snapshot } = await useSiteSnapshot()
+if (!snapshot.value) throw createError({ statusCode: 404, statusMessage: 'Page not found' })
+
+const data = computed(() => snapshot.value!.works)
 
 defineSeo({
     title: 'Works',

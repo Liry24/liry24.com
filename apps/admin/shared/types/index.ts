@@ -7,6 +7,3 @@ export interface ConsoleLog {
     message: string
     type?: 'log' | 'warn' | 'error'
 }
-
-export { db, relations, schema } from '../../database'
-export * from '../../database/types'

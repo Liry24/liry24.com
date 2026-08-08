@@ -1,8 +1,7 @@
+import type { Queue, Workflow } from '@cloudflare/workers-types'
+import { schema, type Database } from '@repo/database'
 import { and, eq, inArray } from 'drizzle-orm'
 import type { BatchItem } from 'drizzle-orm/batch'
-import type { Queue, Workflow } from '@cloudflare/workers-types'
-
-import { schema, type Database } from '../../database'
 
 export const LIRY24_AI_REVIEW_MODEL = 'openai/gpt-5.6-luna'
 
@@ -139,9 +138,7 @@ export const createPost = async (
     ]
     if (tags.length)
         statements.push(
-            database.insert(schema.postTags).values(
-                tags.map((tag) => ({ postSlug: slug, tag })),
-            ),
+            database.insert(schema.postTags).values(tags.map((tag) => ({ postSlug: slug, tag }))),
         )
     await database.batch([statements[0]!, ...statements.slice(1)])
     return slug
@@ -190,7 +187,8 @@ export const updateUnpublishedPost = async (
                 content: input.content ?? existing.content,
                 status,
                 scheduledAt: status === 'scheduled' ? scheduledAt : null,
-                scheduleRevision: schedule?.revision ?? (shouldClearSchedule ? null : existing.scheduleRevision),
+                scheduleRevision:
+                    schedule?.revision ?? (shouldClearSchedule ? null : existing.scheduleRevision),
                 publishWorkflowInstanceId:
                     schedule?.instanceId ??
                     (shouldClearSchedule ? null : existing.publishWorkflowInstanceId),
@@ -207,7 +205,9 @@ export const updateUnpublishedPost = async (
         statements.push(database.delete(schema.postTags).where(eq(schema.postTags.postSlug, slug)))
         if (tags.length)
             statements.push(
-                database.insert(schema.postTags).values(tags.map((tag) => ({ postSlug: slug, tag }))),
+                database
+                    .insert(schema.postTags)
+                    .values(tags.map((tag) => ({ postSlug: slug, tag }))),
             )
     }
     await database.batch([statements[0]!, ...statements.slice(1)])
@@ -236,16 +236,15 @@ export const publishPost = async (
             publishWorkflowInstanceId: null,
             publishWorkflowEngine: null,
         })
-        .where(and(eq(schema.posts.slug, slug), inArray(schema.posts.status, ['draft', 'scheduled'])))
+        .where(
+            and(eq(schema.posts.slug, slug), inArray(schema.posts.status, ['draft', 'scheduled'])),
+        )
         .returning({ slug: schema.posts.slug })
-    if (updated.length) await terminatePublishWorkflow(automation, existing.publishWorkflowInstanceId)
+    if (updated.length)
+        await terminatePublishWorkflow(automation, existing.publishWorkflowInstanceId)
 }
 
-export const deletePost = async (
-    database: Database,
-    slug: string,
-    automation?: PostAutomation,
-) => {
+export const deletePost = async (database: Database, slug: string, automation?: PostAutomation) => {
     const existing = await database.query.posts.findFirst({
         columns: { publishWorkflowInstanceId: true },
         where: { slug: { eq: slug } },
@@ -292,7 +291,10 @@ const safeFailure = (error: unknown) =>
 const responseText = (value: unknown) => {
     if (typeof value === 'string') return value
     if (!value || typeof value !== 'object') return ''
-    const record = value as { response?: unknown; choices?: Array<{ message?: { content?: unknown } }> }
+    const record = value as {
+        response?: unknown
+        choices?: Array<{ message?: { content?: unknown } }>
+    }
     if (typeof record.response === 'string') return record.response
     const content = record.choices?.[0]?.message?.content
     return typeof content === 'string' ? content : ''
@@ -314,7 +316,11 @@ const runReviewAI = async (
         temperature: 0.2,
         max_tokens: 4_000,
     })
-    const parsed = JSON.parse(responseText(raw).trim().replace(/^```(?:json)?\s*|\s*```$/giu, '')) as unknown
+    const parsed = JSON.parse(
+        responseText(raw)
+            .trim()
+            .replace(/^```(?:json)?\s*|\s*```$/giu, ''),
+    ) as unknown
     if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed))
         throw new Error('AI response was not a JSON object')
     const result = parsed as Record<string, unknown>
@@ -325,13 +331,19 @@ const runReviewAI = async (
               const severity = String(item.severity)
               if (!['low', 'medium', 'high'].includes(severity) || typeof item.message !== 'string')
                   return []
-              return [{ severity: severity as 'low' | 'medium' | 'high', message: item.message.slice(0, 1_000) }]
+              return [
+                  {
+                      severity: severity as 'low' | 'medium' | 'high',
+                      message: item.message.slice(0, 1_000),
+                  },
+              ]
           })
         : []
     return {
         issues,
         summary: typeof result.summary === 'string' ? result.summary.slice(0, 2_000) : '',
-        suggestedContent: typeof result.suggestedContent === 'string' ? result.suggestedContent : null,
+        suggestedContent:
+            typeof result.suggestedContent === 'string' ? result.suggestedContent : null,
         notes: typeof result.notes === 'string' ? result.notes.slice(0, 4_000) : '',
     }
 }
@@ -342,13 +354,16 @@ export const processPostReviewJob = async (database: Database, ai: AiBinding, jo
         where: { id: { eq: jobId } },
     })
     if (!job) return { outcome: 'missing' as const }
-    if (job.status === 'completed' || job.status === 'failed') return { outcome: 'complete' as const }
+    if (job.status === 'completed' || job.status === 'failed')
+        return { outcome: 'complete' as const }
 
     const attempt = job.attempts + 1
     const claimed = await database
         .update(schema.postReviewJobs)
         .set({ status: 'running', attempts: attempt, lockedAt: new Date(), lastError: null })
-        .where(and(eq(schema.postReviewJobs.id, job.id), eq(schema.postReviewJobs.status, 'pending')))
+        .where(
+            and(eq(schema.postReviewJobs.id, job.id), eq(schema.postReviewJobs.status, 'pending')),
+        )
         .returning({ id: schema.postReviewJobs.id })
     if (!claimed.length) return { outcome: 'complete' as const }
 
@@ -402,6 +417,9 @@ export const processPostReviewJob = async (database: Database, ai: AiBinding, jo
             .update(schema.postReviewJobs)
             .set({ status: 'pending', lockedAt: null, lastError: message })
             .where(eq(schema.postReviewJobs.id, job.id))
-        return { outcome: 'retry' as const, delaySeconds: REVIEW_RETRY_DELAYS_SECONDS[attempt - 1]! }
+        return {
+            outcome: 'retry' as const,
+            delaySeconds: REVIEW_RETRY_DELAYS_SECONDS[attempt - 1]!,
+        }
     }
 }

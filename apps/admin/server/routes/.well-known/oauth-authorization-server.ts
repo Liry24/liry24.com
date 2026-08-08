@@ -1,5 +1,3 @@
-import { getAuth } from '../../utils/auth'
-
 export default eventHandler(async (event) => {
     const request = toWebRequest(event)
     const metadataUrl = new URL(request.url)

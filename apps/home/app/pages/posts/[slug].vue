@@ -1,7 +1,10 @@
 <script setup lang="ts">
 const route = useRoute()
 
-const { data } = await useFetch(`/api/posts/${route.params.slug}`)
+const { data: snapshot } = await useSiteSnapshot()
+const data = computed(() => snapshot.value?.posts.find((post) => post.slug === route.params.slug))
+
+if (!data.value) throw createError({ statusCode: 404, statusMessage: 'Post not found' })
 
 const location = useBrowserLocation()
 

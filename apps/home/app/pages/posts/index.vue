@@ -1,5 +1,8 @@
 <script setup lang="ts">
-const { data } = await useFetch('/api/posts')
+const { data: snapshot } = await useSiteSnapshot()
+if (!snapshot.value) throw createError({ statusCode: 404, statusMessage: 'Page not found' })
+
+const data = computed(() => snapshot.value!.posts)
 
 defineSeo({
     title: 'Posts',

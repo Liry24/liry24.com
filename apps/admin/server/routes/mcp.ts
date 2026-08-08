@@ -5,15 +5,12 @@ import {
     originValidationResponse,
     type AuthInfo,
 } from '@modelcontextprotocol/server'
+import type { Database } from '@repo/database'
 import type { JWTPayload } from 'jose'
 
-import { useDB, type Database } from '../../database'
-import { getAuth, type Auth } from '../utils/auth'
-import { getCloudflareEnvironment } from '../utils/cloudflareContext'
-import { liry24McpHandler } from '../utils/mcp'
-import type { PostAutomation } from '../utils/postService'
+import { useDB } from '../utils/database'
 
-const siteURL = (process.env.NUXT_PUBLIC_SITE_URL || 'https://liry24.com').replace(/\/$/u, '')
+const siteURL = (process.env.NUXT_PUBLIC_SITE_URL || 'https://admin.liry24.com').replace(/\/$/u, '')
 const resource = `${siteURL}/mcp`
 const issuer = `${siteURL}/api/auth`
 const requiredScope = 'liry24:admin'

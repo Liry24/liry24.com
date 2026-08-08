@@ -4,8 +4,34 @@ const { session, signOut } = useAuth()
 
 const { data: users } = useFetch('/api/users')
 const { data: posts } = useFetch('/api/posts', { key: 'posts' })
+const toast = useToast()
 
 const sidebarCollapsed = ref(false)
+const siteBuildLoading = ref(false)
+
+const publishSite = async () => {
+    siteBuildLoading.value = true
+
+    try {
+        await $fetch('/api/site-build', { method: 'POST' })
+        toast.add({
+            icon: 'mingcute:check-line',
+            title: '更新を受け付けました',
+            description: '公開サイトのビルドを開始しました。',
+            color: 'success',
+        })
+    } catch (error) {
+        console.error(error)
+        toast.add({
+            icon: 'mingcute:close-line',
+            title: '更新を開始できませんでした',
+            description: 'Deploy Hookの設定と状態を確認してください。',
+            color: 'error',
+        })
+    } finally {
+        siteBuildLoading.value = false
+    }
+}
 </script>
 
 <template>
@@ -92,6 +118,16 @@ const sidebarCollapsed = ref(false)
                         :collapsed
                     />
 
+                    <UButton
+                        :label="collapsed ? undefined : '更新を反映'"
+                        icon="mingcute:upload-3-fill"
+                        :loading="siteBuildLoading"
+                        color="neutral"
+                        variant="soft"
+                        block
+                        @click="publishSite"
+                    />
+
                     <AdminNavSection
                         title="Blogs"
                         icon="mingcute:book-3-fill"
@@ -156,9 +192,11 @@ const sidebarCollapsed = ref(false)
                                 label: 'GitHub',
                             },
                             {
-                                to: '/',
+                                to: 'https://liry24.com',
                                 label: 'Back to site',
                                 icon: 'mingcute:arrow-left-line',
+                                target: '_blank',
+                                external: true,
                             },
                         ]"
                         :collapsed
@@ -174,7 +212,7 @@ const sidebarCollapsed = ref(false)
                         }"
                         :items="[
                             {
-                                to: '/admin/settings',
+                                to: '/settings',
                                 label: 'Settings',
                                 icon: 'mingcute:settings-1-fill',
                             },

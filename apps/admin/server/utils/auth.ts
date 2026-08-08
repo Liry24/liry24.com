@@ -2,12 +2,13 @@ import { cimd } from '@better-auth/cimd'
 import { drizzleAdapter } from '@better-auth/drizzle-adapter/relations-v2'
 import { mcp } from '@better-auth/mcp'
 import { passkey } from '@better-auth/passkey'
+import { schema, type Database } from '@repo/database'
 import { betterAuth } from 'better-auth/minimal'
 import { admin, jwt, lastLoginMethod, oAuthProxy } from 'better-auth/plugins'
 
-import { schema, useDB, type Database } from '../../database'
 import { createCimdMetadataResourceFetch, type CimdMetadataFetcher } from './cimdFetch'
 import { getCloudflareEnvironment } from './cloudflareContext'
+import { useDB } from './database'
 
 const siteURL = (process.env.NUXT_PUBLIC_SITE_URL || 'https://admin.liry24.com').replace(/\/$/u, '')
 const mcpResource = `${siteURL}/mcp`

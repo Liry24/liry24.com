@@ -6,14 +6,16 @@ import { ArtViewer } from '#components'
 const route = useRoute()
 const overlay = useOverlay()
 
-const { data } = useFetch('/api/arts')
+const { data: snapshot } = await useSiteSnapshot()
+if (!snapshot.value) throw createError({ statusCode: 404, statusMessage: 'Page not found' })
+
+const data = computed(() => snapshot.value!.arts)
 
 const modalArtViewer = overlay.create(ArtViewer)
 
 onMounted(() => {
-    if (route.query.open && data.value?.map((i) => i.slug).includes(route.query.open as string)) {
+    if (route.query.open && data.value?.map((i) => i.slug).includes(route.query.open as string))
         modalArtViewer.open({ item: data.value.find((i) => i.slug === route.query.open)! })
-    }
 })
 
 defineSeo({

@@ -1,0 +1,23 @@
+export { schema } from '@repo/database'
+export {
+    artsInsertSchema,
+    artsSelectSchema,
+    artsUpdateSchema,
+    careersInsertSchema,
+    careersSelectSchema,
+    careersUpdateSchema,
+    postsInsertSchema,
+    postsUpdateSchema,
+    ranksInsertSchema,
+    ranksSelectSchema,
+    ranksUpdateSchema,
+    skillsInsertSchema,
+    skillsSelectSchema,
+    skillsUpdateSchema,
+    socialsInsertSchema,
+    socialsSelectSchema,
+    socialsUpdateSchema,
+    worksInsertSchema,
+    worksSelectSchema,
+    worksUpdateSchema,
+} from '@repo/database/types'

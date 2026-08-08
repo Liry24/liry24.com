@@ -3,11 +3,10 @@ import { fetchClientMetadataResource } from '@better-auth/cimd/node'
 import { drizzleAdapter } from '@better-auth/drizzle-adapter/relations-v2'
 import { mcp } from '@better-auth/mcp'
 import { passkey } from '@better-auth/passkey'
+import * as schema from '@repo/database/schema'
 import { betterAuth } from 'better-auth'
 import { admin, jwt, lastLoginMethod, oAuthProxy } from 'better-auth/plugins'
 import { drizzle } from 'drizzle-orm/node-sqlite'
-
-import * as schema from './database/schema'
 
 const siteURL = (process.env.NUXT_PUBLIC_SITE_URL || 'https://admin.liry24.com').replace(/\/$/u, '')
 

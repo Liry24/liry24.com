@@ -156,3 +156,45 @@ export const postsUpdateSchema = createUpdateSchema(posts, {
         scheduledAt: z.coerce.date().nullable().optional(),
     })
 export type Post = z.infer<typeof postsSelectSchema>
+
+export interface PublicSiteSnapshot {
+    arts: Array<{
+        slug: string
+        title: string
+        description: string | null
+        href: string | null
+        images: Array<{ src: string; alt: string | null }>
+    }>
+    careers: Array<{ period: string; position: string; company: string }>
+    posts: Array<{
+        slug: string
+        createdAt: Date
+        updatedAt: Date
+        title: string
+        excerpt: string
+        content: string
+        publishedAt: Date | null
+        tags: Array<{ tag: string }>
+    }>
+    ranks: Array<{
+        game: string
+        season: string | null
+        rank: string
+        imageUrl: string
+        href: string | null
+    }>
+    skills: Array<{ name: string; icon: string; category: string | null }>
+    socials: Array<{ href: string; icon: string; label: string }>
+    works: Array<{
+        slug: string
+        createdAt: Date
+        title: string
+        description: string | null
+        category: string | null
+        image: string | null
+        icon: string | null
+        href: string | null
+        price: string | null
+        style: 'large' | 'small'
+    }>
+}

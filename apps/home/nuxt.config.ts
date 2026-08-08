@@ -43,6 +43,14 @@ export default defineNuxtConfig({
         },
     },
 
+    routeRules: {
+        '/': { prerender: true },
+        '/arts': { prerender: true },
+        '/works': { prerender: true },
+        '/posts': { prerender: true },
+        '/sitemap.xml': { prerender: true },
+    },
+
     vite: {
         vue: {
             features: {
@@ -72,6 +80,13 @@ export default defineNuxtConfig({
                     NUXT_PUBLIC_SITE_URL: baseURL,
                     R2_DOMAIN: imagesDomain,
                 },
+                d1_databases: [
+                    {
+                        binding: 'DB',
+                        database_name: process.env.D1_NAME!,
+                        database_id: process.env.D1_ID!,
+                    },
+                ],
                 observability: {
                     logs: {
                         enabled: true,
@@ -81,6 +96,10 @@ export default defineNuxtConfig({
             },
         },
         compressPublicAssets: true,
+        prerender: {
+            crawlLinks: false,
+            failOnError: true,
+        },
         experimental: {
             asyncContext: true,
         },
@@ -146,8 +165,12 @@ export default defineNuxtConfig({
     },
 
     sitemap: {
-        sitemaps: true,
+        zeroRuntime: true,
         sources: ['/api/__sitemap__/urls'],
+    },
+
+    site: {
+        url: baseURL,
     },
 
     ui: {
