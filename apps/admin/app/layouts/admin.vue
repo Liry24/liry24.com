@@ -1,4 +1,17 @@
 <script lang="ts" setup>
+type SiteBuild = {
+    id: string
+    status: 'queued' | 'initializing' | 'running' | 'stopped' | 'unknown'
+    outcome: 'success' | 'fail' | 'skipped' | 'cancelled' | 'terminated' | null | 'unknown'
+    trigger: 'push' | 'pull_request' | 'manual' | 'api' | 'deploy_hook' | 'unknown'
+    branch: string | null
+    createdAt: string | null
+    initializingAt: string | null
+    runningAt: string | null
+    stoppedAt: string | null
+    canCancel: boolean
+}
+
 const { app } = useAppConfig()
 const { session, signOut } = useAuth()
 
@@ -8,18 +21,145 @@ const toast = useToast()
 
 const sidebarCollapsed = ref(false)
 const siteBuildLoading = ref(false)
+const siteBuildCanceling = ref(false)
+const siteBuildStatusAvailable = ref(true)
+const siteBuild = ref<SiteBuild | null>(null)
+const cancelBuildModalOpen = ref(false)
+const observedActiveBuildId = ref<string>()
+const notifiedBuildIds = new Set<string>()
+let siteBuildPoll: number | undefined
+
+const siteBuildIndicator = computed(() => {
+    if (!siteBuildStatusAvailable.value)
+        return {
+            label: 'Status unavailable',
+            icon: 'mingcute:warning-line',
+            color: 'text-warning',
+            active: false,
+        }
+
+    const build = siteBuild.value
+    if (!build) return null
+    if (build.status === 'queued')
+        return {
+            label: 'Queued',
+            icon: 'mingcute:time-line',
+            color: 'text-muted',
+            active: true,
+        }
+    if (build.status === 'initializing')
+        return {
+            label: 'Initializing',
+            icon: 'mingcute:loading-fill',
+            color: 'text-info',
+            active: true,
+        }
+    if (build.status === 'running')
+        return {
+            label: 'Building / Deploying',
+            icon: 'mingcute:loading-fill',
+            color: 'text-info',
+            active: true,
+        }
+
+    const outcomes = {
+        success: ['Succeeded', 'mingcute:check-circle-fill', 'text-success'],
+        fail: ['Failed', 'mingcute:close-circle-fill', 'text-error'],
+        cancelled: ['Canceled', 'mingcute:stop-circle-fill', 'text-warning'],
+        terminated: ['Terminated', 'mingcute:stop-circle-fill', 'text-warning'],
+        skipped: ['Skipped', 'mingcute:skip-forward-fill', 'text-muted'],
+    } as const
+    const outcome =
+        build.outcome && build.outcome !== 'unknown' ? outcomes[build.outcome] : undefined
+    return outcome
+        ? { label: outcome[0], icon: outcome[1], color: outcome[2], active: false }
+        : {
+              label: 'Status unavailable',
+              icon: 'mingcute:warning-line',
+              color: 'text-warning',
+              active: false,
+          }
+})
+
+const cancelBuildDescription = computed(() => {
+    const build = siteBuild.value
+    if (!build) return 'Cancel this build?'
+    return `Cancel build ${build.id.slice(0, 8)}${build.branch ? ` on ${build.branch}` : ''}?`
+})
+
+const stopSiteBuildPolling = () => {
+    if (siteBuildPoll) window.clearTimeout(siteBuildPoll)
+    siteBuildPoll = undefined
+}
+
+const notifyBuildFinished = (build: SiteBuild) => {
+    if (observedActiveBuildId.value !== build.id || notifiedBuildIds.has(build.id)) return
+    notifiedBuildIds.add(build.id)
+    observedActiveBuildId.value = undefined
+
+    const failed = build.outcome === 'fail'
+    const canceled = build.outcome === 'cancelled' || build.outcome === 'terminated'
+    toast.add({
+        icon: failed
+            ? 'mingcute:close-line'
+            : canceled
+              ? 'mingcute:stop-line'
+              : 'mingcute:check-line',
+        title: failed ? 'Build failed' : canceled ? 'Build canceled' : 'Build completed',
+        color: failed ? 'error' : canceled ? 'warning' : 'success',
+    })
+}
+
+const refreshSiteBuild = async (buildId?: string) => {
+    stopSiteBuildPolling()
+    try {
+        const result = await $fetch<{ build: SiteBuild | null }>(
+            buildId ? `/api/site-build/${encodeURIComponent(buildId)}` : '/api/site-build',
+        )
+        siteBuildStatusAvailable.value = true
+        siteBuild.value = result.build
+        const hasFinalOutcome = result.build?.outcome && result.build.outcome !== 'unknown'
+        const awaitingOutcome = result.build?.status === 'stopped' && !hasFinalOutcome
+        if (result.build?.canCancel) observedActiveBuildId.value = result.build.id
+        else if (result.build && hasFinalOutcome) notifyBuildFinished(result.build)
+        if (!result.build?.canCancel) cancelBuildModalOpen.value = false
+
+        const nextBuildId =
+            result.build && (result.build.canCancel || awaitingOutcome)
+                ? result.build.id
+                : undefined
+        siteBuildPoll = window.setTimeout(
+            () => void refreshSiteBuild(nextBuildId),
+            nextBuildId ? 3_000 : 60_000,
+        )
+    } catch (error) {
+        console.error(error)
+        siteBuildStatusAvailable.value = false
+        siteBuildPoll = window.setTimeout(() => void refreshSiteBuild(), 60_000)
+    }
+}
 
 const publishSite = async () => {
+    stopSiteBuildPolling()
     siteBuildLoading.value = true
 
     try {
-        await $fetch('/api/site-build', { method: 'POST' })
+        const result = await $fetch<{ buildId: string; alreadyExists: boolean }>(
+            '/api/site-build',
+            {
+                method: 'POST',
+            },
+        )
+        observedActiveBuildId.value = result.buildId
         toast.add({
             icon: 'mingcute:check-line',
             title: '更新を受け付けました',
-            description: '公開サイトのビルドを開始しました。',
+            description: result.alreadyExists
+                ? '進行中の公開サイトビルドを追跡します。'
+                : '公開サイトのビルドを開始しました。',
             color: 'success',
         })
+        await refreshSiteBuild(result.buildId)
     } catch (error) {
         console.error(error)
         toast.add({
@@ -28,10 +168,33 @@ const publishSite = async () => {
             description: 'Deploy Hookの設定と状態を確認してください。',
             color: 'error',
         })
+        siteBuildPoll = window.setTimeout(() => void refreshSiteBuild(), 60_000)
     } finally {
         siteBuildLoading.value = false
     }
 }
+
+const cancelBuild = async () => {
+    const build = siteBuild.value
+    if (!build?.canCancel) return
+
+    stopSiteBuildPolling()
+    siteBuildCanceling.value = true
+    try {
+        await $fetch(`/api/site-build/${encodeURIComponent(build.id)}/cancel`, { method: 'PUT' })
+        cancelBuildModalOpen.value = false
+        toast.add({ title: 'Build cancellation requested', color: 'warning' })
+    } catch (error) {
+        console.error(error)
+        toast.add({ title: 'Could not cancel the build', color: 'error' })
+    } finally {
+        siteBuildCanceling.value = false
+        await refreshSiteBuild(build.id)
+    }
+}
+
+onMounted(() => void refreshSiteBuild())
+onBeforeUnmount(stopSiteBuildPolling)
 </script>
 
 <template>
@@ -118,15 +281,57 @@ const publishSite = async () => {
                         :collapsed
                     />
 
-                    <UButton
-                        :label="collapsed ? undefined : '更新を反映'"
-                        icon="mingcute:upload-3-fill"
-                        :loading="siteBuildLoading"
-                        color="neutral"
-                        variant="soft"
-                        block
-                        @click="publishSite"
-                    />
+                    <div class="grid gap-1">
+                        <UButton
+                            :label="collapsed ? undefined : 'Apply Changes'"
+                            aria-label="Apply Changes"
+                            title="Apply Changes"
+                            icon="mingcute:upload-3-fill"
+                            :loading="siteBuildLoading"
+                            :disabled="
+                                siteBuildCanceling ||
+                                (siteBuildStatusAvailable && Boolean(siteBuild?.canCancel))
+                            "
+                            color="neutral"
+                            variant="soft"
+                            block
+                            @click="publishSite"
+                        />
+
+                        <div
+                            v-if="siteBuildIndicator"
+                            role="status"
+                            :aria-label="siteBuildIndicator.label"
+                            :title="siteBuildIndicator.label"
+                            :class="
+                                cn(
+                                    'flex items-center gap-1.5 px-2 text-xs',
+                                    siteBuildIndicator.color,
+                                    collapsed && 'justify-center px-0',
+                                )
+                            "
+                        >
+                            <UIcon
+                                :name="siteBuildIndicator.icon"
+                                :class="cn('size-4', siteBuildIndicator.active && 'animate-spin')"
+                            />
+                            <span v-if="!collapsed">{{ siteBuildIndicator.label }}</span>
+                        </div>
+
+                        <UButton
+                            v-if="siteBuildStatusAvailable && siteBuild?.canCancel"
+                            :label="collapsed ? undefined : 'Cancel Build'"
+                            aria-label="Cancel Build"
+                            title="Cancel Build"
+                            icon="mingcute:stop-circle-fill"
+                            :loading="siteBuildCanceling"
+                            :disabled="siteBuildLoading"
+                            color="error"
+                            variant="soft"
+                            block
+                            @click="cancelBuildModalOpen = true"
+                        />
+                    </div>
 
                     <AdminNavSection
                         title="Blogs"
@@ -255,6 +460,35 @@ const publishSite = async () => {
                 <slot />
             </main>
         </UDashboardGroup>
+
+        <UModal v-model:open="cancelBuildModalOpen" title="Cancel build">
+            <template #body>
+                <UAlert
+                    icon="mingcute:alert-fill"
+                    title="Stop the current site build?"
+                    :description="cancelBuildDescription"
+                    color="error"
+                    variant="subtle"
+                />
+            </template>
+
+            <template #footer>
+                <div class="flex w-full justify-end gap-2">
+                    <UButton
+                        label="Keep Building"
+                        variant="ghost"
+                        :disabled="siteBuildCanceling"
+                        @click="cancelBuildModalOpen = false"
+                    />
+                    <UButton
+                        label="Cancel Build"
+                        color="error"
+                        :loading="siteBuildCanceling"
+                        @click="cancelBuild"
+                    />
+                </div>
+            </template>
+        </UModal>
     </div>
 </template>
 
