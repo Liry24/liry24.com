@@ -18,7 +18,7 @@ export default defineNuxtConfig({
             clientSecret: process.env.GITHUB_CLIENT_SECRET,
         },
         r2: {
-            accountId: process.env.R2_ACCOUNT_ID,
+            accountId: process.env.CLOUDFLARE_ACCOUNT_ID,
             accessKeyId: process.env.R2_ACCESS_KEY_ID,
             secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
             bucket: process.env.R2_BUCKET,
@@ -47,7 +47,10 @@ export default defineNuxtConfig({
     },
 
     nitro: {
-        plugins: ['~~/server/plugins/00.reflect-metadata', '~~/server/plugins/01.cloudflare-context'],
+        plugins: [
+            '~~/server/plugins/00.reflect-metadata',
+            '~~/server/plugins/01.cloudflare-context',
+        ],
         cloudflare: {
             dev: {
                 configPath: './.data/wrangler.dev.jsonc',
@@ -75,7 +78,9 @@ export default defineNuxtConfig({
                 ai: { binding: 'AI' },
                 queues: {
                     producers: [{ binding: 'POST_REVIEW_QUEUE', queue: 'liry24-post-reviews' }],
-                    consumers: [{ queue: 'liry24-post-reviews', max_batch_size: 1, max_retries: 4 }],
+                    consumers: [
+                        { queue: 'liry24-post-reviews', max_batch_size: 1, max_retries: 4 },
+                    ],
                 },
                 workflows: [
                     {
@@ -94,7 +99,9 @@ export default defineNuxtConfig({
                 ],
                 vars: {
                     NUXT_PUBLIC_SITE_URL: baseURL,
+                    CLOUDFLARE_ACCOUNT_ID: process.env.CLOUDFLARE_ACCOUNT_ID,
                     GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
+                    SITE_DEPLOY_WORKER_TAG: process.env.SITE_DEPLOY_WORKER_TAG,
                     VERCEL_CLIENT_ID: process.env.VERCEL_CLIENT_ID,
                     D1_NAME: 'liry24-com',
                     R2_BUCKET: 'liry24-com',
